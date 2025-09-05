@@ -1,8 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+# Intaj — Automation Platform MVP
+
+Intaj is a modern automation platform for business, sales, marketing, and content creation. It enables you to build, deploy, and manage:
+- AI chatbots (MVP)
+- Sales agents
+- Marketing agents
+- Content creator agents
+- Workflow automations (coming soon)
+
+**MVP Focus:** Chatbots (with extensible architecture for future automation agents)
+
 
 ## Getting Started
 
-First, run the development server:
+
+First, install dependencies and run the development server:
 
 ```bash
 npm run dev
@@ -16,9 +28,28 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
+- Next.js 15 (App Router, TypeScript)
+- Tailwind CSS, Shadcn UI
+- Supabase (auth, database, storage, vector search)
+- Stripe integration (subscriptions)
+- Embeddable chat widget
+- Extensible for future automation agents
+
+## File Structure
+- `src/app/` — Next.js app routes (dashboard, chat, widget, etc)
+- `src/lib/` — Core libraries (supabase, embeddings, usage, etc)
+- `db/` — Database schema and SQL functions
+
+## Contributing
+See `db/DB_DESCRIPTION.md` for schema and table docs. PRs welcome!
+
+## Links
+- [DB Schema](db/DB_DESCRIPTION.md)
+
+---
+This project is the foundation for a full automation platform. MVP = chatbots, but architecture supports sales, marketing, and content agents.
 
 ## Learn More
 
