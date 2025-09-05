@@ -6,7 +6,7 @@ export default function handler(req, res) {
     var script = document.currentScript;
     var chatbotId = script && script.getAttribute('data-chatbot-id') || 'demo';
     var iframe = document.createElement('iframe');
-    iframe.src = 'https://intaj.nabih.tech/widget/' + chatbotId;
+    iframe.src = 'https://1x1khddk-3000.uks1.devtunnels.ms/widget/' + chatbotId;
     iframe.style.position = 'fixed';
     iframe.style.bottom = '24px';
     iframe.style.right = '24px';

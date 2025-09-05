@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Chat bubble -->
+  <path d="M40 50C40 38.9543 48.9543 30 60 30H140C151.046 30 160 38.9543 160 50V110C160 121.046 151.046 130 140 130H90L60 160V130H60C48.9543 130 40 121.046 40 110V50Z" fill="url(#grad1)"/>
+  
+  <!-- Spark (automation/AI) -->
+  <circle cx="100" cy="80" r="18" fill="white"/>
+  <path d="M100 65L103 77H115L105 84L108 96L100 89L92 96L95 84L85 77H97L100 65Z" fill="url(#grad1)"/>
+</svg>
