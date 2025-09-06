@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - Intaj AI Automation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind after it loads
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            'bg-primary': '#0a0a0b',
+                            'bg-secondary': '#141517',
+                            'bg-tertiary': '#1f2024',
+                            'bg-accent': '#2a2d35',
+                            'neural-purple': '#8b5cf6',
+                            'automation-cyan': '#06b6d4'
+                        },
+                        animation: {
+                            'float': 'float 6s ease-in-out infinite',
+                            'pulse-ai': 'pulse-ai 3s ease-in-out infinite',
+                            'slide-up': 'slide-up 0.8s ease-out forwards',
+                            'glow': 'glow 2s ease-in-out infinite alternate',
+                            'neural-pulse': 'neural-pulse 4s ease-in-out infinite',
+                            'scale-in': 'scale-in 0.5s ease-out forwards'
+                        },
+                        keyframes: {
+                            float: {
+                                '0%, 100%': { transform: 'translateY(0px)' },
+                                '50%': { transform: 'translateY(-20px)' }
+                            },
+                            'pulse-ai': {
+                                '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                                '50%': { opacity: 0.8, transform: 'scale(1.05)' }
+                            },
+                            'slide-up': {
+                                '0%': { opacity: 0, transform: 'translateY(30px)' },
+                                '100%': { opacity: 1, transform: 'translateY(0)' }
+                            },
+                            glow: {
+                                '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' },
+                                '100%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.6)' }
+                            },
+                            'neural-pulse': {
+                                '0%, 100%': { opacity: 0.4 },
+                                '50%': { opacity: 0.8 }
+                            },
+                            'scale-in': {
+                                '0%': { transform: 'scale(0.9)', opacity: 0 },
+                                '100%': { transform: 'scale(1)', opacity: 1 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(31, 32, 36, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        .glass-card-popular {
+            background: rgba(31, 32, 36, 0.9);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+        }
+        .gradient-neural {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        .gradient-automation {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .neural-grid {
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        body {
+            background: #0a0a0b;
+            color: #f8fafc;
+        }
+        .pricing-card {
+            transition: all 0.3s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-8px);
+        }
+        .popular-badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <div class="w-4 h-4 bg-white rounded-sm opacity-90"></div>
+                    </div>
+                    <span class="text-2xl font-bold text-gradient">Intaj</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors">Features</a>
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors">How It Works</a>
+                    <a href="#pricing" class="text-white font-medium">Pricing</a>
+                    <button class="gradient-neural px-6 py-2 rounded-lg text-white font-medium hover:opacity-90 transition-opacity">
+                        Start Free Trial
+                    </button>
+                </div>
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 neural-grid relative overflow-hidden">
+        <!-- Animated Background Elements -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-6 text-center relative z-10">
+            <div class="animate-slide-up">
+                <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                    Simple, <span class="text-gradient">Transparent</span><br>
+                    <span class="text-gradient">AI Automation</span> Pricing
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
+                    Choose the perfect plan to scale your business with intelligent automation. No hidden fees, cancel anytime.
+                </p>
+                
+                <!-- Billing Toggle -->
+                <div class="flex items-center justify-center space-x-4 mb-12">
+                    <span class="text-gray-300">Monthly</span>
+                    <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-700 transition-colors duration-200" id="billing-toggle">
+                        <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 translate-x-1" id="toggle-switch"></span>
+                    </button>
+                    <span class="text-white font-medium">Annual</span>
+                    <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-medium">Save 20%</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Cards Section -->
+    <section id="pricing" class="py-20 bg-bg-secondary">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                
+                <!-- Starter Plan -->
+                <div class="glass-card p-8 rounded-2xl pricing-card relative animate-scale-in">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Starter</h3>
+                        <p class="text-gray-400 mb-6">Perfect for small businesses getting started with AI automation</p>
+                        <div class="flex items-end">
+                            <span class="text-5xl font-bold">$0</span>
+                            <span class="text-gray-400 ml-2 mb-1">/month</span>
+                        </div>
+                        <p class="text-sm text-gray-500">Forever free • No credit card required</p>
+                    </div>
+
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">1 AI Chatbot</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">100 conversations/month</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Website widget integration</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Basic analytics</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Email support</span>
+                        </li>
+                        <li class="flex items-center space-x-3 opacity-50">
+                            <div class="w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-400">Multi-channel integrations</span>
+                        </li>
+                    </ul>
+
+                    <button class="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200">
+                        Get Started Free
+                    </button>
+                </div>
+
+                <!-- Professional Plan (Popular) -->
+                <div class="glass-card-popular p-8 rounded-2xl pricing-card relative animate-scale-in" style="animation-delay: 0.2s;">
+                    <div class="popular-badge">Most Popular</div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Professional</h3>
+                        <p class="text-gray-400 mb-6">Ideal for growing businesses ready to scale their automation</p>
+                        <div class="flex items-end">
+                            <span class="text-5xl font-bold text-gradient monthly-price">$49</span>
+                            <span class="text-5xl font-bold text-gradient annual-price hidden">$39</span>
+                            <span class="text-gray-400 ml-2 mb-1">/month</span>
+                        </div>
+                        <p class="text-sm text-gray-500 monthly-text">Billed monthly • 14-day free trial</p>
+                        <p class="text-sm text-gray-500 annual-text hidden">Billed annually • Save $120/year</p>
+                    </div>
+
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">5 AI Chatbots</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">5,000 conversations/month</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Multi-channel integrations</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Facebook & Instagram</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Advanced analytics</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Priority support</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">API access</span>
+                        </li>
+                    </ul>
+
+                    <button class="w-full gradient-neural text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl animate-glow">
+                        Start Free Trial
+                    </button>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="glass-card p-8 rounded-2xl pricing-card relative animate-scale-in" style="animation-delay: 0.4s;">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Enterprise</h3>
+                        <p class="text-gray-400 mb-6">For large organizations needing advanced automation and support</p>
+                        <div class="flex items-end">
+                            <span class="text-5xl font-bold text-gradient monthly-price">$149</span>
+                            <span class="text-5xl font-bold text-gradient annual-price hidden">$119</span>
+                            <span class="text-gray-400 ml-2 mb-1">/month</span>
+                        </div>
+                        <p class="text-sm text-gray-500 monthly-text">Billed monthly • Custom setup included</p>
+                        <p class="text-sm text-gray-500 annual-text hidden">Billed annually • Save $360/year</p>
+                    </div>
+
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">24/7 phone & chat support</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">SLA & uptime guarantee</span>
+                        </li>
+                    </ul>
+
+                    <button class="w-full gradient-automation text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Comparison -->
+    <section class="py-20 bg-bg-primary">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    Compare <span class="text-gradient">All Features</span>
+                </h2>
+                <p class="text-xl text-gray-300">See what's included in each plan</p>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-bg-tertiary">
+                            <tr>
+                                <th class="text-left p-6 font-semibold">Features</th>
+                                <th class="text-center p-6 font-semibold">Starter</th>
+                                <th class="text-center p-6 font-semibold bg-blue-500/10">Professional</th>
+                                <th class="text-center p-6 font-semibold">Enterprise</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr>
+                                <td class="p-6 font-medium">AI Chatbots</td>
+                                <td class="p-6 text-center">1</td>
+                                <td class="p-6 text-center bg-blue-500/5">5</td>
+                                <td class="p-6 text-center">Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-medium">Monthly Conversations</td>
+                                <td class="p-6 text-center">100</td>
+                                <td class="p-6 text-center bg-blue-500/5">5,000</td>
+                                <td class="p-6 text-center">50,000+</td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-medium">Website Widget</td>
+                                <td class="p-6 text-center">
+                                    <div class="w-5 h-5 bg-green-500 rounded-full mx-auto"></div>
+                                </td>
+                                <td class="p-6 text-center bg-blue-500/5">
+                                    <div class="w-5 h-5 bg-green-500 rounded-full mx-auto"></div>
+                                </td>
+                                <td class="p-6 text-center">
+                                    <div class="w-5 h-5 bg-green-500 rounded-full mx-auto"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-medium">Facebook & Instagram</td>
+                                <td class="p-6 text-center">
+                                    <div class="w-5 h-5 bg-gray-500 rounded-full mx-auto"></div>
+                                </td>
+                                <td class="p-6 text-center bg-blue-500/5">
+                                    <div class="w-5 h-5 bg-green-500 rounded-full mx-auto"></div>
+                                </td>
+                                <td class="p-6 text-center">
+                                    <div class="w-5 h-5 bg-green-500 rounded-full mx-auto"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-medium">WhatsApp Business</td>
+                                <td class="p-6 text-center">
+                                    <div class="w-5 h-5 bg-gray-500 rounded-full mx-auto"></div>
+                                </td>
+                                <td class="p-6 text-center bg-blue-500/5">
+                                    <div class="w-5 h-5 bg-gray-500 rounded-full mx-auto"></div>
+                                </td>
+                                <td class="p-6 text-center">
+                                    <div class="w-5 h-5 bg-green-500 rounded-full mx-auto"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-medium">Analytics Dashboard</td>
+                                <td class="p-6 text-center text-gray-400">Basic</td>
+                                <td class="p-6 text-center bg-blue-500/5 text-blue-400">Advanced</td>
+                                <td class="p-6 text-center text-cyan-400">Enterprise</td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-medium">API Access</td>
+                                <td class="p-6 text-center">
+                                    <div class="w-5 h-5 bg-gray-500 rounded-full mx-auto"></div>
+                                </td>
+                                <td class="p-6 text-center bg-blue-500/5">
+                                    <div class="w-5 h-5 bg-green-500 rounded-full mx-auto"></div>
+                                </td>
+                                <td class="p-6 text-center">
+                                    <div class="w-5 h-5 bg-green-500 rounded-full mx-auto"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-medium">Support</td>
+                                <td class="p-6 text-center text-gray-400">Email</td>
+                                <td class="p-6 text-center bg-blue-500/5 text-blue-400">Priority</td>
+                                <td class="p-6 text-center text-cyan-400">24/7 Phone</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-bg-secondary">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    Frequently Asked <span class="text-gradient">Questions</span>
+                </h2>
+                <p class="text-xl text-gray-300">Everything you need to know about Intaj pricing</p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="glass-card p-6 rounded-xl">
+                    <button class="w-full text-left flex items-center justify-between faq-toggle" data-target="faq-1">
+                        <h3 class="text-lg font-semibold">How does the free trial work?</h3>
+                        <svg class="w-5 h-5 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content mt-4 text-gray-300 hidden" id="faq-1">
+                        <p>Start with a 14-day free trial of our Professional plan. No credit card required. You can create chatbots, connect channels, and explore all features. After the trial, choose to upgrade or continue with our free Starter plan.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-xl">
+                    <button class="w-full text-left flex items-center justify-between faq-toggle" data-target="faq-2">
+                        <h3 class="text-lg font-semibold">Can I change plans anytime?</h3>
+                        <svg class="w-5 h-5 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content mt-4 text-gray-300 hidden" id="faq-2">
+                        <p>Yes! Upgrade or downgrade your plan anytime. Upgrades take effect immediately, and downgrades take effect at your next billing cycle. You'll always have access to your current plan features until the billing period ends.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-xl">
+                    <button class="w-full text-left flex items-center justify-between faq-toggle" data-target="faq-3">
+                        <h3 class="text-lg font-semibold">What happens if I exceed my conversation limit?</h3>
+                        <svg class="w-5 h-5 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content mt-4 text-gray-300 hidden" id="faq-3">
+                        <p>We'll notify you when you reach 80% of your limit. If you exceed it, your chatbots will continue working, but you'll be charged for additional conversations at $0.01 per conversation. You can upgrade your plan anytime to get a higher limit.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-xl">
+                    <button class="w-full text-left flex items-center justify-between faq-toggle" data-target="faq-4">
+                        <h3 class="text-lg font-semibold">Do you offer custom enterprise solutions?</h3>
+                        <svg class="w-5 h-5 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content mt-4 text-gray-300 hidden" id="faq-4">
+                        <p>Absolutely! For organizations with unique requirements, we offer custom enterprise solutions including on-premise deployment, custom integrations, dedicated infrastructure, and specialized support. Contact our sales team to discuss your needs.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-xl">
+                    <button class="w-full text-left flex items-center justify-between faq-toggle" data-target="faq-5">
+                        <h3 class="text-lg font-semibold">Is there a setup fee?</h3>
+                        <svg class="w-5 h-5 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content mt-4 text-gray-300 hidden" id="faq-5">
+                        <p>No setup fees for any plan. You only pay your monthly or annual subscription. Enterprise customers get complimentary setup assistance and onboarding support from our team.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20">
+        <div class="max-w-4xl mx-auto text-center px-6">
+            <h2 class="text-4xl md:text-6xl font-bold mb-6">
+                Ready to <span class="text-gradient">Transform Your Business</span>?
+            </h2>
+            <p class="text-xl text-gray-300 mb-8">
+                Join thousands of companies already automating their customer engagement with AI.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+                <button class="gradient-neural px-12 py-4 rounded-lg text-white font-bold text-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">
+                    Start Your Free Trial
+                </button>
+                <button class="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors">
+                    <span>Talk to Sales</span>
+                </button>
+            </div>
+            <div class="flex items-center justify-center space-x-8 text-gray-400 text-sm">
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>14-Day Free Trial</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span>No Credit Card Required</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                    <span>Cancel Anytime</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-bg-tertiary py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <div class="w-4 h-4 bg-white rounded-sm opacity-90"></div>
+                        </div>
+                        <span class="text-2xl font-bold text-gradient">Intaj</span>
+                    </div>
+                    <p class="text-gray-400">The AI automation platform that never sleeps. Build, deploy, and scale intelligent customer experiences.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">API</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Community</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Status</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">© 2024 Intaj. All rights reserved.</p>
+                <div class="flex space-x-4 text-gray-400 text-sm">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-white transition-colors">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Billing toggle functionality
+        const billingToggle = document.getElementById('billing-toggle');
+        const toggleSwitch = document.getElementById('toggle-switch');
+        const monthlyPrices = document.querySelectorAll('.monthly-price');
+        const annualPrices = document.querySelectorAll('.annual-price');
+        const monthlyTexts = document.querySelectorAll('.monthly-text');
+        const annualTexts = document.querySelectorAll('.annual-text');
+        
+        let isAnnual = false;
+
+        billingToggle.addEventListener('click', () => {
+            isAnnual = !isAnnual;
+            
+            if (isAnnual) {
+                toggleSwitch.classList.add('translate-x-5');
+                billingToggle.classList.add('bg-blue-600');
+                billingToggle.classList.remove('bg-gray-700');
+                
+                monthlyPrices.forEach(price => price.classList.add('hidden'));
+                annualPrices.forEach(price => price.classList.remove('hidden'));
+                monthlyTexts.forEach(text => text.classList.add('hidden'));
+                annualTexts.forEach(text => text.classList.remove('hidden'));
+            } else {
+                toggleSwitch.classList.remove('translate-x-5');
+                billingToggle.classList.remove('bg-blue-600');
+                billingToggle.classList.add('bg-gray-700');
+                
+                monthlyPrices.forEach(price => price.classList.remove('hidden'));
+                annualPrices.forEach(price => price.classList.add('hidden'));
+                monthlyTexts.forEach(text => text.classList.remove('hidden'));
+                annualTexts.forEach(text => text.classList.add('hidden'));
+            }
+        });
+
+        // FAQ toggle functionality
+        document.querySelectorAll('.faq-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-target');
+                const content = document.getElementById(targetId);
+                const icon = button.querySelector('.faq-icon');
+                
+                if (content.classList.contains('hidden')) {
+                    content.classList.remove('hidden');
+                    icon.classList.add('rotate-180');
+                } else {
+                    content.classList.add('hidden');
+                    icon.classList.remove('rotate-180');
+                }
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-slide-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe pricing cards
+        document.querySelectorAll('.pricing-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add scroll-based navbar background
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.backgroundColor = 'rgba(31, 32, 36, 0.95)';
+                nav.style.backdropFilter = 'blur(20px)';
+            } else {
+                nav.style.backgroundColor = 'rgba(31, 32, 36, 0.8)';
+                nav.style.backdropFilter = 'blur(12px)';
+            }
+        });
+
+        // Add floating particles effect
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'fixed w-1 h-1 bg-blue-500/30 rounded-full pointer-events-none animate-neural-pulse';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.top = '100vh';
+            particle.style.animationDuration = Math.random() * 3 + 2 + 's';
+            
+            document.body.appendChild(particle);
+            
+            const animation = particle.animate([
+                { transform: 'translateY(0px)', opacity: 0 },
+                { transform: 'translateY(-100vh)', opacity: 1 },
+                { transform: 'translateY(-200vh)', opacity: 0 }
+            ], {
+                duration: Math.random() * 5000 + 3000,
+                easing: 'linear'
+            });
+            
+            animation.onfinish = () => particle.remove();
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 2000);
+
+        // Add click ripple effect to buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.className = 'absolute bg-white/20 rounded-full pointer-events-none animate-ping';
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+</body>
+</html>-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Unlimited AI Chatbots</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">50,000+ conversations/month</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">All channel integrations</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">WhatsApp Business API</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Custom integrations</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-200">Dedicated account manager</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <div class="w-5 h-5 bg-cyan-500 rounded-full flex items

@@ -3,30 +3,47 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/storageClient';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+// Initialize Stripe with a dummy key during build
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy', {
+  apiVersion: '2025-08-27.basil',
 });
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_dummy';
 
 export async function POST(req: NextRequest) {
-  const sig = req.headers.get('stripe-signature');
-  const buf = await req.arrayBuffer();
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(Buffer.from(buf), sig!, endpointSecret);
-  } catch (err) {
-    return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
+  const signature = req.headers.get('stripe-signature');
+  if (!signature) {
+    return NextResponse.json({ error: 'No signature found' }, { status: 400 });
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const user_id = session.metadata?.user_id;
-    // Mark user as pro in Supabase
-    if (user_id) {
-      await supabase.from('profiles').update({ subscription: 'pro' }).eq('id', user_id);
-    }
+  const body = await req.arrayBuffer();
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      Buffer.from(body),
+      signature,
+      endpointSecret
+    );
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
-  // Add more event types as needed
+
+  // Handle the event
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const user_id = session.metadata?.user_id;
+      if (user_id) {
+        await supabase
+          .from('profiles')
+          .update({ subscription: 'pro' })
+          .eq('id', user_id);
+      }
+      break;
+    }
+    // Add more cases as needed
+  }
 
   return NextResponse.json({ received: true });
 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabaseClient';
-import { createChatbot } from './actions';
+
 
 export default function ChatbotsPage() {
   interface Chatbot {
@@ -42,8 +42,14 @@ export default function ChatbotsPage() {
     e.preventDefault();
     setError(null);
     try {
-      const chatbot = await createChatbot({ name, model, settings: JSON.parse(settings) });
-      setChatbots([chatbot, ...chatbots]);
+      const res = await fetch('/api/chatbots/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, model, settings: JSON.parse(settings) }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create chatbot');
+      setChatbots([data.chatbot, ...chatbots]);
       setName('');
       setSettings('{}');
     } catch (err) {

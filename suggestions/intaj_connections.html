@@ -1,0 +1,693 @@
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- User Profile -->
+            <div class="p-4 border-t border-gray-700/50">
+                <div class="flex items-center space-x-3 p-3 rounded-lg glass-card">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold text-sm">JD</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium text-gray-200">John Doe</div>
+                        <div class="text-xs text-gray-400">Pro Plan</div>
+                    </div>
+                    <button class="text-gray-400 hover:text-gray-200 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <header class="bg-bg-secondary border-b border-gray-700/50 px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Connections</h1>
+                        <p class="text-gray-400">Manage your channel integrations and platform connections</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- Connection Status -->
+                        <div class="flex items-center space-x-2 px-4 py-2 bg-bg-tertiary rounded-lg">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm text-gray-300">3 Connected</span>
+                        </div>
+                        <!-- Add Connection -->
+                        <button class="gradient-neural px-4 py-2 rounded-lg text-white font-medium hover:opacity-90 transition-opacity flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            <span>Add Connection</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Connections Content -->
+            <main class="flex-1 overflow-y-auto bg-bg-primary p-8">
+                <!-- Connection Status Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-2xl font-bold text-green-500">3</div>
+                        </div>
+                        <div class="text-lg font-semibold text-white">Connected</div>
+                        <div class="text-gray-400 text-sm">Active integrations</div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-yellow-500 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                            </div>
+                            <div class="text-2xl font-bold text-yellow-500">1</div>
+                        </div>
+                        <div class="text-lg font-semibold text-white">Syncing</div>
+                        <div class="text-gray-400 text-sm">In progress</div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-500 animate-pulse-ai" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                </svg>
+                            </div>
+                            <div class="text-2xl font-bold text-blue-500">2</div>
+                        </div>
+                        <div class="text-lg font-semibold text-white">Available</div>
+                        <div class="text-gray-400 text-sm">Ready to connect</div>
+                    </div>
+                </div>
+
+                <!-- Active Connections -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Active Connections</span>
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Website Connection -->
+                        <div class="connection-card glass-card p-6 rounded-2xl hover:border-blue-500/50 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-white">Website</div>
+                                        <div class="text-sm text-gray-400">mycompany.com</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    <span class="text-xs text-green-500">Connected</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Status:</span>
+                                    <span class="text-green-500">Active</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Bot:</span>
+                                    <span class="text-gray-300">Support Bot</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Today:</span>
+                                    <span class="text-gray-300">125 chats</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Response:</span>
+                                    <span class="text-gray-300">1.1s avg</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 px-3 py-2 bg-bg-accent hover:bg-blue-600/20 border border-gray-600 hover:border-blue-500 rounded-lg text-sm text-gray-300 hover:text-blue-400 transition-colors">
+                                    Configure
+                                </button>
+                                <button class="flex-1 px-3 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-600/50 rounded-lg text-sm text-green-400 transition-colors">
+                                    Test
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Facebook Connection -->
+                        <div class="connection-card glass-card p-6 rounded-2xl hover:border-blue-600/50 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-white">Facebook</div>
+                                        <div class="text-sm text-gray-400">@mycompany</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    <span class="text-xs text-green-500">Connected</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Status:</span>
+                                    <span class="text-green-500">Active</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Bot:</span>
+                                    <span class="text-gray-300">Sales Bot</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Today:</span>
+                                    <span class="text-gray-300">67 messages</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Conversion:</span>
+                                    <span class="text-gray-300">32%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 px-3 py-2 bg-bg-accent hover:bg-blue-600/20 border border-gray-600 hover:border-blue-500 rounded-lg text-sm text-gray-300 hover:text-blue-400 transition-colors">
+                                    Configure
+                                </button>
+                                <button class="flex-1 px-3 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-600/50 rounded-lg text-sm text-green-400 transition-colors">
+                                    Test
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Instagram Connection -->
+                        <div class="connection-card glass-card p-6 rounded-2xl hover:border-pink-500/50 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.621 5.367 11.988 11.988 11.988s11.988-5.367 11.988-11.988C24.005 5.367 18.638.001 12.017.001zM8.449 4.267c.168 0 .433 0 .612-.003.179-.003.357-.006.537-.004.537.006 1.08.003 1.617.013.895.016 1.791.013 2.686.046.537.02 1.074.056 1.612.08.269.012.538.028.807.053.807.074 1.613.195 2.388.465 1.244.433 2.172 1.203 2.693 2.187.695 1.317.785 2.818.785 4.42v7.19c0 1.601-.09 3.102-.785 4.42-.521.984-1.449 1.754-2.693 2.187-.775.27-1.581.391-2.388.465-.269.025-.538.041-.807.053-.538.024-1.075.06-1.612.08-.895.033-1.791.03-2.686.046-.537.01-1.08.007-1.617.013-.18.002-.358-.001-.537-.004-.179-.003-.444-.003-.612-.003H8.449c-.168 0-.433 0-.612.003-.179.003-.357.006-.537.004-.537-.006-1.08-.003-1.617-.013-.895-.016-1.791-.013-2.686-.046-.537-.02-1.074-.056-1.612-.08-.269-.012-.538-.028-.807-.053-.807-.074-1.613-.195-2.388-.465-1.244-.433-2.172-1.203-2.693-2.187C4.81 18.089 4.72 16.588 4.72 14.986V7.796c0-1.601.09-3.102.785-4.42.521-.984 1.449-1.754 2.693-2.187.775-.27 1.581-.391 2.388-.465.269-.025.538-.041.807-.053.538-.024 1.075-.06 1.612-.08.895-.033 1.791-.03 2.686-.046.537-.01 1.08-.007 1.617-.013.18-.002.358.001.537.004.179.003.444.003.612.003h.359z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-white">Instagram</div>
+                                        <div class="text-sm text-gray-400">@mycompany</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                                    <span class="text-xs text-yellow-500">Syncing</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Status:</span>
+                                    <span class="text-yellow-500">Syncing</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Bot:</span>
+                                    <span class="text-gray-300">Marketing Bot</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Today:</span>
+                                    <span class="text-gray-300">89 interactions</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Rating:</span>
+                                    <span class="text-gray-300">4.8/5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 px-3 py-2 bg-bg-accent hover:bg-purple-600/20 border border-gray-600 hover:border-purple-500 rounded-lg text-sm text-gray-300 hover:text-purple-400 transition-colors">
+                                    Configure
+                                </button>
+                                <button class="flex-1 px-3 py-2 bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-600/50 rounded-lg text-sm text-yellow-400 transition-colors">
+                                    Retry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Connections -->
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
+                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Available Connections</span>
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- WhatsApp -->
+                        <div class="connection-card glass-card p-6 rounded-2xl hover:border-green-500/50 transition-all duration-300 cursor-pointer">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-bounce-gentle">
+                                    <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                                    </svg>
+                                </div>
+                                <h3 class="font-semibold text-white mb-2">WhatsApp</h3>
+                                <p class="text-gray-400 text-sm mb-4">Connect your WhatsApp Business account for automated messaging</p>
+                                <button class="gradient-neural w-full px-4 py-2 rounded-lg text-white font-medium hover:opacity-90 transition-opacity">
+                                    Connect
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Telegram -->
+                        <div class="connection-card glass-card p-6 rounded-2xl hover:border-blue-400/50 transition-all duration-300 cursor-pointer">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-bounce-gentle">
+                                    <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.820 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="font-semibold text-white mb-2">Telegram</h3>
+                                <p class="text-gray-400 text-sm mb-4">Create powerful bots for your Telegram channels</p>
+                                <button class="bg-blue-400/20 hover:bg-blue-400/30 w-full px-4 py-2 rounded-lg text-blue-400 font-medium border border-blue-400/50 transition-colors">
+                                    Coming Soon
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Discord -->
+                        <div class="connection-card glass-card p-6 rounded-2xl hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-bounce-gentle">
+                                    <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.445.865-.608 1.25-1.845-.276-3.68-.276-5.487 0-.164-.393-.406-.874-.618-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="font-semibold text-white mb-2">Discord</h3>
+                                <p class="text-gray-400 text-sm mb-4">Build community bots for your Discord servers</p>
+                                <button class="bg-indigo-500/20 hover:bg-indigo-500/30 w-full px-4 py-2 rounded-lg text-indigo-400 font-medium border border-indigo-500/50 transition-colors">
+                                    Coming Soon
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Slack -->
+                        <div class="connection-card glass-card p-6 rounded-2xl hover:border-purple-500/50 transition-all duration-300 cursor-pointer">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-bounce-gentle">
+                                    <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52-2.523A2.528 2.528 0 0 1 5.042 10.1h2.52v2.542a2.528 2.528 0 0 1-2.52 2.523zm0-6.584a2.528 2.528 0 0 1-2.52-2.523A2.528 2.528 0 0 1 5.042 3.535a2.528 2.528 0 0 1 2.52 2.523v2.523H5.042zm6.584-2.523a2.528 2.528 0 0 1 2.523-2.523 2.528 2.528 0 0 1 2.523 2.523v2.523h-2.523a2.528 2.528 0 0 1-2.523-2.523zm2.523 6.584a2.528 2.528 0 0 1 2.523 2.523 2.528 2.528 0 0 1-2.523 2.523h-2.523v-2.523a2.528 2.528 0 0 1 2.523-2.523zm6.584 2.523a2.528 2.528 0 0 1-2.523 2.523 2.528 2.528 0 0 1-2.523-2.523v-2.523h2.523a2.528 2.528 0 0 1 2.523 2.523zm-2.523-6.584a2.528 2.528 0 0 1-2.523-2.523 2.528 2.528 0 0 1 2.523-2.523 2.528 2.528 0 0 1 2.523 2.523v2.523h-2.523z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="font-semibold text-white mb-2">Slack</h3>
+                                <p class="text-gray-400 text-sm mb-4">Automate workflows in your Slack workspace</p>
+                                <button class="bg-purple-500/20 hover:bg-purple-500/30 w-full px-4 py-2 rounded-lg text-purple-400 font-medium border border-purple-500/50 transition-colors">
+                                    Coming Soon
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connection Tutorial -->
+                <div class="mt-8 glass-card p-6 rounded-2xl">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 gradient-neural rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-white mb-2">How to Connect a New Platform</h3>
+                            <p class="text-gray-400 mb-4">Follow these simple steps to add a new channel integration:</p>
+                            <div class="grid md:grid-cols-3 gap-4 text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs">1</div>
+                                    <span class="text-gray-300">Click "Connect" on your desired platform</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs">2</div>
+                                    <span class="text-gray-300">Authenticate using OAuth login</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xs">3</div>
+                                    <span class="text-gray-300">Configure your bot settings</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate connection status updates
+            function updateConnectionStatus() {
+                const statusElements = document.querySelectorAll('.animate-pulse');
+                statusElements.forEach(element => {
+                    // Add random flicker effect
+                    if (Math.random() > 0.8) {
+                        element.style.opacity = '0.5';
+                        setTimeout(() => {
+                            element.style.opacity = '1';
+                        }, 200);
+                    }
+                });
+            }
+
+            // Update every 3 seconds
+            setInterval(updateConnectionStatus, 3000);
+
+            // Add click handlers for connection cards
+            document.querySelectorAll('.connection-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Add ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.className = 'absolute inset-0 bg-blue-500/10 rounded-2xl opacity-0';
+                    this.appendChild(ripple);
+                    
+                    ripple.animate([
+                        { opacity: 0, transform: 'scale(0.8)' },
+                        { opacity: 1, transform: 'scale(1)' },
+                        { opacity: 0, transform: 'scale(1.1)' }
+                    ], {
+                        duration: 600,
+                        easing: 'ease-out'
+                    }).onfinish = () => ripple.remove();
+                });
+            });
+
+            // Add connect button handlers
+            document.querySelectorAll('button:contains("Connect")').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const platform = this.closest('.connection-card').querySelector('h3').textContent;
+                    
+                    // Simulate OAuth flow
+                    this.innerHTML = `
+                        <svg class="w-4 h-4 animate-spin inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Connecting...
+                    `;
+                    this.disabled = true;
+                    
+                    setTimeout(() => {
+                        this.innerHTML = 'Connected!';
+                        this.className = this.className.replace('gradient-neural', 'bg-green-600');
+                        
+                        setTimeout(() => {
+                            // Show success message
+                            const notification = document.createElement('div');
+                            notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                            notification.textContent = `${platform} connected successfully!`;
+                            document.body.appendChild(notification);
+                            
+                            setTimeout(() => notification.remove(), 3000);
+                        }, 500);
+                    }, 2000);
+                });
+            });
+
+            // Add test button handlers
+            document.querySelectorAll('button:contains("Test")').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    this.innerHTML = `
+                        <svg class="w-4 h-4 animate-spin inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Testing...
+                    `;
+                    
+                    setTimeout(() => {
+                        this.innerHTML = 'Test Sent!';
+                        this.className = this.className.replace('green-600/20', 'blue-600/20');
+                        this.className = this.className.replace('green-600/30', 'blue-600/30');
+                        this.className = this.className.replace('green-600/50', 'blue-600/50');
+                        this.className = this.className.replace('green-400', 'blue-400');
+                        
+                        setTimeout(() => {
+                            this.innerHTML = 'Test';
+                            this.className = this.className.replace('blue-600/20', 'green-600/20');
+                            this.className = this.className.replace('blue-600/30', 'green-600/30');
+                            this.className = this.className.replace('blue-600/50', 'green-600/50');
+                            this.className = this.className.replace('blue-400', 'green-400');
+                        }, 2000);
+                    }, 1500);
+                });
+            });
+
+            // Add particles effect
+            function createConnectionParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'fixed w-2 h-2 bg-blue-500/30 rounded-full pointer-events-none animate-float';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = '100vh';
+                particle.style.zIndex = '1';
+                
+                document.body.appendChild(particle);
+                
+                const animation = particle.animate([
+                    { transform: 'translateY(0px) scale(1)', opacity: 0 },
+                    { transform: 'translateY(-50vh) scale(0.5)', opacity: 1 },
+                    { transform: 'translateY(-100vh) scale(0)', opacity: 0 }
+                ], {
+                    duration: Math.random() * 5000 + 4000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+                
+                animation.onfinish = () => particle.remove();
+            }
+
+            // Create connection particles
+            setInterval(createConnectionParticle, 4000);
+
+            // Animate connection stats on load
+            setTimeout(() => {
+                const statNumbers = document.querySelectorAll('.text-2xl.font-bold');
+                statNumbers.forEach((stat, index) => {
+                    const finalValue = parseInt(stat.textContent);
+                    let currentValue = 0;
+                    const increment = finalValue / 30;
+                    
+                    const counter = setInterval(() => {
+                        currentValue += increment;
+                        if (currentValue >= finalValue) {
+                            currentValue = finalValue;
+                            clearInterval(counter);
+                        }
+                        stat.textContent = Math.floor(currentValue);
+                    }, 50);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connections - Intaj AI Automation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind after it loads
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            'bg-primary': '#0a0a0b',
+                            'bg-secondary': '#141517',
+                            'bg-tertiary': '#1f2024',
+                            'bg-accent': '#2a2d35',
+                            'neural-purple': '#8b5cf6',
+                            'automation-cyan': '#06b6d4'
+                        },
+                        animation: {
+                            'float': 'float 6s ease-in-out infinite',
+                            'pulse-ai': 'pulse-ai 3s ease-in-out infinite',
+                            'slide-up': 'slide-up 0.8s ease-out forwards',
+                            'glow': 'glow 2s ease-in-out infinite alternate',
+                            'neural-pulse': 'neural-pulse 4s ease-in-out infinite',
+                            'bounce-gentle': 'bounce-gentle 2s ease-in-out infinite',
+                            'spin-slow': 'spin 3s linear infinite'
+                        },
+                        keyframes: {
+                            float: {
+                                '0%, 100%': { transform: 'translateY(0px)' },
+                                '50%': { transform: 'translateY(-20px)' }
+                            },
+                            'pulse-ai': {
+                                '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                                '50%': { opacity: 0.8, transform: 'scale(1.05)' }
+                            },
+                            'slide-up': {
+                                '0%': { opacity: 0, transform: 'translateY(30px)' },
+                                '100%': { opacity: 1, transform: 'translateY(0)' }
+                            },
+                            glow: {
+                                '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' },
+                                '100%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.6)' }
+                            },
+                            'neural-pulse': {
+                                '0%, 100%': { opacity: 0.4 },
+                                '50%': { opacity: 0.8 }
+                            },
+                            'bounce-gentle': {
+                                '0%, 100%': { transform: 'translateY(0)' },
+                                '50%': { transform: 'translateY(-5px)' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(31, 32, 36, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        .gradient-neural {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        .gradient-automation {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        body {
+            background: #0a0a0b;
+            color: #f8fafc;
+        }
+        .sidebar-link {
+            transition: all 0.3s ease;
+        }
+        .sidebar-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+            padding-left: 21px;
+        }
+        .sidebar-link.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid #3b82f6;
+            padding-left: 21px;
+        }
+        .connection-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .connection-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        .connection-card:hover::before {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <div class="flex h-screen bg-bg-primary">
+        <!-- Sidebar -->
+        <div class="w-80 bg-bg-secondary border-r border-gray-700/50 flex flex-col">
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-700/50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                        <div class="w-5 h-5 bg-white rounded-sm opacity-90"></div>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-bold text-gradient">Intaj</span>
+                        <div class="text-xs text-gray-400">AI Automation Hub</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="dashboard.html" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"></path>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="#" class="sidebar-link active flex items-center space-x-3 p-3 rounded-lg text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                    </svg>
+                    <span>Connections</span>
+                </a>
+
+                <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    <span>Chatbots</span>
+                </a>
+
+                <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    <span>AI Agents</span>
+                </a>
+
+                <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                    <span>Content Studio</span>
+                </a>
+
+                <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2 2z"></path>
+                    </svg>
+                    <span>Analytics</span>
+                </a>
+
+                <div class="border-t border-gray-700/50 pt-4 mt-4">
+                    <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:text-gray-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-

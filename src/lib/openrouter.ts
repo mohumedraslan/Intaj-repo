@@ -27,7 +27,7 @@ export async function streamChatResponse({ model, messages, onToken }: {
     const { value, done: doneReading } = await reader.read();
     done = doneReading;
     buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
-    let lines = buffer.split('\n');
+    const lines = buffer.split('\n');
     buffer = lines.pop() || '';
     for (const line of lines) {
       if (line.startsWith('data: ')) {

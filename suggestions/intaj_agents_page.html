@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agents - Intaj Automation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            'bg-primary': '#0a0a0b',
+                            'bg-secondary': '#141517',
+                            'bg-tertiary': '#1f2024',
+                            'bg-accent': '#2a2d35',
+                            'neural-purple': '#8b5cf6',
+                            'automation-cyan': '#06b6d4'
+                        },
+                        animation: {
+                            'float': 'float 6s ease-in-out infinite',
+                            'pulse-ai': 'pulse-ai 3s ease-in-out infinite',
+                            'slide-up': 'slide-up 0.8s ease-out forwards',
+                            'glow': 'glow 2s ease-in-out infinite alternate',
+                            'neural-pulse': 'neural-pulse 4s ease-in-out infinite',
+                            'gradient-shift': 'gradient-shift 8s ease-in-out infinite',
+                            'typing': 'typing 2s ease-in-out infinite',
+                            'bot-thinking': 'bot-thinking 1.5s ease-in-out infinite'
+                        },
+                        keyframes: {
+                            float: {
+                                '0%, 100%': { transform: 'translateY(0px)' },
+                                '50%': { transform: 'translateY(-20px)' }
+                            },
+                            'pulse-ai': {
+                                '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                                '50%': { opacity: 0.8, transform: 'scale(1.05)' }
+                            },
+                            'slide-up': {
+                                '0%': { opacity: 0, transform: 'translateY(30px)' },
+                                '100%': { opacity: 1, transform: 'translateY(0)' }
+                            },
+                            glow: {
+                                '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' },
+                                '100%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.6)' }
+                            },
+                            'neural-pulse': {
+                                '0%, 100%': { opacity: 0.4 },
+                                '50%': { opacity: 0.8 }
+                            },
+                            'gradient-shift': {
+                                '0%, 100%': { backgroundPosition: '0% 50%' },
+                                '50%': { backgroundPosition: '100% 50%' }
+                            },
+                            'typing': {
+                                '0%, 100%': { opacity: 1 },
+                                '50%': { opacity: 0.3 }
+                            },
+                            'bot-thinking': {
+                                '0%, 100%': { transform: 'scale(1)', opacity: 0.7 },
+                                '50%': { transform: 'scale(1.1)', opacity: 1 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(31, 32, 36, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        .gradient-neural {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        .gradient-automation {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        }
+        .gradient-sales {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+        }
+        .gradient-marketing {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .neural-grid {
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        .agent-avatar {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6);
+            background-size: 400% 400%;
+            animation: gradient-shift 8s ease-in-out infinite;
+        }
+        .sales-avatar {
+            background: linear-gradient(45deg, #f59e0b, #ef4444, #f59e0b);
+            background-size: 400% 400%;
+            animation: gradient-shift 6s ease-in-out infinite;
+        }
+        .marketing-avatar {
+            background: linear-gradient(45deg, #10b981, #059669, #10b981);
+            background-size: 400% 400%;
+            animation: gradient-shift 7s ease-in-out infinite;
+        }
+        body {
+            background: #0a0a0b;
+            color: #f8fafc;
+        }
+        .agent-status-online {
+            background: radial-gradient(circle, #10b981 0%, #059669 100%);
+        }
+        .agent-status-training {
+            background: radial-gradient(circle, #f59e0b 0%, #d97706 100%);
+        }
+        .agent-status-offline {
+            background: radial-gradient(circle, #6b7280 0%, #4b5563 100%);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <div class="w-4 h-4 bg-white rounded-sm opacity-90"></div>
+                    </div>
+                    <span class="text-2xl font-bold text-gradient">Intaj</span>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="#dashboard" class="text-gray-300 hover:text-white transition-colors">Dashboard</a>
+                    <a href="#agents" class="text-white font-medium border-b-2 border-blue-500">AI Agents</a>
+                    <a href="#analytics" class="text-gray-300 hover:text-white transition-colors">Analytics</a>
+                    <a href="#channels" class="text-gray-300 hover:text-white transition-colors">Channels</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen neural-grid pt-24 pb-12">
+        <!-- Animated Background Elements -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-1/4 left-1/3 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl animate-float" style="animation-delay: 4s;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <!-- Header Section -->
+            <div class="mb-12 animate-slide-up">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 class="text-4xl md:text-5xl font-bold mb-2">
+                            <span class="text-gradient">AI Agents</span> Control Center
+                        </h1>
+                        <p class="text-xl text-gray-300">Manage your intelligent workforce of AI agents</p>
+                    </div>
+                    <button class="gradient-neural px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-lg">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create New Agent
+                    </button>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                    <div class="glass-card p-6 rounded-xl text-center">
+                        <div class="text-3xl font-bold text-gradient mb-2">8</div>
+                        <div class="text-gray-300 text-sm">Active Agents</div>
+                        <div class="flex items-center justify-center mt-2">
+                            <div class="w-2 h-2 agent-status-online rounded-full animate-pulse mr-2"></div>
+                            <span class="text-xs text-green-400">All Online</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl text-center">
+                        <div class="text-3xl font-bold text-gradient mb-2">247</div>
+                        <div class="text-gray-300 text-sm">Conversations Today</div>
+                        <div class="text-xs text-cyan-400 mt-2">+12% vs yesterday</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl text-center">
+                        <div class="text-3xl font-bold text-gradient mb-2">1.2s</div>
+                        <div class="text-gray-300 text-sm">Avg Response Time</div>
+                        <div class="text-xs text-green-400 mt-2">-0.3s improvement</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl text-center">
+                        <div class="text-3xl font-bold text-gradient mb-2">94%</div>
+                        <div class="text-gray-300 text-sm">Resolution Rate</div>
+                        <div class="text-xs text-blue-400 mt-2">Above target</div>
+                    </div>
+                </div>
+
+                <!-- Agent Type Tabs -->
+                <div class="flex space-x-4 mb-8">
+                    <button class="agent-tab active px-6 py-3 rounded-lg bg-blue-600/20 border border-blue-500 text-blue-300 font-medium transition-all" data-tab="all">
+                        All Agents
+                    </button>
+                    <button class="agent-tab px-6 py-3 rounded-lg bg-bg-tertiary border border-gray-600 text-gray-300 font-medium transition-all hover:border-blue-500" data-tab="chatbot">
+                        Chatbots
+                    </button>
+                    <button class="agent-tab px-6 py-3 rounded-lg bg-bg-tertiary border border-gray-600 text-gray-300 font-medium transition-all hover:border-orange-500" data-tab="sales">
+                        Sales Agents
+                    </button>
+                    <button class="agent-tab px-6 py-3 rounded-lg bg-bg-tertiary border border-gray-600 text-gray-300 font-medium transition-all hover:border-green-500" data-tab="marketing">
+                        Marketing Agents
+                    </button>
+                </div>
+            </div>
+
+            <!-- Agents Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Customer Support Chatbot -->
+                <div class="agent-card glass-card p-8 rounded-2xl hover:border-blue-500/50 transition-all duration-300 transform hover:-translate-y-2 animate-slide-up" data-type="chatbot">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 agent-avatar rounded-full flex items-center justify-center animate-pulse-ai">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-1">Support Assistant</h3>
+                                <p class="text-gray-400 text-sm">Customer Support Chatbot</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 agent-status-online rounded-full animate-pulse"></div>
+                            <span class="text-xs text-green-400">Online</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-bg-tertiary rounded-lg p-4 mb-6">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="w-6 h-6 bg-blue-500 rounded-full animate-bot-thinking"></div>
+                            <span class="text-sm text-gray-300 animate-typing">Helping customers...</span>
+                        </div>
+                        <div class="bg-blue-500/20 rounded-lg p-3 text-sm">
+                            "How can I help you with your account today? I can assist with billing, technical issues, and general questions."
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-blue-400">142</div>
+                            <div class="text-xs text-gray-400">Chats Today</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-400">96%</div>
+                            <div class="text-xs text-gray-400">Satisfaction</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-cyan-400">0.8s</div>
+                            <div class="text-xs text-gray-400">Avg Response</div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-2">
+                        <button class="flex-1 gradient-neural px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                            Configure
+                        </button>
+                        <button class="px-4 py-2 bg-bg-tertiary border border-gray-600 text-gray-300 rounded-lg text-sm hover:border-blue-500 transition-colors">
+                            Analytics
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sales Agent -->
+                <div class="agent-card glass-card p-8 rounded-2xl hover:border-orange-500/50 transition-all duration-300 transform hover:-translate-y-2 animate-slide-up" data-type="sales">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 sales-avatar rounded-full flex items-center justify-center animate-pulse-ai">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-1">Sales Pro</h3>
+                                <p class="text-gray-400 text-sm">Lead Qualification Agent</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 agent-status-online rounded-full animate-pulse"></div>
+                            <span class="text-xs text-green-400">Active</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-bg-tertiary rounded-lg p-4 mb-6">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="w-6 h-6 bg-orange-500 rounded-full animate-bot-thinking"></div>
+                            <span class="text-sm text-gray-300 animate-typing">Qualifying leads...</span>
+                        </div>
+                        <div class="bg-orange-500/20 rounded-lg p-3 text-sm">
+                            "I'd love to show you how our platform can increase your sales by 40%. What's your biggest challenge right now?"
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-orange-400">23</div>
+                            <div class="text-xs text-gray-400">Leads Today</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-400">67%</div>
+                            <div class="text-xs text-gray-400">Conversion</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-yellow-400">$2.4k</div>
+                            <div class="text-xs text-gray-400">Revenue</div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-2">
+                        <button class="flex-1 gradient-sales px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                            Configure
+                        </button>
+                        <button class="px-4 py-2 bg-bg-tertiary border border-gray-600 text-gray-300 rounded-lg text-sm hover:border-orange-500 transition-colors">
+                            Pipeline
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Marketing Agent -->
+                <div class="agent-card glass-card p-8 rounded-2xl hover:border-green-500/50 transition-all duration-300 transform hover:-translate-y-2 animate-slide-up" data-type="marketing">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 marketing-avatar rounded-full flex items-center justify-center animate-pulse-ai">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-1">Marketing Guru</h3>
+                                <p class="text-gray-400 text-sm">Content & Campaign Agent</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 agent-status-training rounded-full animate-pulse"></div>
+                            <span class="text-xs text-yellow-400">Training</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-bg-tertiary rounded-lg p-4 mb-6">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="w-6 h-6 bg-green-500 rounded-full animate-bot-thinking"></div>
+                            <span class="text-sm text-gray-300 animate-typing">Creating content...</span>
+                        </div>
+                        <div class="bg-green-500/20 rounded-lg p-3 text-sm">
+                            "Just generated 5 social media posts and 2 email campaigns for your product launch. Want to review them?"
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-400">18</div>
+                            <div class="text-xs text-gray-400">Content Pieces</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-purple-400">4.2%</div>
+                            <div class="text-xs text-gray-400">Engagement</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-cyan-400">1.2k</div>
+                            <div class="text-xs text-gray-400">Reach</div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-2">
+                        <button class="flex-1 gradient-marketing px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                            Configure
+                        </button>
+                        <button class="px-4 py-2 bg-bg-tertiary border border-gray-600 text-gray-300 rounded-lg text-sm hover:border-green-500 transition-colors">
+                            Campaigns
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Website Chatbot -->
+                <div class="agent-card glass-card p-8 rounded-2xl hover:border-blue-500/50 transition-all duration-300 transform hover:-translate-y-2 animate-slide-up" data-type="chatbot">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 agent-avatar rounded-full flex items-center justify-center animate-pulse-ai">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9V3"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-1">Web Assistant</h3>
+                                <p class="text-gray-400 text-sm">Website Integration Bot</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 agent-status-online rounded-full animate-pulse"></div>
+                            <span class="text-xs text-green-400">Live</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-bg-tertiary rounded-lg p-4 mb-6">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="w-6 h-6 bg-cyan-500 rounded-full animate-bot-thinking"></div>
+                            <span class="text-sm text-gray-300">Embedded on 3 websites</span>
+                        </div>
+                        <div class="bg-cyan-500/20 rounded-lg p-3 text-sm">
+                            "Welcome! I'm here to help you learn more about our services. What can I assist you with today?"
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-cyan-400">89</div>
+                            <div class="text-xs text-gray-400">Sessions</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-blue-400">23%</div>
+                            <div class="text-xs text-gray-400">Engagement</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-400">3.2m</div>
+                            <div class="text-xs text-gray-400">Avg Session</div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-2">
+                        <button class="flex-1 gradient-automation px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                            Widget Code
+                        </button>
+                        <button class="px-4 py-2 bg-bg-tertiary border border-gray-600 text-gray-300 rounded-lg text-sm hover:border-cyan-500 transition-colors">
+                            Analytics
+                        </button>
+                    </div>
+                </div>
+
+                <!-- E-commerce Bot -->
+                <div class="agent-card glass-card p-8 rounded-2xl hover:border-purple-500/50 transition-all duration-300 transform hover:-translate-y-2 animate-slide-up" data-type="chatbot">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 agent-avatar rounded-full flex items-center justify-center animate-pulse-ai">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-1">Shopping Helper</h3>
+                                <p class="text-gray-400 text-sm">E-commerce Assistant</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 agent-status-offline rounded-full"></div>
+                            <span class="text-xs text-gray-400">Paused</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-bg-tertiary rounded-lg p-4 mb-6 opacity-75">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="w-6 h-6 bg-gray-500 rounded-full"></div>
+                            <span class="text-sm text-gray-400">Agent paused</span>
+                        </div>
+                        <div class="bg-gray-500/20 rounded-lg p-3 text-sm">
+                            "I help customers find products and complete purchases. Currently undergoing updates..."
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class

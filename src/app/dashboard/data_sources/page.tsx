@@ -40,8 +40,8 @@ export default function DataSourcesPage() {
       });
       if (!res.ok) throw new Error('Failed to save metadata');
       setUploaded(file.name);
-      setError((err as Error).message);
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setUploading(false);
     }
@@ -50,9 +50,17 @@ export default function DataSourcesPage() {
   return (
     <div className="max-w-xl mx-auto py-8">
       <h1 className="text-2xl font-bold mb-4">Upload Data Source</h1>
-        <input type="file" accept=".pdf,.docx" onChange={handleFileChange} title="Upload file" />
-        <input type="file" accept=".pdf,.docx" onChange={handleFileChange} />
-        <Button type="submit" disabled={uploading || !file}>{uploading ? 'Uploading...' : 'Upload'}</Button>
+      <form onSubmit={handleUpload} className="mb-4">
+        <input 
+          type="file" 
+          accept=".pdf,.docx" 
+          onChange={handleFileChange} 
+          className="mb-2 block"
+          title="Upload file" 
+        />
+        <Button type="submit" disabled={uploading || !file}>
+          {uploading ? 'Uploading...' : 'Upload'}
+        </Button>
       </form>
       {error && <div className="text-red-500 mb-2">{error}</div>}
       {uploaded && <div className="text-green-600">Uploaded: {uploaded}</div>}
