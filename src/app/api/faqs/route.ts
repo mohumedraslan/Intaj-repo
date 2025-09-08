@@ -1,10 +1,10 @@
 // src/app/api/faqs/route.ts
 // API route for FAQ CRUD (Prompt 010)
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 export async function GET() {
-  const supabase = createClient();
+  // supabase is already imported and ready to use
   const user = (await supabase.auth.getUser()).data.user;
   if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   const { data, error } = await supabase
@@ -17,7 +17,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient();
+  // supabase is already imported and ready to use
   const user = (await supabase.auth.getUser()).data.user;
   if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   const body = await req.json();

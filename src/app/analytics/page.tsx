@@ -14,8 +14,6 @@ import {
   TrendingUp,
   TrendingDown,
   Activity,
-  Users,
-  Zap,
   Target,
   BarChart3,
   Download,

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 
 export default function ChatbotsPage() {
@@ -23,7 +23,7 @@ export default function ChatbotsPage() {
 
   useEffect(() => {
     const fetchChatbots = async () => {
-      const supabase = createClient();
+      // supabase is already imported and ready to use
       const user = (await supabase.auth.getUser()).data.user;
       if (!user) return;
       const { data, error } = await supabase

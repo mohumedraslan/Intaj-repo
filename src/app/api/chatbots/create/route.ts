@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 
 export async function POST(req: NextRequest) {
   try {
     const { name, model, settings } = await req.json();
-    const supabase = createClient();
+    // supabase is already imported and ready to use
     const user = (await supabase.auth.getUser()).data.user;
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     const { data, error } = await supabase

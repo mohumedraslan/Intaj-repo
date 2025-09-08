@@ -1,11 +1,11 @@
 // src/app/dashboard/chatbots/actions.ts
 // Server actions for chatbot CRUD (create, update, delete)
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 // NOTE: Do not import this file into client components. Use API routes instead for client-server communication.
 
 export async function createChatbot({ name, model, settings }: { name: string; model: string; settings: Record<string, unknown> }) {
-  const supabase = createClient();
+  // supabase is already imported and ready to use
   const user = (await supabase.auth.getUser()).data.user;
   if (!user) throw new Error('Not authenticated');
   const { data, error } = await supabase
@@ -24,7 +24,7 @@ export async function createChatbot({ name, model, settings }: { name: string; m
 }
 
 export async function updateChatbot({ id, name, model, settings }: { id: string; name: string; model: string; settings: Record<string, unknown> }) {
-  const supabase = createClient();
+  // supabase is already imported and ready to use
   const user = (await supabase.auth.getUser()).data.user;
   if (!user) throw new Error('Not authenticated');
   const { error } = await supabase
@@ -37,7 +37,7 @@ export async function updateChatbot({ id, name, model, settings }: { id: string;
 }
 
 export async function deleteChatbot(id: string) {
-  const supabase = createClient();
+  // supabase is already imported and ready to use
   const user = (await supabase.auth.getUser()).data.user;
   if (!user) throw new Error('Not authenticated');
   const { error } = await supabase
