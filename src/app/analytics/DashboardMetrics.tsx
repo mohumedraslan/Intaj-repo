@@ -19,14 +19,21 @@ const MetricCard = ({ title, value, description }: MetricCardProps) => (
   </Card>
 )
 
-export function DashboardMetrics({ data }: { data: any }) {
+interface DashboardData {
+  messagesByChannel: Array<{ count: number }>;
+  activeChatbots: number;
+  apiUsage: { used: number; limit: number };
+  costs: { total: number };
+}
+
+export function DashboardMetrics({ data }: { data: DashboardData }) {
   const { messagesByChannel, activeChatbots, apiUsage, costs } = data
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <MetricCard
         title="Total Messages"
-        value={messagesByChannel.reduce((acc: number, curr: any) => acc + curr.count, 0)}
+        value={messagesByChannel.reduce((acc: number, curr: { count: number }) => acc + curr.count, 0)}
         description="Across all channels"
       />
       <MetricCard

@@ -88,3 +88,6 @@ export async function streamResponse(
     throw error;
   }
 }
+
+// Export alias for compatibility
+export const streamChatResponse = streamResponse;

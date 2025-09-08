@@ -187,7 +187,7 @@ export default function Home() {
                   <div className="text-gray-400 text-sm">Marketing Director, Growth Co.</div>
                 </div>
               </div>
-              <p className="text-gray-300 italic">&quot;AI automation increased our lead conversion by 300%. It's like having a sales team that works around the clock.&quot;</p>
+              <p className="text-gray-300 italic">&quot;AI automation increased our lead conversion by 300%. It&apos;s like having a sales team that works around the clock.&quot;</p>
             </div>
             <div className="bg-[#23242a] p-6 rounded-2xl">
               <div className="mb-4">
