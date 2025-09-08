@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import '@/styles/profile.css';
+import { TwoFactorSetup } from '@/components/security/TwoFactorSetup';
 
 export default function ProfilePage() {
   const [aiModel, setAiModel] = useState('gpt4');
   const [responseStyle, setResponseStyle] = useState('professional');
   const [saveMessage, setSaveMessage] = useState('');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showTwoFactorSetup, setShowTwoFactorSetup] = useState(false);
 
   const handleSaveChanges = () => {
     setSaveMessage('Saved successfully!');
@@ -206,7 +208,7 @@ export default function ProfilePage() {
                         key={style}
                         onClick={() => setResponseStyle(style)}
                         role="radio"
-                        aria-checked={responseStyle === style ? "true" : "false"}
+                        aria-checked={responseStyle === style}
                         className={`${
                           responseStyle === style
                             ? 'bg-purple-600/20 border-purple-500 text-purple-300'
@@ -249,7 +251,10 @@ export default function ProfilePage() {
                     <div className="font-medium">Two-Factor Authentication</div>
                     <div className="text-sm text-gray-400">Add an extra layer of security</div>
                   </div>
-                  <button className="gradient-neural px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                  <button 
+                    className="gradient-neural px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                    onClick={() => setShowTwoFactorSetup(true)}
+                  >
                     Enable 2FA
                   </button>
                 </div>
@@ -280,8 +285,23 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-        </div>
+          </div>
       </div>
+
+      {/* 2FA Setup Dialog */}
+      {showTwoFactorSetup && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="max-w-md w-full mx-4">
+            <TwoFactorSetup 
+              onComplete={() => {
+                setShowTwoFactorSetup(false);
+                setSaveMessage('Two-factor authentication has been enabled.');
+              }}
+              onCancel={() => setShowTwoFactorSetup(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

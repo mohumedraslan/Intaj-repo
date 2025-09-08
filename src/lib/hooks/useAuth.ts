@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { createClient } from '../supabaseClient';
+import { supabase } from '../supabaseClient';
 import { type User } from '@supabase/auth-helpers-nextjs';
 import { useState, useEffect } from 'react';
 
@@ -7,7 +7,6 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(

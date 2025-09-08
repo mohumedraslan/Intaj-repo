@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Factor Authentication Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            margin-top: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        .security-badge::before {
+            content: "🔒";
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideUp 1s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #64748b;
+            font-weight: 600;
+            margin: 0 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 60px;
+            height: 2px;
+            background: #e2e8f0;
+            transform: translateY(-50%);
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .step.completed::after {
+            background: #10b981;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .method-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .method-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .method-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .method-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        }
+
+        .method-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .method-card.selected::before {
+            transform: scaleX(1);
+        }
+
+        .method-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .method-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .method-description {
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .method-features {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .method-features li {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .method-features li::before {
+            content: "✓";
+            margin-right: 0.5rem;
+            font-weight: 600;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border: 2px solid #ddd;
+            border-radius: 16px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #666;
+            animation: pulse 2s infinite;
+        }
+
+        .verification-code {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: 0.25rem;
+            margin: 1rem 0;
+        }
+
+        .input-group {
+            margin: 1.5rem 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .code-input {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+
+        .code-digit {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .code-digit:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 140px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+            animation: bounce 1s;
+        }
+
+        .recovery-codes {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .recovery-codes h3 {
+            color: #92400e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recovery-codes h3::before {
+            content: "⚠️";
+        }
+
+        .codes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .recovery-code {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            text-align: center;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-card {
+                padding: 2rem;
+            }
+            
+            .method-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .code-input {
+                gap: 0.25rem;
+            }
+            
+            .code-digit {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Secure Your Account</h1>
+            <p>Enable two-factor authentication to add an extra layer of security to your account</p>
+            <div class="security-badge">Enhanced Security</div>
+        </div>
+
+        <div class="main-card">
+            <div class="step-indicator">
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+                <div class="step" id="step4">4</div>
+            </div>
+
+            <!-- Step 1: Choose Method -->
+            <div class="content-section active" id="section1">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #1e293b; font-size: 1.75rem;">Choose Your 2FA Method</h2>
+                
+                <div class="method-selection">
+                    <div class="method-card" data-method="app">
+                        <div class="method-icon">📱</div>
+                        <div class="method-title">Authenticator App</div>
+                        <div class="method-description">Use Google Authenticator, Authy, or similar apps to generate time-based codes.</div>
+                        <ul class="method-features">
+                            <li>Works offline</li>
+                            <li>Most secure option</li>
+                            <li>30-second rotating codes</li>
+                        </ul>
+                    </div>
+
+                    <div class="method-card" data-method="sms">
+                        <div class="method-icon">💬</div>
+                        <div class="method-title">SMS Text Message</div>
+                        <div class="method-description">Receive verification codes via text message to your mobile phone.</div>
+                        <ul class="method-features">
+                            <li>Easy to use</li>
+                            <li>No app required</li>
+                            <li>Works on any phone</li>
+                        </ul>
+                    </div>
+
+                    <div class="method-card" data-method="email">
+                        <div class="method-icon">📧</div>
+                        <div class="method-title">Email Verification</div>
+                        <div class="method-description">Receive verification codes in your registered email inbox.</div>
+                        <ul class="method-features">
+                            <li>Always accessible</li>
+                            <li>No phone required</li>
+                            <li>Backup option</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" onclick="nextStep()" id="continueBtn" disabled>Continue Setup</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Setup Method -->
+            <div class="content-section" id="section2">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #1e293b; font-size: 1.75rem;">Setup Your Authentication Method</h2>
+                
+                <!-- Authenticator App Setup -->
+                <div id="app-setup" style="display: none;">
+                    <div class="qr-section">
+                        <h3 style="margin-bottom: 1rem; color: #374151;">Scan QR Code</h3>
+                        <div class="qr-code">📷</div>
+                        <p style="color: #64748b; margin-bottom: 1rem;">Scan this QR code with your authenticator app</p>
+                        
+                        <div style="margin: 2rem 0;">
+                            <h4 style="margin-bottom: 0.5rem; color: #374151;">Manual Entry Code:</h4>
+                            <div class="verification-code">JBSW Y3DP EHPK 3PXP</div>
+                            <p style="color: #64748b; font-size: 0.875rem;">Enter this code manually if you can't scan the QR code</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SMS Setup -->
+                <div id="sms-setup" style="display: none;">
+                    <div class="input-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" placeholder="+1 (555) 123-4567" />
+                    </div>
+                    <p style="color: #64748b; font-size: 0.875rem; text-align: center;">We'll send a verification code to this number</p>
+                </div>
+
+                <!-- Email Setup -->
+                <div id="email-setup" style="display: none;">
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="your.email@example.com" />
+                    </div>
+                    <p style="color: #64748b; font-size: 0.875rem; text-align: center;">We'll send verification codes to this email address</p>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn" onclick="nextStep()">Send Code</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Verify Code -->
+            <div class="content-section" id="section3">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #1e293b; font-size: 1.75rem;">Enter Verification Code</h2>
+                
+                <p style="text-align: center; color: #64748b; margin-bottom: 2rem;" id="verificationText">
+                    Enter the 6-digit code from your authenticator app
+                </p>
+
+                <div class="code-input">
+                    <input type="text" class="code-digit" maxlength="1" />
+                    <input type="text" class="code-digit" maxlength="1" />
+                    <input type="text" class="code-digit" maxlength="1" />
+                    <input type="text" class="code-digit" maxlength="1" />
+                    <input type="text" class="code-digit" maxlength="1" />
+                    <input type="text" class="code-digit" maxlength="1" />
+                </div>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <button class="btn btn-secondary" onclick="resendCode()" id="resendBtn">Resend Code</button>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn" onclick="nextStep()" id="verifyBtn">Verify Code</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Success & Recovery Codes -->
+            <div class="content-section" id="section4">
+                <div class="success-message">
+                    <div class="success-icon">✅</div>
+                    <h2 style="color: #1e293b; margin-bottom: 1rem;">2FA Successfully Enabled!</h2>
+                    <p style="color: #64748b; margin-bottom: 2rem;">Your account is now protected with two-factor authentication</p>
+                </div>
+
+                <div class="recovery-codes">
+                    <h3>Important: Save Your Recovery Codes</h3>
+                    <p style="color: #92400e; margin-bottom: 1rem;">
+                        Store these codes in a safe place. You can use them to access your account if you lose your authentication device.
+                    </p>
+                    
+                    <div class="codes-grid">
+                        <div class="recovery-code">1A2B-3C4D</div>
+                        <div class="recovery-code">5E6F-7G8H</div>
+                        <div class="recovery-code">9I0J-1K2L</div>
+                        <div class="recovery-code">3M4N-5O6P</div>
+                        <div class="recovery-code">7Q8R-9S0T</div>
+                        <div class="recovery-code">1U2V-3W4X</div>
+                        <div class="recovery-code">5Y6Z-7A8B</div>
+                        <div class="recovery-code">9C0D-1E2F</div>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-secondary" onclick="downloadCodes()">📥 Download Codes</button>
+                        <button class="btn btn-secondary" onclick="printCodes()" style="margin-left: 1rem;">🖨️ Print Codes</button>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" onclick="finishSetup()">Complete Setup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedMethod = '';
+
+        // Method selection
+        document.querySelectorAll('.method-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedMethod = this.getAttribute('data-method');
+                document.getElementById('continueBtn').disabled = false;
+                
+                // Update step 2 content based on selection
+                updateStep2Content();
+            });
+        });
+
+        // Code input navigation
+        document.querySelectorAll('.code-digit').forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && index < 5) {
+                    document.querySelectorAll('.code-digit')[index + 1].focus();
+                }
+                checkCodeComplete();
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                    document.querySelectorAll('.code-digit')[index - 1].focus();
+                }
+            });
+        });
+
+        function updateStep2Content() {
+            document.getElementById('app-setup').style.display = selectedMethod === 'app' ? 'block' : 'none';
+            document.getElementById('sms-setup').style.display = selectedMethod === 'sms' ? 'block' : 'none';
+            document.getElementById('email-setup').style.display = selectedMethod === 'email' ? 'block' : 'none';
+        }
+
+        function updateStep3Content() {
+            const verificationText = document.getElementById('verificationText');
+            const resendBtn = document.getElementById('resendBtn');
+            
+            switch(selectedMethod) {
+                case 'app':
+                    verificationText.textContent = 'Enter the 6-digit code from your authenticator app';
+                    resendBtn.style.display = 'none';
+                    break;
+                case 'sms':
+                    verificationText.textContent = 'Enter the 6-digit code sent to your phone';
+                    resendBtn.style.display = 'inline-block';
+                    break;
+                case 'email':
+                    verificationText.textContent = 'Enter the 6-digit code sent to your email';
+                    resendBtn.style.display = 'inline-block';
+                    break;
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < 4) {
+                // Hide current section
+                document.getElementById(`section${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.add('completed');
+                
+                currentStep++;
+                
+                // Show next section
+                document.getElementById(`section${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                
+                if (currentStep === 3) {
+                    updateStep3Content();
+                }
+                
+                // Simulate sending code for step 3
+                if (currentStep === 3) {
+                    simulateSendCode();
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                // Hide current section
+                document.getElementById(`section${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                
+                currentStep--;
+                
+                // Show previous section
+                document.getElementById(`section${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}`).classList.remove('completed');
+            }
+        }
+
+        function checkCodeComplete() {
+            const digits = document.querySelectorAll('.code-digit');
+            const code = Array.from(digits).map(d => d.value).join('');
+            document.getElementById('verifyBtn').disabled = code.length !== 6;
+        }
+
+        function simulateSendCode() {
+            // Simulate API call
+            setTimeout(() => {
+                showNotification('Verification code sent!', 'success');
+            }, 1000);
+        }
+
+        function resendCode() {
+            document.getElementById('resendBtn').disabled = true;
+            document.getElementById('resendBtn').textContent = 'Sending...';
+            
+            setTimeout(() => {
+                document.getElementById('resendBtn').disabled = false;
+                document.getElementById('resendBtn').textContent = 'Resend Code';
+                showNotification('New code sent!', 'success');
+            }, 2000);
+        }
+
+        function downloadCodes() {
+            const codes = [
+                '1A2B-3C4D', '5E6F-7G8H', '9I0J-1K2L', '3M4N-5O6P',
+                '7Q8R-9S0T', '1U2V-3W4X', '5Y6Z-7A8B', '9C0D-1E2F'
+            ];
+            
+            const content = `Two-Factor Authentication Recovery Codes\n\nGenerated on: ${new Date().toLocaleString()}\n\nRecovery Codes:\n${codes.join('\n')}\n\nIMPORTANT: Store these codes in a safe place. Each code can only be used once.`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '2fa-recovery-codes.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Recovery codes downloaded!', 'success');
+        }
+
+        function printCodes() {
+            const codes = [
+                '1A2B-3C4D', '5E6F-7G8H', '9I0J-1K2L', '3M4N-5O6P',
+                '7Q8R-9S0T', '1U2V-3W4X', '5Y6Z-7A8B', '9C0D-1E2F'
+            ];
+            
+            const printContent = `
+                <html>
+                <head><title>2FA Recovery Codes</title></head>
+                <body style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h1>Two-Factor Authentication Recovery Codes</h1>
+                    <p><strong>Generated on:</strong> ${new Date().toLocaleString()}</p>
+                    <div style="border: 2px solid #000; padding: 20px; margin: 20px 0;">
+                        <h2>Recovery Codes:</h2>
+                        <div style="font-family: monospace; font-size: 16px; line-height: 1.8;">
+                            ${codes.map(code => `<div>${code}</div>`).join('')}
+                        </div>
+                    </div>
+                    <p><strong>IMPORTANT:</strong> Store these codes in a safe place. Each code can only be used once.</p>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function finishSetup() {
+            showNotification('2FA setup completed successfully!', 'success');
+            // In a real application, this would redirect to the dashboard or account page
+            setTimeout(() => {
+                alert('Setup complete! You would now be redirected to your dashboard.');
+            }, 1500);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                font-weight: 600;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Auto-focus first code input when step 3 becomes active
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.id === 'section3' && mutation.target.classList.contains('active')) {
+                    setTimeout(() => {
+                        document.querySelector('.code-digit').focus();
+                    }, 100);
+                }
+            });
+        });
+
+        document.querySelectorAll('.content-section').forEach(section => {
+            observer.observe(section, { attributes: true, attributeFilter: ['class'] });
+        });
+
+        // Simulate QR code generation animation
+        setTimeout(() => {
+            const qrCode = document.querySelector('.qr-code');
+            if (qrCode) {
+                qrCode.innerHTML = `
+                    <svg width="160" height="160" style="background: white; border-radius: 8px;">
+                        <rect width="160" height="160" fill="white"/>
+                        <g fill="black">
+                            <rect x="20" y="20" width="20" height="20"/>
+                            <rect x="40" y="20" width="20" height="20"/>
+                            <rect x="80" y="20" width="20" height="20"/>
+                            <rect x="120" y="20" width="20" height="20"/>
+                            <rect x="20" y="40" width="20" height="20"/>
+                            <rect x="80" y="40" width="20" height="20"/>
+                            <rect x="100" y="40" width="20" height="20"/>
+                            <rect x="120" y="40" width="20" height="20"/>
+                            <rect x="60" y="60" width="20" height="20"/>
+                            <rect x="100" y="60" width="20" height="20"/>
+                            <rect x="20" y="80" width="20" height="20"/>
+                            <rect x="60" y="80" width="20" height="20"/>
+                            <rect x="80" y="80" width="20" height="20"/>
+                            <rect x="120" y="80" width="20" height="20"/>
+                            <rect x="40" y="100" width="20" height="20"/>
+                            <rect x="80" y="100" width="20" height="20"/>
+                            <rect x="100" y="100" width="20" height="20"/>
+                            <rect x="20" y="120" width="20" height="20"/>
+                            <rect x="40" y="120" width="20" height="20"/>
+                            <rect x="60" y="120" width="20" height="20"/>
+                            <rect x="100" y="120" width="20" height="20"/>
+                            <rect x="120" y="120" width="20" height="20"/>
+                        </g>
+                    </svg>
+                `;
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

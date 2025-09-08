@@ -123,6 +123,116 @@ Help set up testing and deployment pipeline. Requirements:
 Focus on reliability and maintainability.
 ```
 
+### Prompt 8: Analytics & Dashboard Implementation
+```
+Implement analytics and dashboard features. Requirements:
+
+1. Usage analytics dashboard
+   - Message counts per channel
+   - Active chatbots
+   - API usage tracking
+   - Cost monitoring
+2. Performance metrics
+   - Response times
+   - Error rates
+   - User engagement
+3. Custom reports and exports
+4. Real-time monitoring
+
+Focus on actionable insights and performance optimization.
+```
+
+### Prompt 9: Rate Limiting & Usage Controls
+```
+Implement comprehensive rate limiting and usage controls:
+
+1. Per-user rate limiting
+   - API calls
+   - Message counts
+   - File uploads
+2. Subscription tier limits
+3. Usage quotas
+4. Automatic notifications
+5. Grace period handling
+6. Upgrade prompts
+
+Focus on fair usage and business sustainability.
+```
+
+### Prompt 10: Error Handling & Recovery
+```
+Implement robust error handling and recovery:
+
+1. Global error handling
+2. Retry mechanisms
+   - API calls
+   - Database operations
+   - File operations
+3. Fallback strategies
+4. Error logging
+5. User notifications
+6. Auto-recovery procedures
+
+Focus on system resilience and user experience.
+```
+
+### Prompt 11: Documentation & API Reference
+```
+Create comprehensive documentation:
+
+1. API Reference
+   - Endpoints
+   - Authentication
+   - Rate limits
+2. Integration guides
+   - WhatsApp
+   - Facebook
+   - Instagram
+   - Website widget
+3. SDK documentation
+4. Tutorial guides
+5. Best practices
+
+Focus on developer experience and adoption.
+```
+
+### Prompt 12: Security Hardening
+```
+Implement additional security measures:
+
+1. Advanced authentication
+   - 2FA implementation
+   - Session management
+   - Token rotation
+2. Encryption at rest
+3. Audit logging
+4. Security headers
+5. CORS policies
+6. Input validation
+7. Output sanitization
+
+Focus on protecting user data and system integrity.
+```
+
+### Prompt 13: Performance Optimization
+```
+Implement performance improvements:
+
+1. Caching strategy
+   - Redis implementation
+   - Cache invalidation
+   - Cache warming
+2. Database optimization
+   - Query optimization
+   - Indexing strategy
+   - Connection pooling
+3. CDN setup
+4. Load balancing
+5. Asset optimization
+
+Focus on scalability and response times.
+```
+
 ## Usage Instructions
 
 1. Use these prompts in order, one at a time

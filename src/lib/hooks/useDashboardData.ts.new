@@ -1,0 +1,41 @@
+'use client';
+
+import { useCallback, useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/lib/database.types';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+
+interface DashboardStats {
+  activeBots: number;
+  conversations: number;
+  responseTime: number;
+  satisfaction: number;
+  weeklyBotGrowth: number;
+  conversationGrowth: number;
+  responseTimeImprovement: number;
+  satisfactionGrowth: number;
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'conversation' | 'connection' | 'update' | 'signup';
+  message: string;
+  timestamp: string;
+  metadata?: Record<string, string | number | boolean | null>;
+}
+
+interface MessageMetric {
+  response_time: number;
+}
+
+interface ConversationRating {
+  rating: number;
+}
+
+interface ActivityLogItem {
+  id: string;
+  type: string;
+  message: string;
+  created_at: string;
+  metadata: Record<string, string | number | boolean | null> | null;
+}

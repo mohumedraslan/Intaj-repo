@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import DemoChatbot from "@/components/DemoChatbot";
+import Header from "@/components/Header";
 
 export default function Home() {
   useEffect(() => {
@@ -30,32 +31,7 @@ export default function Home() {
 
   return (
     <main className="w-full min-h-screen bg-[#0a0a0b] text-[#f8fafc] font-sans antialiased">
-      {/* Header */}
-      <header className="w-full bg-[#141517] border-b border-gray-700/50 flex items-center justify-between px-8 py-4 fixed top-0 left-0 z-50 backdrop-blur-sm bg-opacity-80">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center animate-pulse-ai">
-            <div className="w-5 h-5 bg-white rounded-sm opacity-90"></div>
-          </div>
-          <div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">Intaj</span>
-            <div className="text-xs text-gray-400">AI Automation Hub</div>
-          </div>
-        </div>
-        <nav className="flex items-center gap-8">
-          <a href="#features" className="text-gray-300 hover:text-blue-400 transition-colors text-sm font-medium">Features</a>
-          <a href="#how-it-works" className="text-gray-300 hover:text-blue-400 transition-colors text-sm font-medium">How It Works</a>
-          <a href="#pricing" className="text-gray-300 hover:text-blue-400 transition-colors text-sm font-medium">Pricing</a>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-gray-200 hover:text-blue-400 transition-colors text-sm font-medium">Log In</Link>
-            <Link 
-              href="/signup" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              Start Free Trial
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <section className="w-full min-h-screen flex flex-col items-center justify-center pt-32 pb-12 px-0 bg-[#0a0a0b] relative overflow-hidden">
@@ -80,9 +56,9 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Link href="/signup" className="bg-gradient-to-r from-blue-500 to-purple-500 px-8 py-4 rounded-lg text-white font-semibold text-lg hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">Get Started - Free for Limited Time</Link>
-              <a href="#" className="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors">
+              <a href="#demo" className="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
-                <span>Watch Demo</span>
+                <span>Try Demo</span>
               </a>
             </div>
             <div className="flex items-center space-x-8 text-gray-400 text-sm">
@@ -102,7 +78,7 @@ export default function Home() {
           </div>
 
           {/* Right Side - Demo Chatbot */}
-          <div className="w-full md:w-auto mt-12 md:mt-0 flex justify-center md:justify-end">
+          <div id="demo" className="w-full md:w-auto mt-12 md:mt-0 flex justify-center md:justify-end">
             <div className="transform hover:scale-105 transition-transform duration-300">
               <div className="relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 rounded-xl blur opacity-30"></div>

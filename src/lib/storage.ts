@@ -1,4 +1,4 @@
-import { createClient } from '../supabaseClient';
+import { serverSupabase } from './serverSupabase';
 import { v4 as uuidv4 } from 'uuid';
 import { decode } from 'base64-arraybuffer';
 
@@ -9,7 +9,7 @@ interface FileMetadata {
 }
 
 export class StorageService {
-  private supabase = createClient();
+  private supabase = serverSupabase;
   private readonly BUCKET_NAME = 'documents';
   private readonly ALLOWED_TYPES = [
     'application/pdf',

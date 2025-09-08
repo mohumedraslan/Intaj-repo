@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Intaj AI Automation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'bg-primary': '#0a0a0b',
+                        'bg-secondary': '#141517',
+                        'bg-tertiary': '#1f2024',
+                        'bg-accent': '#2a2d35',
+                        'neural-purple': '#8b5cf6',
+                        'automation-cyan': '#06b6d4'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'pulse-ai': 'pulseAI 2s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'counter': 'counter 2s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        pulseAI: {
+                            '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+                            '50%': { opacity: '0.8', transform: 'scale(1.02)' }
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' },
+                            '100%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.6)' }
+                        },
+                        counter: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(31, 32, 36, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        .gradient-neural {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        .gradient-automation {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        body {
+            background: #0a0a0b;
+            color: #f8fafc;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .metric-trend {
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-trend::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="max-w-full px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-8">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <div class="w-4 h-4 bg-white rounded-sm opacity-90"></div>
+                        </div>
+                        <span class="text-2xl font-bold text-gradient">Intaj</span>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-6">
+                        <a href="/dashboard" class="text-gray-300 hover:text-white transition-colors">Dashboard</a>
+                        <a href="/analytics" class="text-blue-400 font-medium">Analytics</a>
+                        <a href="/bots" class="text-gray-300 hover:text-white transition-colors">Bots</a>
+                        <a href="/channels" class="text-gray-300 hover:text-white transition-colors">Channels</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>Real-time data</span>
+                    </div>
+                    <button class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-full px-6 py-8">
+            <!-- Header -->
+            <div class="mb-8 animate-slide-up">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div>
+                        <h1 class="text-4xl font-bold mb-2">
+                            <span class="text-gradient">Analytics Dashboard</span>
+                        </h1>
+                        <p class="text-gray-300">Real-time insights into your AI automation performance</p>
+                    </div>
+                    <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                        <select class="bg-bg-tertiary border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 90 days</option>
+                            <option>Custom range</option>
+                        </select>
+                        <button class="gradient-neural px-4 py-2 rounded-lg text-white font-medium hover:opacity-90 transition-opacity">
+                            Export Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Conversations -->
+                <div class="glass-card p-6 rounded-2xl metric-trend animate-slide-up">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-neural rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex items-center space-x-1 text-green-400 text-sm">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>+23%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-white mb-1" data-counter="15247">0</div>
+                        <div class="text-gray-400 text-sm">Total Conversations</div>
+                    </div>
+                </div>
+
+                <!-- Active Bots -->
+                <div class="glass-card p-6 rounded-2xl metric-trend animate-slide-up" style="animation-delay: 0.1s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex items-center space-x-1 text-blue-400 text-sm">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>+12%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-white mb-1" data-counter="8">0</div>
+                        <div class="text-gray-400 text-sm">Active AI Bots</div>
+                    </div>
+                </div>
+
+                <!-- Response Time -->
+                <div class="glass-card p-6 rounded-2xl metric-trend animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-automation rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex items-center space-x-1 text-green-400 text-sm">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>-15%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-white mb-1"><span data-counter="1.2">0</span>s</div>
+                        <div class="text-gray-400 text-sm">Avg Response Time</div>
+                    </div>
+                </div>
+
+                <!-- Conversion Rate -->
+                <div class="glass-card p-6 rounded-2xl metric-trend animate-slide-up" style="animation-delay: 0.3s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex items-center space-x-1 text-green-400 text-sm">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>+8%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-white mb-1"><span data-counter="34">0</span>%</div>
+                        <div class="text-gray-400 text-sm">Conversion Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Conversations Over Time -->
+                <div class="glass-card p-6 rounded-2xl animate-slide-up">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-white">Conversations Over Time</h3>
+                        <div class="flex items-center space-x-2">
+                            <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg">Daily</button>
+                            <button class="px-3 py-1 bg-gray-700 text-gray-300 text-sm rounded-lg hover:bg-gray-600">Weekly</button>
+                            <button class="px-3 py-1 bg-gray-700 text-gray-300 text-sm rounded-lg hover:bg-gray-600">Monthly</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="conversationsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Channel Performance -->
+                <div class="glass-card p-6 rounded-2xl animate-slide-up">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-white">Channel Performance</h3>
+                        <div class="flex items-center space-x-1 text-blue-400 text-sm">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                            <span>Live</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="channelChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analytics -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Bot Performance -->
+                <div class="glass-card p-6 rounded-2xl animate-slide-up">
+                    <h3 class="text-xl font-semibold text-white mb-6">Top Performing Bots</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-bg-tertiary rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 gradient-neural rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-white">Support Bot</div>
+                                    <div class="text-sm text-gray-400">Website</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-green-400">94%</div>
+                                <div class="text-sm text-gray-400">Success Rate</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-bg-tertiary rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-white">Sales Agent</div>
+                                    <div class="text-sm text-gray-400">Facebook</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-blue-400">87%</div>
+                                <div class="text-sm text-gray-400">Success Rate</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-bg-tertiary rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 gradient-automation rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-white">Marketing Bot</div>
+                                    <div class="text-sm text-gray-400">Instagram</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-yellow-400">76%</div>
+                                <div class="text-sm text-gray-400">Success Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="glass-card p-6 rounded-2xl animate-slide-up">
+                    <h3 class="text-xl font-semibold text-white mb-6">Recent Activities</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 animate-pulse"></div>
+                            <div class="flex-1">
+                                <div class="text-white text-sm">Support Bot resolved 12 tickets</div>
+                                <div class="text-gray-400 text-xs">2 minutes ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 animate-pulse"></div>
+                            <div class="flex-1">
+                                <div class="text-white text-sm">New user connected Instagram</div>
+                                <div class="text-gray-400 text-xs">5 minutes ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 animate-pulse"></div>
+                            <div class="flex-1">
+                                <div class="text-white text-sm">Sales Agent generated 3 new leads</div>
+                                <div class="text-gray-400 text-xs">8 minutes ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-cyan-500 rounded-full mt-2 animate-pulse"></div>
+                            <div class="flex-1">
+                                <div class="text-white text-sm">Knowledge base updated with 5 new FAQs</div>
+                                <div class="text-gray-400 text-xs">15 minutes ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2 animate-pulse"></div>
+                            <div class="flex-1">
+                                <div class="text-white text-sm">Marketing campaign reached 1K users</div>
+                                <div class="text-gray-400 text-xs">22 minutes ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="glass-card p-6 rounded-2xl animate-slide-up">
+                    <h3 class="text-xl font-semibold text-white mb-6">AI Insights</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border border-blue-500/20">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="w-4 h-4 bg-blue-500 rounded-full animate-pulse-ai"></div>
+                                <span class="text-blue-300 text-sm font-medium">Optimization Tip</span>
+                            </div>
+                            <p class="text-gray-200 text-sm">Your Support Bot's response time improved by 15% this week. Consider scaling this configuration to other bots.</p>
+                        </div>
+                        
+                        <div class="p-4 bg-gradient-to-r from-purple-900/30 to-cyan-900/30 rounded-lg border border-purple-500/20">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="w-4 h-4 bg-purple-500 rounded-full animate-pulse-ai"></div>
+                                <span class="text-purple-300 text-sm font-medium">Trend Alert</span>
+                            </div>
+                            <p class="text-gray-200 text-sm">Peak conversation hours: 2PM-4PM. Consider adding more automation during these times.</p>
+                        </div>
+                        
+                        <div class="p-4 bg-gradient-to-r from-cyan-900/30 to-green-900/30 rounded-lg border border-cyan-500/20">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="w-4 h-4 bg-cyan-500 rounded-full animate-pulse-ai"></div>
+                                <span class="text-cyan-300 text-sm font-medium">Growth Opportunity</span>
+                            </div>
+                            <p class="text-gray-200 text-sm">Instagram engagement up 34%. Consider expanding your social media bot presence.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Table -->
+            <div class="glass-card p-6 rounded-2xl animate-slide-up">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-white">Performance Breakdown</h3>
+                    <button class="text-blue-400 hover:text-blue-300 transition-colors text-sm">View All</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="text-left py-3 text-gray-400 font-medium">Bot Name</th>
+                                <th class="text-left py-3 text-gray-400 font-medium">Channel</th>
+                                <th class="text-left py-3 text-gray-400 font-medium">Conversations</th>
+                                <th class="text-left py-3 text-gray-400 font-medium">Success Rate</th>
+                                <th class="text-left py-3 text-gray-400 font-medium">Response Time</th>
+                                <th class="text-left py-3 text-gray-400 font-medium">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 text-white font-medium">Support Bot</td>
+                                <td class="py-4 text-gray-300">8,432</td>
+                                <td class="py-4">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="text-green-400 font-medium">94%</div>
+                                        <div class="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="w-[94%] h-full bg-green-400 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-gray-300">1.1s</td>
+                                <td class="py-4">
+                                    <span class="px-2 py-1 bg-green-900/30 text-green-400 rounded-lg text-xs">Active</span>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 text-white font-medium">Sales Agent</td>
+                                <td class="py-4 text-gray-300">Facebook</td>
+                                <td class="py-4 text-gray-300">3,245</td>
+                                <td class="py-4">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="text-blue-400 font-medium">87%</div>
+                                        <div class="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="w-[87%] h-full bg-blue-400 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-gray-300">1.4s</td>
+                                <td class="py-4">
+                                    <span class="px-2 py-1 bg-green-900/30 text-green-400 rounded-lg text-xs">Active</span>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 text-white font-medium">Marketing Bot</td>
+                                <td class="py-4 text-gray-300">Instagram</td>
+                                <td class="py-4 text-gray-300">2,156</td>
+                                <td class="py-4">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="text-yellow-400 font-medium">76%</div>
+                                        <div class="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="w-[76%] h-full bg-yellow-400 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-gray-300">2.1s</td>
+                                <td class="py-4">
+                                    <span class="px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded-lg text-xs">Optimizing</span>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 text-white font-medium">FAQ Bot</td>
+                                <td class="py-4 text-gray-300">WhatsApp</td>
+                                <td class="py-4 text-gray-300">1,823</td>
+                                <td class="py-4">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="text-cyan-400 font-medium">91%</div>
+                                        <div class="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="w-[91%] h-full bg-cyan-400 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-gray-300">0.9s</td>
+                                <td class="py-4">
+                                    <span class="px-2 py-1 bg-green-900/30 text-green-400 rounded-lg text-xs">Active</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Counter animation for metrics
+        function animateCounter(element, target, duration = 2000, isDecimal = false) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                
+                if (isDecimal) {
+                    element.textContent = current.toFixed(1);
+                } else {
+                    element.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 16);
+        }
+
+        // Initialize counter animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const counters = document.querySelectorAll('[data-counter]');
+            counters.forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-counter'));
+                const isDecimal = target < 10 && target % 1 !== 0;
+                
+                setTimeout(() => {
+                    animateCounter(counter, target, 2000, isDecimal);
+                }, 500);
+            });
+
+            // Initialize charts
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Conversations Over Time Chart
+            const conversationsCtx = document.getElementById('conversationsChart').getContext('2d');
+            new Chart(conversationsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Conversations',
+                        data: [1200, 1900, 3000, 2500, 2200, 3200, 2800],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#1e40af',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }, {
+                        label: 'Successful',
+                        data: [1100, 1750, 2700, 2200, 2000, 2900, 2500],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#059669',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#f8fafc',
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#64748b'
+                            },
+                            grid: {
+                                color: 'rgba(100, 116, 139, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#64748b'
+                            },
+                            grid: {
+                                color: 'rgba(100, 116, 139, 0.1)'
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            hoverRadius: 8
+                        }
+                    }
+                }
+            });
+
+            // Channel Performance Doughnut Chart
+            const channelCtx = document.getElementById('channelChart').getContext('2d');
+            new Chart(channelCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Website', 'Facebook', 'Instagram', 'WhatsApp'],
+                    datasets: [{
+                        data: [8432, 3245, 2156, 1823],
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#8b5cf6',
+                            '#06b6d4',
+                            '#10b981'
+                        ],
+                        borderColor: [
+                            '#1e40af',
+                            '#7c3aed',
+                            '#0891b2',
+                            '#059669'
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#f8fafc',
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value.toLocaleString()} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // Real-time data simulation
+        function updateRealTimeData() {
+            // Simulate real-time updates
+            const activities = [
+                'Support Bot resolved 3 new tickets',
+                'Sales Agent qualified 2 leads',
+                'Marketing Bot reached 150 new users',
+                'FAQ Bot handled 8 inquiries',
+                'New user signed up via Instagram',
+                'Knowledge base updated successfully'
+            ];
+
+            const activityFeed = document.querySelector('.space-y-4');
+            if (activityFeed && Math.random() > 0.7) {
+                const newActivity = document.createElement('div');
+                newActivity.className = 'flex items-start space-x-3 animate-slide-up';
+                newActivity.innerHTML = `
+                    <div class="w-2 h-2 bg-green-500 rounded-full mt-2 animate-pulse"></div>
+                    <div class="flex-1">
+                        <div class="text-white text-sm">${activities[Math.floor(Math.random() * activities.length)]}</div>
+                        <div class="text-gray-400 text-xs">Just now</div>
+                    </div>
+                `;
+                
+                activityFeed.insertBefore(newActivity, activityFeed.firstChild);
+                
+                // Remove old activities (keep only 5)
+                const children = activityFeed.children;
+                if (children.length > 5) {
+                    activityFeed.removeChild(children[children.length - 1]);
+                }
+            }
+        }
+
+        // Update every 10 seconds
+        setInterval(updateRealTimeData, 10000);
+
+        // Add smooth scrolling and intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-slide-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards for animation
+        document.querySelectorAll('.glass-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Add pulse effect to active status indicators
+        setInterval(() => {
+            document.querySelectorAll('.animate-pulse').forEach(element => {
+                element.style.opacity = element.style.opacity === '0.5' ? '1' : '0.5';
+            });
+        }, 1000);
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</body>
+</html>-300">Website</td>
+                                <td class="py-4 text-gray

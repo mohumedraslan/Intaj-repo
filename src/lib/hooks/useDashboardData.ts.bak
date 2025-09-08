@@ -1,0 +1,187 @@
+export function useDashboardData() {
+  const supabase = createClientComponentClient<Database>();
+  const [stats, setStats] = useState<DashboardStats>({
+    activeBots: 0,
+    conversations: 0,
+    responseTime: 0,
+    satisfaction: 0,
+    weeklyBotGrowth: 0,
+    conversationGrowth: 0,
+    responseTimeImprovement: 0,
+    satisfactionGrowth: 0
+  });
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDashboardData = useCallback(async (): Promise<void> => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const userId = user.id;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      const lastWeek = new Date(today);
+      lastWeek.setDate(lastWeek.getDate() - 7);
+      
+      const lastMonth = new Date(today);
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+      // Fetch active bots and weekly growth
+      const { data: currentBots } = await supabase
+        .from('chatbots')
+        .select('id, created_at')
+        .eq('user_id', userId)
+        .eq('status', 'active');
+
+      const { data: lastWeekBots } = await supabase
+        .from('chatbots')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .lte('created_at', lastWeek.toISOString());
+
+      // Fetch today's and yesterday's conversations
+      const { data: todayConversations } = await supabase
+        .from('conversations')
+        .select('id, chatbot_id')
+        .eq('status', 'active')
+        .gte('started_at', today.toISOString().split('T')[0]);
+
+      const { data: yesterdayConversations } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('status', 'active')
+        .gte('started_at', yesterday.toISOString().split('T')[0])
+        .lt('started_at', today.toISOString().split('T')[0]);
+
+      // Fetch response time metrics
+      const { data: todayMetrics } = await supabase
+        .from('message_metrics')
+        .select('response_time')
+        .gte('created_at', today.toISOString().split('T')[0]);
+
+      const { data: avgMetrics } = await supabase
+        .from('message_metrics')
+        .select('response_time')
+        .gte('created_at', lastMonth.toISOString());
+
+      // Fetch satisfaction ratings
+      const { data: todayRatings } = await supabase
+        .from('conversation_ratings')
+        .select('rating')
+        .gte('created_at', today.toISOString().split('T')[0]);
+
+      const { data: monthRatings } = await supabase
+        .from('conversation_ratings')
+        .select('rating')
+        .gte('created_at', lastMonth.toISOString());
+
+      // Calculate stats
+      const activeBots = currentBots?.length || 0;
+      const lastWeekBotCount = lastWeekBots?.length || 0;
+      const weeklyBotGrowth = lastWeekBotCount ? 
+        ((activeBots - lastWeekBotCount) / lastWeekBotCount) * 100 : 0;
+
+      const todayConvoCount = todayConversations?.length || 0;
+      const yesterdayConvoCount = yesterdayConversations?.length || 0;
+      const conversationGrowth = yesterdayConvoCount ? 
+        ((todayConvoCount - yesterdayConvoCount) / yesterdayConvoCount) * 100 : 0;
+
+      const todayResponseTime = todayMetrics?.length ?
+        todayMetrics.reduce((acc: number, curr: MessageMetric) => acc + curr.response_time, 0) / todayMetrics.length : 0;
+      const avgResponseTime = avgMetrics?.length ?
+        avgMetrics.reduce((acc: number, curr: MessageMetric) => acc + curr.response_time, 0) / avgMetrics.length : 0;
+      const responseTimeImprovement = avgResponseTime ? todayResponseTime - avgResponseTime : 0;
+
+      const todaySatisfaction = todayRatings?.length ?
+        (todayRatings.filter((r: ConversationRating) => r.rating >= 4).length / todayRatings.length) * 100 : 0;
+      const monthSatisfaction = monthRatings?.length ?
+        (monthRatings.filter((r: ConversationRating) => r.rating >= 4).length / monthRatings.length) * 100 : 0;
+      const satisfactionGrowth = monthSatisfaction ? todaySatisfaction - monthSatisfaction : 0;
+
+      setStats({
+        activeBots,
+        conversations: todayConvoCount,
+        responseTime: todayResponseTime,
+        satisfaction: todaySatisfaction,
+        weeklyBotGrowth,
+        conversationGrowth,
+        responseTimeImprovement,
+        satisfactionGrowth
+      });
+
+      // Fetch recent activity
+      const { data: activity } = await supabase
+        .from('activity_log')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (activity) {
+        setRecentActivity(activity.map((item: ActivityLogItem) => ({
+          id: item.id,
+          type: item.type as 'conversation' | 'connection' | 'update' | 'signup',
+          message: item.message,
+          timestamp: item.created_at,
+          metadata: item.metadata
+        })));
+      }
+
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      setLoading(false);
+    }
+  }, [supabase]);
+
+  useEffect(() => {
+    void fetchDashboardData();
+
+    // Set up real-time subscriptions for updates
+    const conversationsSubscription = supabase
+      .channel('dashboard-conversations')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'conversations'
+      }, () => {
+        void fetchDashboardData();
+      })
+      .subscribe();
+
+    const activitySubscription = supabase
+      .channel('dashboard-activity')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'activity_log'
+      }, () => {
+        void fetchDashboardData();
+      })
+      .subscribe();
+
+    return () => {
+      conversationsSubscription.unsubscribe();
+      activitySubscription.unsubscribe();
+    };
+  }, [fetchDashboardData, supabase]);
+
+  return {
+    stats,
+    recentActivity,
+    loading,
+    error,
+    refetch: fetchDashboardData
+  };
+}
