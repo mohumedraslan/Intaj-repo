@@ -1,29 +1,187 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '@/styles/profile.css';
 import { TwoFactorSetup } from '@/components/security/TwoFactorSetup';
+import { supabase } from '@/lib/supabaseClient';
+import { User } from '@supabase/supabase-js';
+
+interface UserProfile {
+  id: string;
+  email: string;
+  full_name?: string;
+  company?: string;
+  phone?: string;
+  avatar_url?: string;
+  ai_model?: string;
+  response_style?: string;
+  created_at: string;
+}
+
+interface UserStats {
+  totalChatbots: number;
+  activeConnections: number;
+  totalMessages: number;
+  planType: string;
+}
 
 export default function ProfilePage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState(true);
   const [aiModel, setAiModel] = useState('gpt4');
   const [responseStyle, setResponseStyle] = useState('professional');
   const [saveMessage, setSaveMessage] = useState('');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [showTwoFactorSetup, setShowTwoFactorSetup] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    email: '',
+    company: '',
+    phone: ''
+  });
 
-  const handleSaveChanges = () => {
-    setSaveMessage('Saved successfully!');
-    setTimeout(() => setSaveMessage(''), 3000);
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      setUser(user);
+
+      // Fetch profile data
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profileData) {
+        setProfile(profileData);
+        setFormData({
+          full_name: profileData.full_name || '',
+          email: profileData.email || user.email || '',
+          company: profileData.company || '',
+          phone: profileData.phone || ''
+        });
+        setAiModel(profileData.ai_model || 'gpt4');
+        setResponseStyle(profileData.response_style || 'professional');
+      } else {
+        // Create profile if it doesn't exist
+        const newProfile = {
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || '',
+          created_at: new Date().toISOString()
+        };
+        await supabase.from('profiles').insert([newProfile]);
+        setProfile(newProfile as UserProfile);
+        setFormData({
+          full_name: newProfile.full_name,
+          email: newProfile.email || '',
+          company: '',
+          phone: ''
+        });
+      }
+
+      // Fetch user statistics
+      const [chatbotsResult, connectionsResult, messagesResult] = await Promise.all([
+        supabase.from('chatbots').select('id').eq('user_id', user.id),
+        supabase.from('connections').select('id').eq('user_id', user.id),
+        supabase.from('messages').select('id').eq('user_id', user.id)
+      ]);
+
+      setStats({
+        totalChatbots: chatbotsResult.data?.length || 0,
+        activeConnections: connectionsResult.data?.length || 0,
+        totalMessages: messagesResult.data?.length || 0,
+        planType: 'Pro Plan' // This would come from subscription data
+      });
+
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handlePhotoUpload = () => {
+  const handleSaveChanges = async () => {
+    if (!user || !profile) return;
+
+    try {
+      const updates = {
+        full_name: formData.full_name,
+        company: formData.company,
+        phone: formData.phone,
+        ai_model: aiModel,
+        response_style: responseStyle,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setProfile({ ...profile, ...updates });
+      setSaveMessage('Profile updated successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setSaveMessage('Error updating profile');
+      setTimeout(() => setSaveMessage(''), 3000);
+    }
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!user) return;
+    
     setUploadingPhoto(true);
+    // This would implement actual file upload to Supabase storage
+    // For now, just simulate the upload
     setTimeout(() => {
       setUploadingPhoto(false);
       setSaveMessage('Profile photo updated!');
       setTimeout(() => setSaveMessage(''), 3000);
     }, 2000);
   };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen neural-grid pt-24 pb-12 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen neural-grid pt-24 pb-12 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">Please log in to view your profile</p>
+          <button className="gradient-neural px-6 py-2 rounded-lg text-white font-medium">
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen neural-grid pt-24 pb-12">
@@ -76,23 +234,23 @@ export default function ProfilePage() {
                 </button>
               </div>
 
-              <h2 className="text-2xl font-bold mb-2">Alex Johnson</h2>
-              <p className="text-gray-400 mb-4">alex@company.com</p>
+              <h2 className="text-2xl font-bold mb-2">{profile?.full_name || 'User'}</h2>
+              <p className="text-gray-400 mb-4">{profile?.email || user?.email}</p>
               
               {/* Status Badge */}
               <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-600/20 to-cyan-600/20 px-4 py-2 rounded-full mb-6">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-green-400 font-medium">Pro Plan Active</span>
+                <span className="text-sm text-green-400 font-medium">{stats?.planType || 'Free Plan'} Active</span>
               </div>
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gradient">5</div>
+                  <div className="text-2xl font-bold text-gradient">{stats?.totalChatbots || 0}</div>
                   <div className="text-xs text-gray-400">Active Bots</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gradient">3</div>
+                  <div className="text-2xl font-bold text-gradient">{stats?.activeConnections || 0}</div>
                   <div className="text-xs text-gray-400">Channels</div>
                 </div>
               </div>
@@ -126,7 +284,8 @@ export default function ProfilePage() {
                   <input
                     id="fullName"
                     type="text"
-                    defaultValue="Alex Johnson"
+                    value={formData.full_name}
+                    onChange={(e) => handleInputChange('full_name', e.target.value)}
                     className="w-full bg-bg-tertiary border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-blue-500 focus:outline-none transition-colors input-focus"
                     placeholder="Enter your full name"
                   />
@@ -136,9 +295,11 @@ export default function ProfilePage() {
                   <input
                     id="email"
                     type="email"
-                    defaultValue="alex@company.com"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
                     className="w-full bg-bg-tertiary border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-blue-500 focus:outline-none transition-colors input-focus"
                     placeholder="Enter your email address"
+                    disabled
                   />
                 </div>
                 <div>
@@ -146,7 +307,8 @@ export default function ProfilePage() {
                   <input
                     id="company"
                     type="text"
-                    defaultValue="TechCorp Inc."
+                    value={formData.company}
+                    onChange={(e) => handleInputChange('company', e.target.value)}
                     className="w-full bg-bg-tertiary border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-blue-500 focus:outline-none transition-colors input-focus"
                     placeholder="Enter your company name"
                   />
@@ -156,7 +318,8 @@ export default function ProfilePage() {
                   <input
                     id="phone"
                     type="tel"
-                    defaultValue="+1 (555) 123-4567"
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
                     className="w-full bg-bg-tertiary border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-blue-500 focus:outline-none transition-colors input-focus"
                     placeholder="Enter your phone number"
                   />

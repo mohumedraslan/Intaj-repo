@@ -1,6 +1,7 @@
 
 import "./globals.css";
 import Link from "next/link";
+import UserExperienceProvider from "@/components/ux/UserExperienceProvider";
 
 export default function RootLayout({
   children,
@@ -19,10 +20,11 @@ export default function RootLayout({
         className="min-h-screen bg-[#0a0a0b] text-[#f8fafc] font-sans antialiased overflow-x-hidden"
         suppressHydrationWarning
       >
-        {/* Main Content */}
-        <main className="w-full min-h-[calc(100vh-4rem)]">
-          {children}
-        </main>
+        <UserExperienceProvider>
+          {/* Main Content */}
+          <main id="main-content" className="w-full min-h-[calc(100vh-4rem)]">
+            {children}
+          </main>
 
         {/* Footer */}
         <footer className="w-full bg-[#141517] border-t border-gray-700/50">
@@ -125,6 +127,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+        </UserExperienceProvider>
       </body>
     </html>
   );

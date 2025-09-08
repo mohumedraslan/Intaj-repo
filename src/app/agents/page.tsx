@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 import '@/styles/agents.css';
 
 type AgentStatus = 'online' | 'training' | 'offline';
@@ -29,8 +30,134 @@ interface Agent {
 
 export default function AgentsPage() {
   const [selectedType, setSelectedType] = useState<AgentType>('all');
-  
-  const agents: Agent[] = [
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [overallStats, setOverallStats] = useState({
+    activeAgents: 0,
+    conversationsToday: 0,
+    avgResponseTime: '0s',
+    resolutionRate: 0
+  });
+
+  useEffect(() => {
+    const fetchUserAgents = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          setError('Please log in to view your agents');
+          setLoading(false);
+          return;
+        }
+
+        // Fetch user's chatbots as agents
+        const { data: chatbots, error: chatbotsError } = await supabase
+          .from('chatbots')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (chatbotsError) {
+          setError(chatbotsError.message);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch messages for statistics
+        const { data: messages, error: messagesError } = await supabase
+          .from('messages')
+          .select('*')
+          .in('chatbot_id', chatbots?.map(bot => bot.id) || [])
+          .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+        if (messagesError) {
+          console.error('Error fetching messages:', messagesError);
+        }
+
+        // Transform chatbots into agents
+        const transformedAgents: Agent[] = chatbots?.map((chatbot, index) => {
+          const botMessages = messages?.filter(msg => msg.chatbot_id === chatbot.id) || [];
+          const todayMessages = botMessages.length;
+          const avgResponseTime = '1.2s'; // Placeholder - would need more complex calculation
+          
+          const agentType: Exclude<AgentType, 'all'> = 
+            chatbot.name.toLowerCase().includes('sales') ? 'sales' :
+            chatbot.name.toLowerCase().includes('marketing') ? 'marketing' : 'chatbot';
+
+          return {
+            id: chatbot.id,
+            name: chatbot.name,
+            type: agentType,
+            role: chatbot.description || `${agentType === 'chatbot' ? 'Customer Support' : agentType === 'sales' ? 'Sales' : 'Marketing'} Agent`,
+            status: (chatbot.status === 'active' ? 'online' : 'offline') as AgentStatus,
+            avatar: getAgentAvatar(agentType),
+            message: chatbot.settings?.welcome_message || "How can I help you today?",
+            activity: chatbot.status === 'active' ? 
+              (agentType === 'sales' ? 'Qualifying leads...' : 
+               agentType === 'marketing' ? 'Creating content...' : 
+               'Helping customers...') : 'Offline',
+            stats: [
+              { key: "chats", value: todayMessages.toString(), label: "Chats Today", color: "text-blue-400" },
+              { key: "satisfaction", value: "94%", label: "Satisfaction", color: "text-green-400" },
+              { key: "response", value: avgResponseTime, label: "Avg Response", color: "text-cyan-400" }
+            ],
+            gradientClass: agentType === 'sales' ? 'gradient-sales' : 
+                          agentType === 'marketing' ? 'gradient-marketing' : 'gradient-neural',
+            hoverBorderClass: agentType === 'sales' ? 'hover:border-orange-500/50' :
+                             agentType === 'marketing' ? 'hover:border-green-500/50' : 'hover:border-blue-500/50'
+          };
+        }) || [];
+
+        setAgents(transformedAgents);
+
+        // Calculate overall stats
+        const activeCount = transformedAgents.filter(agent => agent.status === 'online').length;
+        const totalMessages = messages?.length || 0;
+        const avgResolution = transformedAgents.length > 0 ? 
+          Math.round(transformedAgents.reduce((acc, agent) => acc + 94, 0) / transformedAgents.length) : 0;
+
+        setOverallStats({
+          activeAgents: activeCount,
+          conversationsToday: totalMessages,
+          avgResponseTime: '1.2s',
+          resolutionRate: avgResolution
+        });
+
+      } catch (err) {
+        setError('Failed to fetch agents data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserAgents();
+  }, []);
+
+  const getAgentAvatar = (type: Exclude<AgentType, 'all'>) => {
+    if (type === 'sales') {
+      return (
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+      );
+    } else if (type === 'marketing') {
+      return (
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+        </svg>
+      );
+    } else {
+      return (
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+      );
+    }
+  };
+
+  // Template agents for when user has no chatbots
+  const templateAgents: Agent[] = [
     {
       id: '1',
       name: 'Support Assistant',
@@ -96,24 +223,24 @@ export default function AgentsPage() {
     }
   ];
 
-  const overallStats = [
+  const statsDisplay = [
     {
-      value: "8",
+      value: overallStats.activeAgents.toString(),
       label: "Active Agents",
       status: { type: 'online' as AgentStatus, text: 'All Online' }
     },
     {
-      value: "247",
+      value: overallStats.conversationsToday.toString(),
       label: "Conversations Today",
       trend: { value: '+12%', text: 'vs yesterday', color: 'text-cyan-400' }
     },
     {
-      value: "1.2s",
+      value: overallStats.avgResponseTime,
       label: "Avg Response Time",
       trend: { value: '-0.3s', text: 'improvement', color: 'text-green-400' }
     },
     {
-      value: "94%",
+      value: `${overallStats.resolutionRate}%`,
       label: "Resolution Rate",
       trend: { value: '', text: 'Above target', color: 'text-blue-400' }
     }
@@ -159,7 +286,7 @@ export default function AgentsPage() {
 
           {/* Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            {overallStats.map((stat, index) => (
+            {statsDisplay.map((stat, index) => (
               <div key={index} className="glass-card p-6 rounded-xl text-center">
                 <div className="text-3xl font-bold text-gradient mb-2">{stat.value}</div>
                 <div className="text-gray-300 text-sm">{stat.label}</div>
