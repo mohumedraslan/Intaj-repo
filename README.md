@@ -1,27 +1,42 @@
-# Intaj — Automation Platform MVP
+# Intaj — Automation Platform MVP (Version 1)
 
 Intaj is a modern automation platform for business, sales, marketing, and content creation. It enables you to build, deploy, and manage:
 
-- AI chatbots (MVP)
-- Sales agents
-- Marketing agents
-- Content creator agents
+- AI chatbots (MVP Version 1)
+- Sales agents (coming soon)
+- Marketing agents (coming soon)
+- Content creator agents (coming soon)
 - Workflow automations (coming soon)
 
 **MVP Focus:** Chatbots (with extensible architecture for future automation agents)
+
+## MVP Version 1 Notes
+
+This is the first MVP version of Intaj, focused on core functionality. Some features have been temporarily disabled or marked as "coming soon" to facilitate the release. For a complete list of temporarily disabled features and known issues, please refer to the [IGNORED_ERRORS_FOR_MVP_V1.md](./IGNORED_ERRORS_FOR_MVP_V1.md) file.
 
 ## Getting Started
 
 First, install dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
 # or
+yarn install
 yarn dev
 # or
+pnpm install
 pnpm dev
 # or
+bun install
 bun dev
+```
+
+For production build:
+
+```bash
+npm run build
+npm start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
