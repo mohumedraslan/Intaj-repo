@@ -3,6 +3,7 @@
 ## What is Intaj?
 Intaj is a unified AI automation platform for modern businesses. It empowers organizations to automate customer engagement, sales, marketing, and content workflows across multiple channels—including chatbots, Facebook, Instagram, and more.
 
+
 ## What Does Intaj Do?
 - **Automates customer support** with AI chatbots and messaging integrations.
 - **Enables sales and marketing automation** through smart agents and workflow triggers.
