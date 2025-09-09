@@ -15,7 +15,6 @@ import {
   TrendingDown,
   Activity,
   Target,
-  BarChart3,
   Download,
   Eye
 } from 'lucide-react';
@@ -53,7 +52,7 @@ interface Activity {
 
 export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [metrics, setMetrics] = useState<{
     conversations: MetricData;
     activeBots: MetricData;
@@ -70,7 +69,7 @@ export default function AnalyticsPage() {
 
   const [activities, setActivities] = useState<Activity[]>([]);
 
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<{ name: string; value: number; [key: string]: string | number }[]>([]);
 
   const [insights] = useState([
     {
@@ -193,14 +192,21 @@ export default function AnalyticsPage() {
       });
 
       // Transform bot performance data from RPC response
-      const botPerformanceData: BotPerformance[] = analyticsData.bot_performance?.map((bot: any) => ({
+      const botPerformanceData: BotPerformance[] = analyticsData.bot_performance?.map((bot: {
+        name: string;
+        channel: string;
+        conversations?: number;
+        success_rate?: number;
+        response_time?: string;
+        status?: string;
+      }) => ({
         name: bot.name,
         channel: bot.channel === 'website' ? 'Website' : 
                 bot.channel === 'whatsapp' ? 'WhatsApp' :
                 bot.channel === 'facebook' ? 'Facebook' :
                 bot.channel === 'instagram' ? 'Instagram' : 'Website',
         conversations: bot.conversations || 0,
-        successRate: Math.round(bot.success_rate) || 85,
+        successRate: Math.round(bot.success_rate || 85),
         responseTime: bot.response_time || '1.2s',
         status: bot.status as 'active' | 'optimizing' | 'inactive'
       })) || [];

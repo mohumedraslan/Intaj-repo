@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+const crypto = require('crypto');
 
 export interface FacebookConfig {
   pageAccessToken: string;
@@ -57,21 +58,33 @@ export class FacebookMessengerIntegration {
   }
 
   /**
-   * Send a text message via Facebook Messenger
+   * Send a message via Facebook Messenger
    */
-  async sendTextMessage(recipientId: string, text: string): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  async sendMessage(recipientId: string, message: string, messageType: 'text' | 'image' | 'file' = 'text'): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
+      const messageData: { recipient: { id: string }; message: { text?: string; attachment?: { type: string; payload: { url: string } } } } = {
+        recipient: { id: recipientId },
+        message: {}
+      };
+
+      if (messageType === 'text') {
+        messageData.message.text = message;
+      } else if (messageType === 'image' || messageType === 'file') {
+        messageData.message.attachment = {
+          type: messageType,
+          payload: {
+            url: message
+          }
+        };
+      }
+
       const response = await fetch(`${this.baseUrl}/me/messages`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.config.pageAccessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          recipient: { id: recipientId },
-          message: { text: text },
-          messaging_type: 'RESPONSE'
-        })
+        body: JSON.stringify(messageData)
       });
 
       const data = await response.json();
@@ -223,149 +236,27 @@ export class FacebookMessengerIntegration {
   }
 
   /**
-   * Send image message
+   * Process incoming webhook data
    */
-  async sendImageMessage(recipientId: string, imageUrl: string): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  async processWebhookData(webhookData: Record<string, unknown>): Promise<{ success: boolean; messages?: Record<string, unknown>[]; error?: string }> {
     try {
-      const response = await fetch(`${this.baseUrl}/me/messages`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.pageAccessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          recipient: { id: recipientId },
-          message: {
-            attachment: {
-              type: 'image',
-              payload: {
-                url: imageUrl,
-                is_reusable: true
-              }
+      const messages: Record<string, unknown>[] = [];
+
+      const data = webhookData as { entry?: { messaging?: Record<string, unknown>[] }[] };
+      if (data.entry) {
+        for (const entry of data.entry) {
+          if (entry.messaging) {
+            for (const messaging of entry.messaging) {
+              messages.push(messaging);
             }
-          },
-          messaging_type: 'RESPONSE'
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          messageId: data.message_id
-        };
-      } else {
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to send image message'
-        };
+          }
+        }
       }
-    } catch (error) {
+
       return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        success: true,
+        messages
       };
-    }
-  }
-
-  /**
-   * Get user profile information
-   */
-  async getUserProfile(userId: string): Promise<{ success: boolean; profile?: any; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/${userId}?fields=first_name,last_name,profile_pic&access_token=${this.config.pageAccessToken}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          profile: data
-        };
-      } else {
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to get user profile'
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Set up persistent menu
-   */
-  async setPersistentMenu(menuItems: Array<{
-    type: 'web_url' | 'postback';
-    title: string;
-    url?: string;
-    payload?: string;
-  }>): Promise<{ success: boolean; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/me/messenger_profile`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.pageAccessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          persistent_menu: [{
-            locale: 'default',
-            composer_input_disabled: false,
-            call_to_actions: menuItems
-          }]
-        })
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const data = await response.json();
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to set persistent menu'
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Set greeting text
-   */
-  async setGreeting(greetingText: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/me/messenger_profile`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.pageAccessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          greeting: [{
-            locale: 'default',
-            text: greetingText
-          }]
-        })
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        const data = await response.json();
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to set greeting'
-        };
-      }
     } catch (error) {
       return {
         success: false,
@@ -377,62 +268,25 @@ export class FacebookMessengerIntegration {
   /**
    * Verify webhook signature
    */
-  static verifyWebhookSignature(payload: string, signature: string, appSecret: string): boolean {
-    const crypto = require('crypto');
-    const expectedSignature = crypto
-      .createHmac('sha1', appSecret)
-      .update(payload, 'utf8')
-      .digest('hex');
-    
-    return signature === `sha1=${expectedSignature}`;
-  }
-
-  /**
-   * Parse incoming webhook message
-   */
-  static parseWebhookMessage(webhookData: any): FacebookMessage | null {
+  async verifyWebhook(signature: string, body: string): Promise<{ valid: boolean; error?: string }> {
     try {
-      const entry = webhookData.entry?.[0];
-      const messaging = entry?.messaging?.[0];
-
-      if (!messaging || !messaging.message) return null;
-
-      const message: FacebookMessage = {
-        id: messaging.message.mid,
-        senderId: messaging.sender.id,
-        recipientId: messaging.recipient.id,
-        timestamp: messaging.timestamp,
-        message: {
-          text: messaging.message.text,
-          attachments: messaging.message.attachments
-        }
-      };
-
-      return message;
-    } catch (error) {
-      console.error('Error parsing Facebook webhook message:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Handle postback events
-   */
-  static parseWebhookPostback(webhookData: any): { senderId: string; payload: string; title: string } | null {
-    try {
-      const entry = webhookData.entry?.[0];
-      const messaging = entry?.messaging?.[0];
-
-      if (!messaging || !messaging.postback) return null;
-
+      const expectedSignature = crypto.createHmac('sha256', this.config.appSecret)
+        .update(body)
+        .digest('hex');
+      
+      const providedSignature = signature.replace('sha256=', '');
+      
       return {
-        senderId: messaging.sender.id,
-        payload: messaging.postback.payload,
-        title: messaging.postback.title
+        valid: crypto.timingSafeEqual(
+          Buffer.from(expectedSignature, 'hex'),
+          Buffer.from(providedSignature, 'hex')
+        )
       };
-    } catch (error) {
-      console.error('Error parsing Facebook webhook postback:', error);
-      return null;
+    } catch (error: unknown) {
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
     }
   }
 }
@@ -485,15 +339,14 @@ export class FacebookConnectionManager {
   }
 
   /**
-   * Get Facebook connection from database
+   * Get user profile
    */
-  async getConnection(userId: string, chatbotId: string): Promise<{ success: boolean; connection?: any; error?: string }> {
+  async getUserProfile(userId: string): Promise<{ success: boolean; profile?: Record<string, unknown>; error?: string }> {
     try {
       const { data, error } = await this.supabase
-        .from('connections')
+        .from('users')
         .select('*')
-        .eq('user_id', userId)
-        .eq('chatbot_id', chatbotId)
+        .eq('id', userId)
         .eq('platform', 'facebook')
         .eq('active', true)
         .single();

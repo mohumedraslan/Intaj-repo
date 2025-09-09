@@ -49,10 +49,28 @@ export class InstagramIntegration {
   }
 
   /**
-   * Send a text message via Instagram Direct Messages
+   * Send a message via Instagram Direct Messages
    */
-  async sendTextMessage(recipientId: string, text: string): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  async sendMessage(recipientId: string, message: string, messageType: 'text' | 'image' | 'story_reply' = 'text'): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
+      const messageData: Record<string, unknown> = {};
+
+      if (messageType === 'text') {
+        messageData.message = { text: message };
+      } else if (messageType === 'image') {
+        messageData.message = {
+          attachment: {
+            type: 'image',
+            payload: {
+              url: message,
+              is_reusable: true
+            }
+          }
+        };
+      } else if (messageType === 'story_reply') {
+        messageData.message = { text: message };
+      }
+
       const response = await fetch(`${this.baseUrl}/me/messages`, {
         method: 'POST',
         headers: {
@@ -61,7 +79,7 @@ export class InstagramIntegration {
         },
         body: JSON.stringify({
           recipient: { id: recipientId },
-          message: { text: text }
+          ...messageData
         })
       });
 
@@ -87,226 +105,27 @@ export class InstagramIntegration {
   }
 
   /**
-   * Send an image message via Instagram Direct Messages
-   */
-  async sendImageMessage(recipientId: string, imageUrl: string): Promise<{ success: boolean; messageId?: string; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/me/messages`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          recipient: { id: recipientId },
-          message: {
-            attachment: {
-              type: 'image',
-              payload: {
-                url: imageUrl,
-                is_reusable: true
-              }
-            }
-          }
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          messageId: data.message_id
-        };
-      } else {
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to send image message'
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Send a message with quick replies
-   */
-  async sendQuickReplyMessage(
-    recipientId: string, 
-    text: string, 
-    quickReplies: InstagramQuickReply[]
-  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/me/messages`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          recipient: { id: recipientId },
-          message: {
-            text: text,
-            quick_replies: quickReplies
-          }
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          messageId: data.message_id
-        };
-      } else {
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to send quick reply message'
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Reply to a story mention
-   */
-  async replyToStoryMention(storyId: string, text: string): Promise<{ success: boolean; messageId?: string; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/${storyId}/replies`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: text
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          messageId: data.id
-        };
-      } else {
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to reply to story mention'
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Get media information from Instagram
-   */
-  async getMediaInfo(mediaId: string): Promise<{ success: boolean; media?: any; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/${mediaId}?fields=id,media_type,media_url,thumbnail_url,timestamp,username&access_token=${this.config.accessToken}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          media: data
-        };
-      } else {
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to get media info'
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Get user profile information
-   */
-  async getUserProfile(userId: string): Promise<{ success: boolean; profile?: any; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/${userId}?fields=id,username,name,profile_picture_url&access_token=${this.config.accessToken}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          profile: data
-        };
-      } else {
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to get user profile'
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Get Instagram business account information
-   */
-  async getBusinessAccountInfo(): Promise<{ success: boolean; account?: any; error?: string }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/${this.config.instagramBusinessAccountId}?fields=id,username,name,profile_picture_url,followers_count,follows_count,media_count&access_token=${this.config.accessToken}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          account: data
-        };
-      } else {
-        return {
-          success: false,
-          error: data.error?.message || 'Failed to get business account info'
-        };
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
    * Get Instagram media comments
    */
-  async getMediaComments(mediaId: string): Promise<{ success: boolean; comments?: any[]; error?: string }> {
+  async processWebhookData(webhookData: Record<string, unknown>): Promise<{ success: boolean; messages?: Record<string, unknown>[]; error?: string }> {
     try {
+      const entry = webhookData.entry?.[0];
+      const changes = entry?.changes?.[0];
+
+      if (changes?.field !== 'comments') return { success: false, error: 'Invalid webhook data' };
+
+      const value = changes.value;
+      const mediaId = value.media?.id;
+
+      if (!mediaId) return { success: false, error: 'Invalid media ID' };
+
       const response = await fetch(`${this.baseUrl}/${mediaId}/comments?fields=id,text,username,timestamp&access_token=${this.config.accessToken}`);
       const data = await response.json();
 
       if (response.ok) {
         return {
           success: true,
-          comments: data.data
+          messages: data.data
         };
       } else {
         return {
@@ -323,34 +142,36 @@ export class InstagramIntegration {
   }
 
   /**
-   * Reply to a comment on Instagram media
+   * Store incoming message in database
    */
-  async replyToComment(commentId: string, text: string): Promise<{ success: boolean; replyId?: string; error?: string }> {
+  async processIncomingMessage(message: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch(`${this.baseUrl}/${commentId}/replies`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: text
-        })
-      });
+      const chatbotId = message.chatbot_id;
+      const { error } = await this.supabase
+        .from('messages')
+        .insert({
+          chatbot_id: chatbotId,
+          role: 'user',
+          content: message.content,
+          metadata: {
+            platform: 'instagram',
+            message_id: message.message_id,
+            sender_id: message.sender_id,
+            recipient_id: message.recipient_id,
+            message_type: message.message_type,
+            timestamp: message.timestamp
+          },
+          created_at: new Date().toISOString()
+        });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        return {
-          success: true,
-          replyId: data.id
-        };
-      } else {
+      if (error) {
         return {
           success: false,
-          error: data.error?.message || 'Failed to reply to comment'
+          error: error.message
         };
       }
+
+      return { success: true };
     } catch (error) {
       return {
         success: false,
@@ -360,25 +181,40 @@ export class InstagramIntegration {
   }
 
   /**
-   * Get Instagram insights for a media post
+   * Store outgoing message in database
    */
-  async getMediaInsights(mediaId: string): Promise<{ success: boolean; insights?: any; error?: string }> {
+  async storeOutgoingMessage(
+    chatbotId: string, 
+    recipientId: string, 
+    content: string, 
+    messageId?: string,
+    messageType: string = 'message'
+  ): Promise<{ success: boolean; error?: string }> {
     try {
-      const metrics = 'engagement,impressions,reach,saved';
-      const response = await fetch(`${this.baseUrl}/${mediaId}/insights?metric=${metrics}&access_token=${this.config.accessToken}`);
-      const data = await response.json();
+      const { error } = await this.supabase
+        .from('messages')
+        .insert({
+          chatbot_id: chatbotId,
+          role: 'assistant',
+          content: content,
+          metadata: {
+            platform: 'instagram',
+            message_id: messageId,
+            recipient_id: recipientId,
+            message_type: messageType,
+            timestamp: Date.now()
+          },
+          created_at: new Date().toISOString()
+        });
 
-      if (response.ok) {
-        return {
-          success: true,
-          insights: data.data
-        };
-      } else {
+      if (error) {
         return {
           success: false,
-          error: data.error?.message || 'Failed to get media insights'
+          error: error.message
         };
       }
+
+      return { success: true };
     } catch (error) {
       return {
         success: false,
@@ -390,113 +226,25 @@ export class InstagramIntegration {
   /**
    * Verify webhook signature
    */
-  static verifyWebhookSignature(payload: string, signature: string, appSecret: string): boolean {
-    const crypto = require('crypto');
-    const expectedSignature = crypto
-      .createHmac('sha1', appSecret)
-      .update(payload, 'utf8')
-      .digest('hex');
-    
-    return signature === `sha1=${expectedSignature}`;
-  }
-
-  /**
-   * Parse incoming webhook message
-   */
-  static parseWebhookMessage(webhookData: any): InstagramMessage | null {
+  async verifyWebhook(signature: string, body: string): Promise<{ valid: boolean; error?: string }> {
     try {
-      const entry = webhookData.entry?.[0];
-      const messaging = entry?.messaging?.[0];
-
-      if (!messaging) return null;
-
-      // Handle direct messages
-      if (messaging.message) {
-        const message: InstagramMessage = {
-          id: messaging.message.mid,
-          senderId: messaging.sender.id,
-          recipientId: messaging.recipient.id,
-          timestamp: messaging.timestamp,
-          message: {
-            text: messaging.message.text,
-            attachments: messaging.message.attachments
-          },
-          messageType: 'message'
-        };
-        return message;
-      }
-
-      // Handle story mentions
-      if (messaging.story_mention) {
-        const message: InstagramMessage = {
-          id: messaging.story_mention.id,
-          senderId: messaging.sender.id,
-          recipientId: messaging.recipient.id,
-          timestamp: messaging.timestamp,
-          message: {
-            attachments: [{
-              type: 'story_mention',
-              payload: {
-                media_id: messaging.story_mention.media_id
-              }
-            }]
-          },
-          messageType: 'story_mention'
-        };
-        return message;
-      }
-
-      return null;
-    } catch (error) {
-      console.error('Error parsing Instagram webhook message:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Parse story mention from webhook
-   */
-  static parseStoryMention(webhookData: any): InstagramStoryMention | null {
-    try {
-      const entry = webhookData.entry?.[0];
-      const messaging = entry?.messaging?.[0];
-
-      if (!messaging?.story_mention) return null;
-
+      const expectedSignature = require('crypto').createHmac('sha256', this.config.appSecret)
+        .update(body)
+        .digest('hex');
+      
+      const providedSignature = signature.replace('sha256=', '');
+      
       return {
-        id: messaging.story_mention.id,
-        mediaId: messaging.story_mention.media_id,
-        mediaUrl: messaging.story_mention.media_url || '',
-        timestamp: messaging.timestamp,
-        mentionedUserId: messaging.sender.id
+        valid: require('crypto').timingSafeEqual(
+          Buffer.from(expectedSignature, 'hex'),
+          Buffer.from(providedSignature, 'hex')
+        )
       };
-    } catch (error) {
-      console.error('Error parsing Instagram story mention:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Parse comment mention from webhook
-   */
-  static parseCommentMention(webhookData: any): { commentId: string; mediaId: string; text: string; userId: string; timestamp: number } | null {
-    try {
-      const entry = webhookData.entry?.[0];
-      const changes = entry?.changes?.[0];
-
-      if (changes?.field !== 'comments') return null;
-
-      const value = changes.value;
+    } catch (error: unknown) {
       return {
-        commentId: value.id,
-        mediaId: value.media?.id,
-        text: value.text,
-        userId: value.from?.id,
-        timestamp: Date.now()
+        valid: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
       };
-    } catch (error) {
-      console.error('Error parsing Instagram comment mention:', error);
-      return null;
     }
   }
 }
@@ -585,22 +333,21 @@ export class InstagramConnectionManager {
   /**
    * Store incoming message in database
    */
-  async storeMessage(chatbotId: string, message: InstagramMessage): Promise<{ success: boolean; error?: string }> {
+  async storeMessage(chatbotId: string, message: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await this.supabase
         .from('messages')
         .insert({
           chatbot_id: chatbotId,
           role: 'user',
-          content: message.message.text || `${message.messageType} message`,
+          content: message.content,
           metadata: {
             platform: 'instagram',
-            message_id: message.id,
-            sender_id: message.senderId,
-            recipient_id: message.recipientId,
-            timestamp: message.timestamp,
-            message_type: message.messageType,
-            attachments: message.message.attachments
+            message_id: message.message_id,
+            sender_id: message.sender_id,
+            recipient_id: message.recipient_id,
+            message_type: message.message_type,
+            timestamp: message.timestamp
           },
           created_at: new Date().toISOString()
         });

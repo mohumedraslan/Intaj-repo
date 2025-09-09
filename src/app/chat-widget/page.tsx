@@ -4,16 +4,23 @@ import ChatWidget from '@/components/chat/ChatWidget';
 import WidgetTemplates from '@/components/chat/WidgetTemplates';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Settings, Template, Code } from 'lucide-react';
+import { MessageCircle, Settings, Code, FileText } from 'lucide-react';
 
 export default function ChatWidgetPage() {
   const [activeTab, setActiveTab] = useState<'demo' | 'templates' | 'settings'>('demo');
-  const [widgetConfig, setWidgetConfig] = useState({
+  const [widgetConfig, setWidgetConfig] = useState<{
+    botName: string;
+    welcomeMessage: string;
+    primaryColor: string;
+    position: 'bottom-right' | 'bottom-left';
+    allowFileUpload: boolean;
+    maxFileSize: number;
+    allowedFileTypes: string[];
+  }>({
     botName: 'Intaj Assistant',
     welcomeMessage: 'Hello! How can I help you today?',
     primaryColor: '#3b82f6',
-    position: 'bottom-right' as const,
+    position: 'bottom-right',
     allowFileUpload: true,
     maxFileSize: 10,
     allowedFileTypes: ['image/*', 'application/pdf', '.doc', '.docx', '.txt']
@@ -21,7 +28,7 @@ export default function ChatWidgetPage() {
 
   const tabs = [
     { id: 'demo', label: 'Live Demo', icon: MessageCircle },
-    { id: 'templates', label: 'Templates', icon: Template },
+    { id: 'templates', label: 'Templates', icon: FileText },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -49,7 +56,7 @@ export default function ChatWidgetPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'demo' | 'templates' | 'settings')}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
                   activeTab === tab.id
                     ? 'bg-blue-600 text-white'
@@ -194,7 +201,7 @@ export default function ChatWidgetPage() {
                         <label className="block text-sm font-medium text-gray-300 mb-2">Position</label>
                         <select
                           value={widgetConfig.position}
-                          onChange={(e) => setWidgetConfig(prev => ({ ...prev, position: e.target.value as any }))}
+                          onChange={(e) => setWidgetConfig(prev => ({ ...prev, position: e.target.value as 'bottom-right' | 'bottom-left' }))}
                           className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="bottom-right">Bottom Right</option>
