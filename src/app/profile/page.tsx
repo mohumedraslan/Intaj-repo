@@ -35,6 +35,8 @@ export default function ProfilePage() {
   const [saveMessage, setSaveMessage] = useState('');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [showTwoFactorSetup, setShowTwoFactorSetup] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [twoFactorMode, setTwoFactorMode] = useState<'setup' | 'disable'>('setup');
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -45,6 +47,26 @@ export default function ProfilePage() {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  const check2FAStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_2fa_secrets')
+        .select('enabled')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking 2FA status:', error);
+        return false;
+      }
+      
+      return data?.enabled || false;
+    } catch (error) {
+      console.error('Error checking 2FA status:', error);
+      return false;
+    }
+  };
 
   const fetchUserData = async () => {
     try {
@@ -62,6 +84,10 @@ export default function ProfilePage() {
       }
 
       setUser(user);
+
+      // Check 2FA status
+      const is2FAEnabled = await check2FAStatus(user.id);
+      setTwoFactorEnabled(is2FAEnabled);
 
       // Fetch profile data with error handling
       const { data: profileData, error: profileError } = await supabase
@@ -438,14 +464,33 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">Two-Factor Authentication</div>
-                    <div className="text-sm text-gray-400">Add an extra layer of security</div>
+                    <div className="text-sm text-gray-400">
+                      {twoFactorEnabled ? 'Your account is protected with 2FA' : 'Add an extra layer of security'}
+                    </div>
                   </div>
-                  <button 
-                    className="gradient-neural px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity"
-                    onClick={() => setShowTwoFactorSetup(true)}
-                  >
-                    Enable 2FA
-                  </button>
+                  <div className="flex items-center space-x-3">
+                    {twoFactorEnabled && (
+                      <div className="flex items-center space-x-2 text-green-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span className="text-sm font-medium">Enabled</span>
+                      </div>
+                    )}
+                    <button 
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-opacity ${
+                        twoFactorEnabled 
+                          ? 'bg-red-600/20 border border-red-500 text-red-400 hover:bg-red-600/30' 
+                          : 'gradient-neural text-white hover:opacity-90'
+                      }`}
+                      onClick={() => {
+                        setTwoFactorMode(twoFactorEnabled ? 'disable' : 'setup');
+                        setShowTwoFactorSetup(true);
+                      }}
+                    >
+                      {twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}
+                    </button>
+                  </div>
                 </div>
 
                 <hr className="border-gray-700" />
@@ -474,7 +519,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-          </div>
+        </div>
       </div>
 
       {/* 2FA Setup Dialog */}
@@ -482,9 +527,16 @@ export default function ProfilePage() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="max-w-md w-full mx-4">
             <TwoFactorSetup 
+              mode={twoFactorMode}
+              isEnabled={twoFactorEnabled}
               onComplete={() => {
                 setShowTwoFactorSetup(false);
-                setSaveMessage('Two-factor authentication has been enabled.');
+                setTwoFactorEnabled(twoFactorMode === 'setup');
+                setSaveMessage(
+                  twoFactorMode === 'setup' 
+                    ? 'Two-factor authentication has been enabled.' 
+                    : 'Two-factor authentication has been disabled.'
+                );
               }}
               onCancel={() => setShowTwoFactorSetup(false)}
             />

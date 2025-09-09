@@ -19,6 +19,15 @@ import {
   Download,
   Eye
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip
+} from 'recharts';
 
 interface MetricData {
   value: number;
@@ -60,6 +69,8 @@ export default function AnalyticsPage() {
   const [botPerformance, setBotPerformance] = useState<BotPerformance[]>([]);
 
   const [activities, setActivities] = useState<Activity[]>([]);
+
+  const [chartData, setChartData] = useState<any[]>([]);
 
   const [insights] = useState([
     {
@@ -111,118 +122,132 @@ export default function AnalyticsPage() {
 
       setUser(user);
 
-      // Calculate date range
-      const now = new Date();
-      const daysAgo = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
-      const startDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
-
-      // Fetch chatbots data with error handling
-      const { data: chatbots, error: chatbotsError } = await supabase
-        .from('chatbots')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (chatbotsError) {
-        console.error('Error fetching chatbots:', chatbotsError);
-      }
-
-      // Fetch messages data with error handling
-      const { data: messages, error: messagesError } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('created_at', startDate.toISOString());
-
-      if (messagesError) {
-        console.error('Error fetching messages:', messagesError);
-      }
-
-      // Fetch connections data with error handling
-      const { data: connections, error: connectionsError } = await supabase
-        .from('connections')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (connectionsError) {
-        console.error('Error fetching connections:', connectionsError);
-      }
-
-      // Calculate metrics with fallback data
-      const totalConversations = messages?.length || 0;
-      const totalBots = chatbots?.length || 0;
-      const activeBots = chatbots?.filter(bot => bot.status === 'active').length || 0;
-      const avgResponseTime = 1.5; // This would be calculated from actual response times
-      const conversionRate = Math.round((totalConversations * 0.25)); // Simulated conversion rate
-
-      setMetrics({
-        conversations: { value: totalConversations, change: 15, trend: 'up' },
-        activeBots: { value: activeBots, change: 8, trend: 'up' },
-        responseTime: { value: avgResponseTime, change: -10, trend: 'down' },
-        conversionRate: { value: conversionRate, change: 12, trend: 'up' }
+      // Call the new RPC function instead of separate queries
+      const { data: analyticsData, error } = await supabase.rpc('get_analytics_metrics', {
+        user_id_param: user.id,
+        time_range_param: timeRange
       });
 
-      // Transform chatbots into bot performance data or show sample data
-      let botPerformanceData: BotPerformance[] = [];
-      
-      if (chatbots && chatbots.length > 0) {
-        botPerformanceData = chatbots.map(bot => {
-          const botMessages = messages?.filter(msg => msg.chatbot_id === bot.id) || [];
-          return {
-            name: bot.name,
-            channel: bot.channel || 'Website',
-            conversations: botMessages.length,
-            successRate: Math.round(80 + Math.random() * 20), // Simulated success rate
-            responseTime: `${(1 + Math.random() * 2).toFixed(1)}s`,
-            status: bot.status as 'active' | 'optimizing' | 'inactive'
-          };
+      // Fetch chart data for conversations over time
+      const { data: conversationsOverTime, error: chartError } = await supabase.rpc('get_conversations_over_time', {
+        user_id_param: user.id,
+        time_range_param: timeRange
+      });
+
+      if (error) {
+        console.error('Error fetching analytics data:', error);
+        // Fallback to default values if RPC fails
+        setMetrics({
+          conversations: { value: 0, change: 0, trend: 'up' },
+          activeBots: { value: 0, change: 0, trend: 'up' },
+          responseTime: { value: 1.5, change: -10, trend: 'down' },
+          conversionRate: { value: 0, change: 0, trend: 'up' }
         });
+        setBotPerformance([]);
+        setActivities([{
+          id: 'error-1',
+          message: 'Unable to load analytics data',
+          timestamp: 'Just now',
+          type: 'warning'
+        }]);
+        setChartData([]);
+        return;
+      }
+
+      // Set chart data
+      if (conversationsOverTime && !chartError) {
+        setChartData(conversationsOverTime);
       } else {
-        // Show sample data when no bots exist
-        botPerformanceData = [
-          {
-            name: 'Welcome Bot',
-            channel: 'Website',
-            conversations: 0,
-            successRate: 85,
-            responseTime: '1.2s',
-            status: 'inactive'
-          }
-        ];
+        console.error('Error fetching chart data:', chartError);
+        setChartData([]);
+      }
+
+      if (!analyticsData) {
+        console.log('No analytics data returned');
+        setLoading(false);
+        return;
+      }
+
+      // Update metrics using data from RPC function
+      setMetrics({
+        conversations: { 
+          value: analyticsData.total_conversations || 0, 
+          change: 15, // Keep hardcoded for now as requested
+          trend: 'up' 
+        },
+        activeBots: { 
+          value: analyticsData.active_bots || 0, 
+          change: 8, // Keep hardcoded for now as requested
+          trend: 'up' 
+        },
+        responseTime: { 
+          value: parseFloat(analyticsData.avg_response_time) || 1.5, 
+          change: -10, // Keep hardcoded for now as requested
+          trend: 'down' 
+        },
+        conversionRate: { 
+          value: Math.round(analyticsData.conversion_rate) || 0, 
+          change: 12, // Keep hardcoded for now as requested
+          trend: 'up' 
+        }
+      });
+
+      // Transform bot performance data from RPC response
+      const botPerformanceData: BotPerformance[] = analyticsData.bot_performance?.map((bot: any) => ({
+        name: bot.name,
+        channel: bot.channel === 'website' ? 'Website' : 
+                bot.channel === 'whatsapp' ? 'WhatsApp' :
+                bot.channel === 'facebook' ? 'Facebook' :
+                bot.channel === 'instagram' ? 'Instagram' : 'Website',
+        conversations: bot.conversations || 0,
+        successRate: Math.round(bot.success_rate) || 85,
+        responseTime: bot.response_time || '1.2s',
+        status: bot.status as 'active' | 'optimizing' | 'inactive'
+      })) || [];
+
+      // Show sample data if no bots exist
+      if (botPerformanceData.length === 0) {
+        botPerformanceData.push({
+          name: 'Welcome Bot',
+          channel: 'Website',
+          conversations: 0,
+          successRate: 85,
+          responseTime: '1.2s',
+          status: 'inactive'
+        });
       }
 
       setBotPerformance(botPerformanceData);
 
-      // Generate recent activities from real data or show sample
+      // Generate activities based on bot performance data
       const recentActivities: Activity[] = [];
       
-      if (messages && messages.length > 0) {
-        const recentMessages = messages.slice(-5).reverse();
-        recentMessages.forEach((msg) => {
-          const bot = chatbots?.find(b => b.id === msg.chatbot_id);
+      // Add activities for bots with conversations
+      botPerformanceData.forEach(bot => {
+        if (bot.conversations > 0) {
           recentActivities.push({
-            id: msg.id,
-            message: `${bot?.name || 'Bot'} handled a conversation`,
-            timestamp: getRelativeTime(msg.created_at),
+            id: `bot-activity-${bot.name}`,
+            message: `${bot.name} handled ${bot.conversations} conversation${bot.conversations > 1 ? 's' : ''}`,
+            timestamp: 'Recently',
             type: 'success'
           });
+        }
+      });
+
+      // Add bot creation activities
+      if (analyticsData.active_bots > 0) {
+        recentActivities.push({
+          id: 'bots-active',
+          message: `${analyticsData.active_bots} chatbot${analyticsData.active_bots > 1 ? 's' : ''} currently active`,
+          timestamp: 'Now',
+          type: 'info'
         });
       }
 
-      if (chatbots && chatbots.length > 0) {
-        chatbots.slice(-2).forEach(bot => {
-          recentActivities.push({
-            id: `bot-${bot.id}`,
-            message: `${bot.name} was created`,
-            timestamp: getRelativeTime(bot.created_at),
-            type: 'info'
-          });
-        });
-      }
-
-      // If no real activities, show sample activity
+      // If no activities, show welcome message
       if (recentActivities.length === 0) {
         recentActivities.push({
-          id: 'sample-1',
+          id: 'welcome-1',
           message: 'Welcome to your analytics dashboard',
           timestamp: 'Just now',
           type: 'info'
@@ -233,6 +258,21 @@ export default function AnalyticsPage() {
 
     } catch (error) {
       console.error('Error fetching analytics data:', error);
+      // Set fallback data on error
+      setMetrics({
+        conversations: { value: 0, change: 0, trend: 'up' },
+        activeBots: { value: 0, change: 0, trend: 'up' },
+        responseTime: { value: 1.5, change: -10, trend: 'down' },
+        conversionRate: { value: 0, change: 0, trend: 'up' }
+      });
+      setBotPerformance([]);
+      setActivities([{
+        id: 'error-1',
+        message: 'Error loading analytics data',
+        timestamp: 'Just now',
+        type: 'warning'
+      }]);
+      setChartData([]);
     } finally {
       setLoading(false);
     }
@@ -249,30 +289,34 @@ export default function AnalyticsPage() {
     return `${Math.floor(diffInMinutes / 1440)} days ago`;
   };
 
-  const exportAnalyticsData = () => {
-    const exportData = {
-      timestamp: new Date().toISOString(),
-      timeRange,
-      metrics: {
-        conversations: metrics.conversations.value,
-        activeBots: metrics.activeBots.value,
-        responseTime: metrics.responseTime.value,
-        conversionRate: metrics.conversionRate.value
-      },
-      botPerformance,
-      activities: activities.map(activity => ({
-        message: activity.message,
-        timestamp: activity.timestamp,
-        type: activity.type
-      }))
-    };
+  // Helper function to convert bot performance data to CSV
+  const convertToCSV = (data: BotPerformance[]) => {
+    const headers = ['Bot Name', 'Channel', 'Conversations', 'Success Rate (%)', 'Response Time', 'Status'];
+    const csvContent = [
+      headers.join(','),
+      ...data.map(bot => [
+        `"${bot.name}"`,
+        `"${bot.channel}"`,
+        bot.conversations,
+        bot.successRate,
+        `"${bot.responseTime}"`,
+        `"${bot.status}"`
+      ].join(','))
+    ].join('\n');
+    
+    return csvContent;
+  };
 
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
+  const exportAnalyticsData = () => {
+    // Convert bot performance data to CSV
+    const csvData = convertToCSV(botPerformance);
+    
+    // Create blob and download
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `intaj-analytics-${timeRange}-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `intaj-performance-report-${timeRange}-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -479,11 +523,45 @@ export default function AnalyticsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] flex items-center justify-center text-gray-400">
-              <div className="text-center">
-                <BarChart3 className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>Chart visualization will be implemented with Chart.js or Recharts</p>
-              </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <defs>
+                    <linearGradient id="conversationGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
+                  <XAxis 
+                    dataKey="formatted_date" 
+                    stroke="#9ca3af" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="#9ca3af" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: '1px solid #374151',
+                      borderRadius: '8px',
+                      color: '#f9fafb'
+                    }}
+                    labelStyle={{ color: '#d1d5db' }}
+                  />
+                  <Bar 
+                    dataKey="count" 
+                    fill="url(#conversationGradient)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>

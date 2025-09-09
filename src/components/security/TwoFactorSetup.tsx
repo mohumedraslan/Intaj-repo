@@ -72,9 +72,11 @@ const useToast = () => ({
 interface TwoFactorSetupProps {
   onComplete: () => void;
   onCancel: () => void;
+  mode?: 'setup' | 'disable';
+  isEnabled?: boolean;
 }
 
-export function TwoFactorSetup({ onComplete, onCancel }: TwoFactorSetupProps) {
+export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled = false }: TwoFactorSetupProps) {
   const [step, setStep] = useState<'init' | 'qr' | 'verify'>('init');
   const [qrCode, setQrCode] = useState<string>('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
@@ -82,15 +84,97 @@ export function TwoFactorSetup({ onComplete, onCancel }: TwoFactorSetupProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  const disableTwoFactor = async () => {
+    try {
+      setLoading(true);
+      
+      // Get the auth token from Supabase
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await fetch('/api/auth/2fa/disable', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          code: verificationCode 
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to disable 2FA');
+      }
+      
+      toast({
+        title: 'Success',
+        description: 'Two-factor authentication has been disabled.'
+      });
+      onComplete();
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to disable 2FA. Please try again.';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const startSetup = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/2fa/setup');
-      if (!response.ok) throw new Error('Setup failed');
+      
+      // Get the auth token from Supabase
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await fetch('/api/auth/2fa/setup', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Setup failed');
+      }
       
       const data = await response.json();
-      setQrCode(data.qrCode);
-      setBackupCodes(data.backupCodes);
+      
+      // Generate QR code from otpauth_url
+      const QRCode = await import('qrcode');
+      const qrCodeDataUrl = await QRCode.toDataURL(data.otpauth_url);
+      setQrCode(qrCodeDataUrl);
+      
+      // Generate backup codes (placeholder for now)
+      const backupCodes = Array.from({ length: 8 }, () =>
+        Math.random().toString(36).slice(-8).toUpperCase()
+      );
+      setBackupCodes(backupCodes);
+      
       setStep('qr');
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to start 2FA setup. Please try again.';
@@ -107,13 +191,35 @@ export function TwoFactorSetup({ onComplete, onCancel }: TwoFactorSetupProps) {
   const verifyAndEnable = async () => {
     try {
       setLoading(true);
+      
+      // Get the auth token from Supabase
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
       const response = await fetch('/api/auth/2fa/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: verificationCode })
+        headers: { 
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ 
+          code: verificationCode,
+          enable: true 
+        })
       });
 
-      if (!response.ok) throw new Error('Verification failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Verification failed');
+      }
       
       toast({
         title: 'Success',
@@ -133,6 +239,49 @@ export function TwoFactorSetup({ onComplete, onCancel }: TwoFactorSetupProps) {
   };
 
   if (step === 'init') {
+    if (mode === 'disable') {
+      return (
+        <Card className="w-full max-w-md mx-auto p-8 bg-gradient-to-br from-red-50 via-white to-red-100">
+          <CardHeader>
+            <CardTitle>
+              <span className="text-gradient text-2xl font-bold">Disable Two-Factor Authentication</span>
+            </CardTitle>
+            <CardDescription>
+              <span className="text-gray-600">Enter your current authentication code to disable 2FA for your account.</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert>
+              <AlertDescription>
+                <span className="text-red-700 font-medium">Warning: Disabling 2FA will make your account less secure.</span>
+              </AlertDescription>
+            </Alert>
+            <div className="mt-4">
+              <Input
+                type="text"
+                placeholder="Enter 6-digit code"
+                value={verificationCode}
+                onChange={e => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                className="font-mono text-center text-lg border-2 border-red-500 rounded-xl bg-white shadow-lg text-red-900 placeholder-red-400 focus:border-red-600 focus:bg-red-50"
+                maxLength={6}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="destructive" onClick={onCancel} className="px-6 py-2 rounded-lg font-bold">Cancel</Button>
+            <Button 
+              variant="default"
+              onClick={disableTwoFactor} 
+              disabled={loading || verificationCode.length !== 6}
+              className="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-red-500 to-red-600 text-white"
+            >
+              {loading ? 'Disabling...' : 'Disable 2FA'}
+            </Button>
+          </CardFooter>
+        </Card>
+      );
+    }
+
     return (
       <Card className="w-full max-w-md mx-auto p-8 bg-gradient-to-br from-blue-50 via-white to-blue-100">
         <CardHeader>

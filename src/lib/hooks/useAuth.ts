@@ -39,11 +39,29 @@ export function useAuth() {
     email: string;
     password: string;
   }) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     if (error) throw error;
+
+    // Check if user has 2FA enabled
+    if (data.user) {
+      const { data: twoFactorData, error: twoFactorError } = await supabase
+        .from('user_2fa_secrets')
+        .select('enabled')
+        .eq('user_id', data.user.id)
+        .single();
+
+      if (!twoFactorError && twoFactorData?.enabled) {
+        // User has 2FA enabled, redirect to 2FA verification page
+        router.push('/auth/2fa');
+        return;
+      }
+    }
+
+    // No 2FA or 2FA not enabled, proceed with normal login flow
+    router.push('/dashboard');
   };
 
   const signUp = async ({
