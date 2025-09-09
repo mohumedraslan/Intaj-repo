@@ -317,3 +317,131 @@ When starting a new feature:
    - Performance monitoring
    - Usage analytics
    - Cost monitoring
+
+### Prompt 14: Implement Real Analytics Metrics (Backend + Frontend)
+```
+The analytics dashboard in `src/app/analytics/page.tsx` is currently using simulated data. We need to replace this with real, efficiently-queried data from our Supabase database.
+
+**Part 1: Backend (Supabase RPC Functions)**
+
+1.  **Create a new SQL file** in `db/` named `analytics_functions.sql`.
+2.  In this file, create a Supabase RPC function called `get_analytics_metrics`. This function should:
+    *   Accept `user_id_param` (uuid) and `time_range_param` (text, e.g., '7d', '30d') as arguments.
+    *   Return a JSON object with the following real metrics for the given user and time range:
+        *   `total_conversations`: Count of messages where `role = 'user'`.
+        *   `active_bots`: Count of chatbots where `status = 'active'`.
+        *   `avg_response_time`: This is tricky. For now, you can return a hardcoded value like `1.2` seconds. We can implement a more accurate version later.
+        *   `conversion_rate`: This is also complex. For now, simulate it by taking `(total_conversations * 0.15)`.
+        *   `bot_performance`: An array of JSON objects, one for each chatbot belonging to the user. Each object should contain:
+            *   `name`: The chatbot's name.
+            *   `channel`: The platform from the `connections` table (e.g., 'Website', 'WhatsApp'). Default to 'Website' if no connection is found.
+            *   `conversations`: The number of conversations for that bot.
+            *   `success_rate`: A simulated value for now (e.g., `80 + random() * 15`).
+            *   `response_time`: A simulated value for now (e.g., `(1 + random() * 2) || 's'`).
+            *   `status`: The chatbot's status.
+    *   Refer to `db/DB_DESCRIPTION.md` for table schemas (`messages`, `chatbots`, `connections`).
+    *   Ensure the function is secure and only returns data for the provided `user_id_param`.
+
+**Part 2: Frontend (Update Analytics Page)**
+
+1.  **Modify `src/app/analytics/page.tsx`**.
+2.  In the `fetchAnalyticsData` function, remove the separate fetches for `chatbots`, `messages`, and `connections`.
+3.  **Call the new RPC function** instead:
+    ```javascript
+    const { data: analyticsData, error } = await supabase.rpc('get_analytics_metrics', {
+      user_id_param: user.id,
+      time_range_param: timeRange
+    });
+    ```
+4.  **Update the state** using the data returned from the RPC function.
+    *   Replace all the hardcoded and simulated metric calculations (`totalConversations`, `activeBots`, `avgResponseTime`, `conversionRate`, `botPerformanceData`) with the values from `analyticsData`.
+    *   The `change` and `trend` values for the top-level metrics can remain hardcoded for now, as calculating them requires historical data, which is a separate task.
+
+By the end of this task, the analytics dashboard should display real data from the database, even if some of the more complex metrics are still simulated within the SQL function.
+```
+
+### Prompt 15: Implement Analytics Charts and Export
+```
+The analytics dashboard in `src/app/analytics/page.tsx` has placeholder sections for charts and a non-functional "Export Report" button. Let's implement these features.
+
+**Prerequisites:**
+*   You will need a charting library. Install `recharts` and its types: `npm install recharts @types/recharts`.
+
+**Part 1: Implement Charts**
+
+1.  **Create a new RPC function** in `db/analytics_functions.sql` called `get_conversations_over_time`.
+    *   It should accept `user_id_param` (uuid) and `time_range_param` (text) as arguments.
+    *   It should return a list of daily conversation counts for the last 7 or 30 days. Each row should have a `date` and `count`.
+    *   You can use `date_trunc('day', created_at)` to group messages by day.
+2.  **Modify `src/app/analytics/page.tsx`**:
+    *   Import `ResponsiveContainer`, `BarChart`, `Bar`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip` from `recharts`.
+    *   In `fetchAnalyticsData`, call your new `get_conversations_over_time` RPC function.
+    *   Store the chart data in a new state variable.
+    *   Replace the placeholder `div` for the "Conversations Over Time" chart with a real `<BarChart>` component from `recharts`, using the data you fetched.
+    *   Style the chart to match the dark, modern theme of the dashboard. Use gradients for the bars.
+
+**Part 2: Implement Export Functionality**
+
+1.  **Create a helper function** that converts an array of objects (the `botPerformance` data) into a CSV string.
+    *   The first line of the string should be the headers (e.g., "Bot Name,Channel,Conversations").
+    *   Each subsequent line should be the data for one bot.
+2.  **Modify the "Export Report" button** in `src/app/analytics/page.tsx`.
+3.  When the button is clicked:
+    *   Call the CSV conversion function with the `botPerformance` data.
+    *   Create a `Blob` from the CSV string with `type: 'text/csv;charset=utf-8;'`.
+    *   Create a temporary link (`<a>` element) with a `href` pointing to `URL.createObjectURL(blob)`.
+    *   Set the `download` attribute of the link to something like `intaj-performance-report.csv`.
+    *   Programmatically click the link to trigger the download.
+    *   Clean up by revoking the object URL.
+
+By the end of this task, the dashboard should display an interactive bar chart of conversation history and the "Export Report" button should download a CSV file of the bot performance data.
+```
+
+### Prompt 16: Implement Two-Factor Authentication (2FA)
+```
+We need to enhance user security by adding Time-based One-Time Password (TOTP) two-factor authentication (2FA). We will use the `speakeasy` and `qrcode` libraries.
+
+**Prerequisites:**
+*   Install the necessary libraries: `npm install speakeasy qrcode @types/speakeasy @types/qrcode`.
+
+**Part 1: Backend API Endpoints**
+
+1.  **Database:** Add a new table `user_2fa_secrets` to the database with columns: `user_id` (uuid, FK to auth.users), `secret` (text, encrypted), `enabled` (boolean).
+2.  **Create API Endpoint for Setup (`/api/auth/2fa/setup`):**
+    *   This `POST` endpoint should be protected, requiring an authenticated user.
+    *   Generate a new 2FA secret using `speakeasy.generateSecret({ name: 'Intaj AI (user.email)' })`.
+    *   Save the `base32` version of the secret to the `user_2fa_secrets` table for the user (remember to encrypt it first!).
+    *   Respond with the `otpauth_url` from the secret. Do **not** send the secret itself back to the client.
+3.  **Create API Endpoint for Verification (`/api/auth/2fa/verify`):**
+    *   This `POST` endpoint accepts a `token` from the user.
+    *   Retrieve the user's saved (and decrypted) 2FA secret from the database.
+    *   Use `speakeasy.totp.verify()` to check if the provided token is valid.
+    *   If valid, update the `enabled` flag for the user's 2FA secret to `true`. Respond with success.
+    *   If invalid, respond with an error.
+4.  **Create API Endpoint for Disabling (`/api/auth/2fa/disable`):**
+    *   A `POST` endpoint that requires a valid 2FA token to disable 2FA.
+    *   Verify the token first.
+    *   If valid, remove the user's 2FA record from the database.
+
+**Part 2: Frontend UI**
+
+1.  **Create a new component `TwoFactorSetup` in `src/components/security/`**.
+2.  This component should be displayed on the user's `/profile` page.
+3.  **Setup Flow:**
+    *   A button "Enable 2FA" calls the `/api/auth/2fa/setup` endpoint.
+    *   On success, it receives the `otpauth_url`.
+    *   Use the `qrcode` library to convert the `otpauth_url` into a data URL and display it as an image (`<img src={qrCodeDataUrl} />`).
+    *   Show an input field for the user to enter the 6-digit token from their authenticator app.
+    *   A "Verify" button sends the token to `/api/auth/2fa/verify`.
+    *   On success, show a confirmation message.
+4.  **Disable Flow:**
+    *   If 2FA is enabled, show a "Disable 2FA" button.
+    *   This button should prompt the user for a current 2FA token and then call the `/api/auth/2fa/disable` endpoint.
+
+**Part 3: Integrate into Login Flow**
+
+1.  Modify the main login logic. After a user successfully authenticates with their password, check if they have 2FA enabled.
+2.  If they do, redirect them to a new page (e.g., `/auth/2fa`) where they must enter their 2FA token to complete the login.
+
+This is a complex task. Ensure you handle all states (loading, error, success) and provide clear instructions to the user throughout the UI.
+```
