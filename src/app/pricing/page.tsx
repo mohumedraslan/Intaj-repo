@@ -70,9 +70,11 @@ export default function PricingPage() {
                 <PricingFeature text="Multi-channel integrations" included={false} />
               </ul>
 
-              <button className="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200">
-                Get Started Free
-              </button>
+              <a href="/dashboard" className="block w-full">
+                <button className="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200">
+                  Get Started Free
+                </button>
+              </a>
             </div>
 
             {/* Professional Plan */}
@@ -101,9 +103,11 @@ export default function PricingPage() {
                 <PricingFeature text="API access" included />
               </ul>
 
-              <button className="w-full gradient-neural text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl animate-glow">
-                Start Free Trial
-              </button>
+              <a href="/pricing/checkout?plan=professional" className="block w-full">
+                <button className="w-full gradient-neural text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl animate-glow">
+                  Start Free Trial
+                </button>
+              </a>
             </div>
 
             {/* Enterprise Plan */}
@@ -131,9 +135,11 @@ export default function PricingPage() {
                 <PricingFeature text="SLA & uptime guarantee" included />
               </ul>
 
-              <button className="w-full gradient-automation text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
-                Contact Sales
-              </button>
+              <a href="/pricing/checkout?plan=enterprise" className="block w-full">
+                <button className="w-full gradient-automation text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
+                  Contact Sales
+                </button>
+              </a>
             </div>
           </div>
         </div>

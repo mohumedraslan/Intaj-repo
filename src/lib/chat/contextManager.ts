@@ -1,5 +1,4 @@
-import { createClient } from '../supabaseClient';
-import { ChatMessage } from '../openrouter';
+import { getServerSupabase } from '../serverSupabase';
 import { Redis } from '@upstash/redis';
 
 const redis = new Redis({
@@ -7,21 +6,31 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_TOKEN || '',
 });
 
+interface Message {
+  role: 'assistant' | 'user' | 'system';
+  content: string;
+}
+
 export class ChatContextManager {
   private readonly maxContextLength = 10;
   private readonly contextTTL = 60 * 60; // 1 hour
-  private readonly supabase = createClient();
+  private readonly supabase;
 
-  async getContext(chatId: string): Promise<ChatMessage[]> {
+  constructor() {
+    this.supabase = getServerSupabase();
+  }
+
+  async getContext(chatId: string): Promise<Message[]> {
     try {
       // Try to get context from Redis first
-      const cachedContext = await redis.get<ChatMessage[]>(`chat:${chatId}`);
+      const cachedContext = await redis.get<Message[]>(`chat:${chatId}`);
       if (cachedContext) {
         return cachedContext;
       }
 
       // If not in Redis, get from database
-      const { data: messages } = await this.supabase
+      const supabase = this.supabase;
+      const { data: messages } = await supabase
         .from('messages')
         .select('*')
         .eq('chatbot_id', chatId)
@@ -30,7 +39,7 @@ export class ChatContextManager {
 
       const context = messages
         ? messages.map(msg => ({
-            role: msg.role as ChatMessage['role'],
+            role: msg.role as Message['role'],
             content: msg.content,
           }))
         : [];
@@ -47,10 +56,11 @@ export class ChatContextManager {
     }
   }
 
-  async addMessage(chatId: string, message: ChatMessage): Promise<void> {
+  async addMessage(chatId: string, message: Message): Promise<void> {
     try {
+      const supabase = this.supabase;
       // Add to database
-      await this.supabase.from('messages').insert({
+      await supabase.from('messages').insert({
         chatbot_id: chatId,
         role: message.role,
         content: message.content,
@@ -72,9 +82,10 @@ export class ChatContextManager {
 
   async clearContext(chatId: string): Promise<void> {
     try {
+      const supabase = this.supabase;
       await Promise.all([
         redis.del(`chat:${chatId}`),
-        this.supabase
+        supabase
           .from('messages')
           .delete()
           .eq('chatbot_id', chatId),

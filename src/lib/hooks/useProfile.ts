@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createClient } from '../supabaseClient';
+import { supabase } from '../supabaseClient';
 import { useAuth } from './useAuth';
 
 interface Profile {
@@ -14,7 +14,6 @@ export function useProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const supabase = createClient();
 
   useEffect(() => {
     async function loadProfile() {
