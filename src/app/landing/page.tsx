@@ -1,8 +1,8 @@
 // src/app/landing/page.tsx
 'use client';
 
-import Link from "next/link";
-import Image from "next/image";
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LandingPage() {
   return (
@@ -24,13 +24,20 @@ export default function LandingPage() {
           background-clip: text;
         }
         .neural-grid {
-          background-image: 
-            radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(59, 130, 246, 0.15) 1px,
+            transparent 0
+          );
           background-size: 20px 20px;
         }
         @keyframes glow {
-          0% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
-          100% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+          0% {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+          }
+          100% {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.6);
+          }
         }
         .animate-glow {
           animation: glow 2s ease-in-out infinite alternate;
@@ -47,18 +54,19 @@ export default function LandingPage() {
           Welcome to Intaj AI Platform
         </h1>
         <p className="mb-8 text-lg md:text-2xl text-gray-300 max-w-3xl font-medium mx-auto">
-          Build, deploy, and manage AI chatbots, sales agents, marketing automations, and more. Start with chatbots, scale to full automation.
+          Build, deploy, and manage AI chatbots, sales agents, marketing automations, and more.
+          Start with chatbots, scale to full automation.
         </p>
         <div className="flex flex-col items-center gap-4 mb-10">
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link 
-              href="/signup" 
+            <Link
+              href="/signup"
               className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg shadow-lg hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 font-bold text-lg"
             >
               Start Now - Free Trial Available
             </Link>
-            <Link 
-              href="/features" 
+            <Link
+              href="/features"
               className="px-8 py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-lg shadow-lg hover:border-blue-500 transition-all duration-300 transform hover:-translate-y-1 font-bold text-lg"
             >
               Features
@@ -66,34 +74,78 @@ export default function LandingPage() {
           </div>
           <div className="text-sm text-gray-600 flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              <svg
+                className="w-4 h-4 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
               <span>No credit card required</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-4 h-4 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               <span>Setup in 5 minutes</span>
             </div>
           </div>
         </div>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-[100vw]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-[100vw]">
           <div className="bg-gradient-to-br from-blue-50 via-white to-blue-100 rounded-2xl shadow-xl p-8 flex flex-col items-center border border-blue-100 hover:scale-105 transition-transform">
-            <Image src="/ai-chatbots.svg" alt="AI Chatbots" width={56} height={56} className="mb-3" />
+            <Image
+              src="/ai-chatbots.svg"
+              alt="AI Chatbots"
+              width={56}
+              height={56}
+              className="mb-3"
+            />
             <h3 className="font-bold text-lg mb-1 text-blue-700">AI Chatbots</h3>
-            <p className="text-gray-600 text-sm">Conversational bots for support, sales, and automation.</p>
+            <p className="text-gray-600 text-sm">
+              Conversational bots for support, sales, and automation.
+            </p>
           </div>
           <div className="bg-gradient-to-br from-green-50 via-white to-green-100 rounded-2xl shadow-xl p-8 flex flex-col items-center border border-green-100 hover:scale-105 transition-transform">
-            <Image src="/automation-agents.svg" alt="Automation Agents" width={56} height={56} className="mb-3" />
+            <Image
+              src="/automation-agents.svg"
+              alt="Automation Agents"
+              width={56}
+              height={56}
+              className="mb-3"
+            />
             <h3 className="font-bold text-lg mb-1 text-green-700">Automation Agents</h3>
-            <p className="text-gray-600 text-sm">Sales, marketing, and content agents (coming soon).</p>
+            <p className="text-gray-600 text-sm">
+              Sales, marketing, and content agents (coming soon).
+            </p>
           </div>
           <div className="bg-gradient-to-br from-indigo-50 via-white to-indigo-100 rounded-2xl shadow-xl p-8 flex flex-col items-center border border-indigo-100 hover:scale-105 transition-transform">
-            <Image src="/agents-coming-soon.svg" alt="Integrations" width={56} height={56} className="mb-3" />
+            <Image
+              src="/agents-coming-soon.svg"
+              alt="Integrations"
+              width={56}
+              height={56}
+              className="mb-3"
+            />
             <h3 className="font-bold text-lg mb-1 text-indigo-700">Integrations</h3>
-            <p className="text-gray-600 text-sm">Connect to Facebook, WhatsApp, Instagram, and more.</p>
+            <p className="text-gray-600 text-sm">
+              Connect to Facebook, WhatsApp, Instagram, and more.
+            </p>
           </div>
         </div>
         {/* Testimonials */}
@@ -110,7 +162,10 @@ export default function LandingPage() {
                   <div className="text-sm text-gray-500">Sales Lead</div>
                 </div>
               </div>
-              <p className="text-gray-700">&quot;Intaj made our sales team 2x more productive! The AI automation has transformed how we handle customer inquiries.&quot;</p>
+              <p className="text-gray-700">
+                &quot;Intaj made our sales team 2x more productive! The AI automation has
+                transformed how we handle customer inquiries.&quot;
+              </p>
             </div>
             <div className="glass-card p-6 rounded-xl hover:border-purple-500/30 transition-colors">
               <div className="flex items-center space-x-4 mb-4">
@@ -122,7 +177,10 @@ export default function LandingPage() {
                   <div className="text-sm text-gray-500">Startup Founder</div>
                 </div>
               </div>
-              <p className="text-gray-700">&quot;The chatbot widget is incredibly easy to embed and customize. It took us minutes to set up and start engaging with customers.&quot;</p>
+              <p className="text-gray-700">
+                &quot;The chatbot widget is incredibly easy to embed and customize. It took us
+                minutes to set up and start engaging with customers.&quot;
+              </p>
             </div>
             <div className="glass-card p-6 rounded-xl hover:border-cyan-500/30 transition-colors">
               <div className="flex items-center space-x-4 mb-4">
@@ -134,18 +192,20 @@ export default function LandingPage() {
                   <div className="text-sm text-gray-500">Marketing Manager</div>
                 </div>
               </div>
-              <p className="text-gray-700">&quot;We connected our WhatsApp and Facebook channels in minutes! The omnichannel support has been a game-changer.&quot;</p>
+              <p className="text-gray-700">
+                &quot;We connected our WhatsApp and Facebook channels in minutes! The omnichannel
+                support has been a game-changer.&quot;
+              </p>
             </div>
           </div>
         </div>
-        <Link 
-          href="/signup" 
+        <Link
+          href="/signup"
           className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg shadow-lg text-xl font-bold hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 mt-4 animate-glow"
         >
           Start Your Free Trial Today
         </Link>
       </section>
     </div>
-
   );
 }

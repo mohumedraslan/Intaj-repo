@@ -77,21 +77,18 @@ intaj-app/
 ## Component Architecture
 
 1. Layout Components
-
    - Root layout (full-width container)
    - Navigation bar
    - Footer
    - Sidebar (dashboard)
 
 2. Feature Components
-
    - Stats cards
    - Action buttons
    - Activity feed
    - Bot overview cards
 
 3. Interactive Elements
-
    - Animated background
    - Hover effects
    - Loading states
@@ -100,19 +97,16 @@ intaj-app/
 ## Next Steps
 
 1. Complete Dashboard Features
-
    - Finish active bots section
    - Implement settings
    - Add real-time updates
 
 2. Build Connections Page
-
    - Platform integrations
    - Channel management
    - Connection status
 
 3. Authentication & User Management
-
    - Login/Signup flows
    - User profiles
    - Role-based access
@@ -157,6 +151,7 @@ intaj-app/
 🔄 Dashboard Features: In Progress
 ⏳ Connections Page: Pending
 ⏳ Authentication: Pending
+
 ```
 /
 ├── public/
@@ -181,6 +176,7 @@ intaj-app/
 ## Completed Features
 
 ### 1. Landing Page (`src/app/page.tsx`)
+
 - Modern, full-width dark theme design
 - Responsive navigation with blur effect
 - Hero section with gradient text and animated elements
@@ -189,6 +185,7 @@ intaj-app/
 - CTA section with gradient background
 
 Key styling:
+
 - Background: `#0a0a0b` (dark theme)
 - Full-width sections without padding constraints
 - Gradient text effects using `bg-clip-text`
@@ -196,6 +193,7 @@ Key styling:
 - Animated elements using Tailwind animations
 
 ### 2. Dashboard (`src/app/dashboard/page.tsx`)
+
 - Dark-themed admin interface
 - Responsive sidebar navigation
 - Stats overview with 4 key metrics
@@ -204,6 +202,7 @@ Key styling:
 - User profile section
 
 Key features:
+
 - Fixed sidebar with gradient logo
 - Live stats with animations
 - Recent activity timeline
@@ -212,12 +211,14 @@ Key features:
 - User settings and profile
 
 ### 3. Global Layout (`src/app/layout.tsx`)
+
 - Full-width container setup
 - Removed default max-width constraints
 - Dark theme configuration
 - Meta tags and SEO setup
 
 ## Styling Guidelines
+
 1. Colors:
    - Primary bg: `#0a0a0b`
    - Secondary bg: `#141517`
@@ -231,6 +232,7 @@ Key features:
    - Animations: `animate-float`, `animate-pulse`, `animate-glow`
 
 ## Next Steps
+
 1. Implement remaining dashboard features:
    - Charts and analytics
    - Bot management interface
@@ -252,6 +254,7 @@ Key features:
    - Add testing framework
 
 ## Implementation Notes
+
 - Use `className="w-full"` for full-width sections
 - Remove container max-widths for edge-to-edge design
 - Maintain consistent dark theme colors
@@ -259,6 +262,7 @@ Key features:
 - Keep components modular and reusable
 
 ## Resources
+
 - Tailwind CSS Documentation
 - Next.js 14 App Router
 - React Server Components

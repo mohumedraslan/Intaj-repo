@@ -70,14 +70,14 @@ Send messages via API:
 const response = await fetch('https://api.intaj.io/api/facebook/send', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer your_api_key',
-    'Content-Type': 'application/json'
+    Authorization: 'Bearer your_api_key',
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     recipientId: 'user_psid',
     type: 'text',
-    content: 'Hello from Intaj!'
-  })
+    content: 'Hello from Intaj!',
+  }),
 });
 ```
 
@@ -94,7 +94,7 @@ const intaj = new Intaj({ apiKey: 'your_api_key' });
 await intaj.facebook.send({
   recipientId: 'user_psid',
   type: 'text',
-  content: 'Hello from Intaj!'
+  content: 'Hello from Intaj!',
 });
 
 // Send template message
@@ -102,16 +102,20 @@ await intaj.facebook.sendTemplate({
   recipientId: 'user_psid',
   template: {
     type: 'generic',
-    elements: [{
-      title: 'Welcome!',
-      subtitle: 'Choose an option:',
-      buttons: [{
-        type: 'postback',
-        title: 'Get Started',
-        payload: 'GET_STARTED'
-      }]
-    }]
-  }
+    elements: [
+      {
+        title: 'Welcome!',
+        subtitle: 'Choose an option:',
+        buttons: [
+          {
+            type: 'postback',
+            title: 'Get Started',
+            payload: 'GET_STARTED',
+          },
+        ],
+      },
+    ],
+  },
 });
 ```
 
@@ -123,7 +127,7 @@ await intaj.facebook.sendTemplate({
 await intaj.facebook.send({
   recipientId: 'user_psid',
   type: 'text',
-  content: 'Hello!'
+  content: 'Hello!',
 });
 ```
 
@@ -137,12 +141,14 @@ await intaj.facebook.send({
     title: 'Welcome!',
     subtitle: 'Choose an option:',
     image_url: 'https://example.com/image.jpg',
-    buttons: [{
-      type: 'postback',
-      title: 'Get Started',
-      payload: 'GET_STARTED'
-    }]
-  }
+    buttons: [
+      {
+        type: 'postback',
+        title: 'Get Started',
+        payload: 'GET_STARTED',
+      },
+    ],
+  },
 });
 ```
 
@@ -154,12 +160,14 @@ await intaj.facebook.send({
   type: 'quick_replies',
   content: {
     text: 'Choose an option:',
-    quick_replies: [{
-      content_type: 'text',
-      title: 'Option 1',
-      payload: 'OPTION_1'
-    }]
-  }
+    quick_replies: [
+      {
+        content_type: 'text',
+        title: 'Option 1',
+        payload: 'OPTION_1',
+      },
+    ],
+  },
 });
 ```
 

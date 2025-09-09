@@ -34,12 +34,14 @@ const jobPostings: JobPosting[] = [
 const values = [
   {
     name: 'Innovation First',
-    description: "We're committed to pushing the boundaries of what's possible in AI and chatbot technology.",
+    description:
+      "We're committed to pushing the boundaries of what's possible in AI and chatbot technology.",
     icon: '🚀',
   },
   {
     name: 'Customer Success',
-    description: "Our customers' success is our success. We're dedicated to delivering exceptional value.",
+    description:
+      "Our customers' success is our success. We're dedicated to delivering exceptional value.",
     icon: '🎯',
   },
   {
@@ -92,8 +94,8 @@ export default function CareersPage() {
               Join Us in Shaping the Future of AI
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              We&apos;re building the future of customer engagement through AI-powered conversations.
-              Join our team of passionate innovators and make an impact.
+              We&apos;re building the future of customer engagement through AI-powered
+              conversations. Join our team of passionate innovators and make an impact.
             </p>
           </div>
         </div>
@@ -102,13 +104,15 @@ export default function CareersPage() {
       {/* Values section */}
       <div className="mx-auto mt-16 max-w-7xl px-6 sm:mt-20 lg:px-8">
         <div className="mx-auto max-w-2xl lg:mx-0">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Our Values</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Our Values
+          </h2>
           <p className="mt-6 text-lg leading-8 text-gray-600">
             These core values guide everything we do at Intaj.
           </p>
         </div>
         <dl className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 text-base leading-7 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-4">
-          {values.map((value) => (
+          {values.map(value => (
             <div key={value.name} className="relative pl-9">
               <dt className="inline font-semibold text-gray-900">
                 <span className="absolute left-1 top-1 text-2xl">{value.icon}</span>
@@ -123,13 +127,15 @@ export default function CareersPage() {
       {/* Open positions */}
       <div className="mx-auto mt-32 max-w-7xl px-6 sm:mt-40 lg:px-8">
         <div className="mx-auto max-w-2xl lg:mx-0">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Open Positions</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Open Positions
+          </h2>
           <p className="mt-6 text-lg leading-8 text-gray-600">
             Join our team and help us build the future of conversational AI.
           </p>
         </div>
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-          {jobPostings.map((job) => (
+          {jobPostings.map(job => (
             <div
               key={job.id}
               className="flex flex-col items-start justify-between rounded-2xl bg-white p-8 ring-1 ring-gray-200 hover:bg-gray-50 transition-colors duration-200"
@@ -148,7 +154,9 @@ export default function CareersPage() {
                     {job.title}
                   </Link>
                 </h3>
-                <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">{job.description}</p>
+                <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
+                  {job.description}
+                </p>
               </div>
               <div className="mt-6 flex w-full items-center gap-x-2">
                 <div className="text-sm font-medium text-primary-600 hover:text-primary-500">
@@ -163,16 +171,20 @@ export default function CareersPage() {
       {/* Perks section */}
       <div className="mx-auto mt-32 max-w-7xl px-6 sm:mt-40 lg:px-8">
         <div className="mx-auto max-w-2xl lg:mx-0">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Why Intaj?</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Why Intaj?
+          </h2>
           <p className="mt-6 text-lg leading-8 text-gray-600">
             We offer competitive compensation and great perks to help you do your best work.
           </p>
         </div>
         <dl className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-          {perks.map((perk) => (
+          {perks.map(perk => (
             <div key={perk.name} className="flex flex-col-reverse">
               <dt className="text-base leading-7 text-gray-600">{perk.description}</dt>
-              <dd className="text-2xl font-bold leading-9 tracking-tight text-gray-900">{perk.name}</dd>
+              <dd className="text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                {perk.name}
+              </dd>
             </div>
           ))}
         </dl>
@@ -185,7 +197,8 @@ export default function CareersPage() {
             Don&apos;t see a role that fits?
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-300">
-            We&apos;re always looking for talented individuals. Send us your resume and we&apos;ll keep it on file for future opportunities.
+            We&apos;re always looking for talented individuals. Send us your resume and we&apos;ll
+            keep it on file for future opportunities.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link

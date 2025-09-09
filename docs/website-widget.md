@@ -31,8 +31,8 @@ window.IntajWidget.init({
   position: 'bottom-right',
   theme: {
     primaryColor: '#007bff',
-    textColor: '#333333'
-  }
+    textColor: '#333333',
+  },
 });
 ```
 
@@ -49,8 +49,8 @@ window.IntajWidget.init({
   theme: {
     primaryColor: '#007bff',
     textColor: '#333333',
-    fontFamily: 'Arial, sans-serif'
-  }
+    fontFamily: 'Arial, sans-serif',
+  },
 });
 ```
 
@@ -68,23 +68,23 @@ window.IntajWidget.init({
     borderRadius: '8px',
     headerHeight: '60px',
     width: '380px',
-    height: '600px'
+    height: '600px',
   },
   greeting: {
     message: 'Hello! How can I help you today?',
-    delay: 2000
+    delay: 2000,
   },
   attachments: {
     enabled: true,
     maxSize: 5, // MB
-    allowedTypes: ['image/*', 'application/pdf']
+    allowedTypes: ['image/*', 'application/pdf'],
   },
   persistent: true,
   defaultOpen: false,
   notifications: {
     sound: true,
-    browser: true
-  }
+    browser: true,
+  },
 });
 ```
 
@@ -108,8 +108,8 @@ window.IntajWidget.setUser({
   email: 'john@example.com',
   metadata: {
     plan: 'pro',
-    company: 'Acme Inc'
-  }
+    company: 'Acme Inc',
+  },
 });
 
 // Send message programmatically
@@ -125,7 +125,7 @@ window.IntajWidget.on('ready', () => {
 });
 
 // Message received
-window.IntajWidget.on('message', (message) => {
+window.IntajWidget.on('message', message => {
   console.log('New message:', message);
 });
 
@@ -165,14 +165,14 @@ window.IntajWidget.init({
   components: {
     header: {
       title: 'Custom Header',
-      logo: 'https://example.com/logo.png'
+      logo: 'https://example.com/logo.png',
     },
     launcher: {
       label: 'Chat with us',
-      icon: 'https://example.com/icon.svg'
+      icon: 'https://example.com/icon.svg',
     },
-    inputPlaceholder: 'Type your message...'
-  }
+    inputPlaceholder: 'Type your message...',
+  },
 });
 ```
 
@@ -224,18 +224,18 @@ window.IntajWidget.init({
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>My Website</title>
-  <script src="https://cdn.intaj.io/widget.js" defer></script>
-</head>
-<body>
-  <script>
-    window.IntajWidget.init({
-      botId: 'your_bot_id',
-      apiKey: 'your_public_api_key'
-    });
-  </script>
-</body>
+  <head>
+    <title>My Website</title>
+    <script src="https://cdn.intaj.io/widget.js" defer></script>
+  </head>
+  <body>
+    <script>
+      window.IntajWidget.init({
+        botId: 'your_bot_id',
+        apiKey: 'your_public_api_key',
+      });
+    </script>
+  </body>
 </html>
 ```
 
@@ -244,34 +244,34 @@ window.IntajWidget.init({
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>My Website</title>
-  <script src="https://cdn.intaj.io/widget.js" defer></script>
-  <style>
-    :root {
-      --intaj-primary-color: #007bff;
-      --intaj-text-color: #333333;
-    }
-  </style>
-</head>
-<body>
-  <script>
-    window.IntajWidget.init({
-      botId: 'your_bot_id',
-      apiKey: 'your_public_api_key',
-      theme: {
-        primaryColor: '#007bff'
-      },
-      greeting: {
-        message: 'Welcome! How can I assist you?'
+  <head>
+    <title>My Website</title>
+    <script src="https://cdn.intaj.io/widget.js" defer></script>
+    <style>
+      :root {
+        --intaj-primary-color: #007bff;
+        --intaj-text-color: #333333;
       }
-    });
+    </style>
+  </head>
+  <body>
+    <script>
+      window.IntajWidget.init({
+        botId: 'your_bot_id',
+        apiKey: 'your_public_api_key',
+        theme: {
+          primaryColor: '#007bff',
+        },
+        greeting: {
+          message: 'Welcome! How can I assist you?',
+        },
+      });
 
-    window.IntajWidget.on('ready', () => {
-      console.log('Widget ready');
-    });
-  </script>
-</body>
+      window.IntajWidget.on('ready', () => {
+        console.log('Widget ready');
+      });
+    </script>
+  </body>
 </html>
 ```
 

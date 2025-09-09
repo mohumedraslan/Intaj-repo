@@ -19,7 +19,7 @@ import {
   Phone,
   Sparkles,
   Edit3,
-  MoreVertical
+  MoreVertical,
 } from 'lucide-react';
 
 interface Chatbot {
@@ -39,15 +39,17 @@ export default function ChatbotsPage() {
   useEffect(() => {
     const fetchChatbots = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) return;
-        
+
         const { data, error } = await supabase
           .from('chatbots')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
-          
+
         if (error) {
           setError(error.message);
         } else {
@@ -59,19 +61,16 @@ export default function ChatbotsPage() {
         setLoading(false);
       }
     };
-    
+
     fetchChatbots();
 
     // Set up real-time subscription for chatbots
     const subscription = supabase
       .channel('chatbots_changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'chatbots' },
-        () => {
-          console.log('Chatbots table changed, refetching...');
-          fetchChatbots();
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chatbots' }, () => {
+        console.log('Chatbots table changed, refetching...');
+        fetchChatbots();
+      })
       .subscribe();
 
     return () => {
@@ -80,14 +79,16 @@ export default function ChatbotsPage() {
   }, []);
 
   const getChannelIcons = (settings: Record<string, unknown>) => {
-    const channels = settings?.channels as Record<string, boolean> || {};
+    const channels = (settings?.channels as Record<string, boolean>) || {};
     const icons = [];
-    
+
     if (channels.website) icons.push(<Globe key="website" className="w-4 h-4 text-blue-400" />);
-    if (channels.facebook) icons.push(<Facebook key="facebook" className="w-4 h-4 text-blue-600" />);
-    if (channels.instagram) icons.push(<Instagram key="instagram" className="w-4 h-4 text-purple-500" />);
+    if (channels.facebook)
+      icons.push(<Facebook key="facebook" className="w-4 h-4 text-blue-600" />);
+    if (channels.instagram)
+      icons.push(<Instagram key="instagram" className="w-4 h-4 text-purple-500" />);
     if (channels.whatsapp) icons.push(<Phone key="whatsapp" className="w-4 h-4 text-green-500" />);
-    
+
     return icons;
   };
 
@@ -95,7 +96,7 @@ export default function ChatbotsPage() {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -128,7 +129,9 @@ export default function ChatbotsPage() {
                   Your Chatbots
                 </span>
               </h1>
-              <p className="text-gray-300">Manage and deploy your AI-powered chatbots across multiple channels</p>
+              <p className="text-gray-300">
+                Manage and deploy your AI-powered chatbots across multiple channels
+              </p>
             </div>
             <Link href="/dashboard/chatbots/create">
               <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:-translate-y-0.5">
@@ -156,7 +159,8 @@ export default function ChatbotsPage() {
               </div>
               <h3 className="text-2xl font-bold mb-4">No chatbots yet</h3>
               <p className="text-gray-400 mb-8 max-w-md mx-auto">
-                Get started by creating your first AI chatbot. It only takes a few minutes to set up and deploy.
+                Get started by creating your first AI chatbot. It only takes a few minutes to set up
+                and deploy.
               </p>
               <Link href="/dashboard/chatbots/create">
                 <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:-translate-y-0.5">
@@ -168,8 +172,11 @@ export default function ChatbotsPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {chatbots.map((chatbot) => (
-              <Card key={chatbot.id} className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-blue-500/10 rounded-xl hover:border-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10">
+            {chatbots.map(chatbot => (
+              <Card
+                key={chatbot.id}
+                className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-blue-500/10 rounded-xl hover:border-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10"
+              >
                 <CardHeader className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
@@ -193,14 +200,12 @@ export default function ChatbotsPage() {
                     </Button>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="p-6 pt-0">
                   {chatbot.description && (
-                    <p className="text-gray-300 text-sm mb-4 line-clamp-2">
-                      {chatbot.description}
-                    </p>
+                    <p className="text-gray-300 text-sm mb-4 line-clamp-2">{chatbot.description}</p>
                   )}
-                  
+
                   {/* Channels */}
                   <div className="flex items-center space-x-2 mb-4">
                     <span className="text-xs text-gray-400">Channels:</span>
@@ -264,7 +269,7 @@ export default function ChatbotsPage() {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-purple-500/10">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -272,7 +277,8 @@ export default function ChatbotsPage() {
                       <p className="text-gray-400 text-sm">Active Channels</p>
                       <p className="text-2xl font-bold text-purple-400">
                         {chatbots.reduce((acc, bot) => {
-                          const channels = bot.settings?.channels as Record<string, boolean> || {};
+                          const channels =
+                            (bot.settings?.channels as Record<string, boolean>) || {};
                           return acc + Object.values(channels).filter(Boolean).length;
                         }, 0)}
                       </p>
@@ -281,7 +287,7 @@ export default function ChatbotsPage() {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-green-500/10">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -293,7 +299,7 @@ export default function ChatbotsPage() {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-cyan-500/10">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">

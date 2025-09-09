@@ -19,7 +19,7 @@ export interface AuditLogEntry {
 
 export class AuditLogger {
   private supabase;
-  
+
   constructor() {
     this.supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,9 +33,7 @@ export class AuditLogger {
       timestamp: new Date(),
     };
 
-    const { error } = await this.supabase
-      .from('audit_logs')
-      .insert([fullEntry]);
+    const { error } = await this.supabase.from('audit_logs').insert([fullEntry]);
 
     if (error) {
       console.error('Failed to write audit log:', error);
@@ -59,7 +57,12 @@ export class AuditLogger {
     console.log('[AUDIT LOG]', logEntry);
   }
 
-  async logAuthEvent(userId: string, action: string, status: 'success' | 'failure', metadata: Record<string, unknown>): Promise<void> {
+  async logAuthEvent(
+    userId: string,
+    action: string,
+    status: 'success' | 'failure',
+    metadata: Record<string, unknown>
+  ): Promise<void> {
     await this.log({
       userId,
       action,
@@ -70,7 +73,13 @@ export class AuditLogger {
     });
   }
 
-  async logDataAccess(userId: string, resourceType: string, resourceId: string, action: string, metadata: Record<string, unknown>): Promise<void> {
+  async logDataAccess(
+    userId: string,
+    resourceType: string,
+    resourceId: string,
+    action: string,
+    metadata: Record<string, unknown>
+  ): Promise<void> {
     await this.log({
       userId,
       action,
@@ -82,7 +91,12 @@ export class AuditLogger {
     });
   }
 
-  async logSecurityEvent(userId: string, action: string, metadata: Record<string, unknown>, severity: 'warning' | 'critical' = 'warning'): Promise<void> {
+  async logSecurityEvent(
+    userId: string,
+    action: string,
+    metadata: Record<string, unknown>,
+    severity: 'warning' | 'critical' = 'warning'
+  ): Promise<void> {
     await this.log({
       userId,
       action,
@@ -103,9 +117,7 @@ export class AuditLogger {
     endDate?: Date;
     limit?: number;
   }): Promise<AuditLogEntry[]> {
-    let query = this.supabase
-      .from('audit_logs')
-      .select();
+    let query = this.supabase.from('audit_logs').select();
 
     if (options.userId) query = query.eq('userId', options.userId);
     if (options.action) query = query.eq('action', options.action);

@@ -9,7 +9,7 @@ export function generateTOTP(secret: string, window = 0): string {
 function generateHOTP(secret: string, counter: number): string {
   // Convert Base32 secret to buffer using our base32 implementation
   const decodedSecret = base32Decode(secret.replace(/\s/g, ''));
-  
+
   const buffer = Buffer.alloc(8);
   for (let i = 0; i < 8; i++) {
     buffer[7 - i] = counter & 0xff;
@@ -21,10 +21,11 @@ function generateHOTP(secret: string, counter: number): string {
   const hmacResult = hmac.digest();
 
   const offset = hmacResult[hmacResult.length - 1] & 0xf;
-  const code = (hmacResult[offset] & 0x7f) << 24 |
-               (hmacResult[offset + 1] & 0xff) << 16 |
-               (hmacResult[offset + 2] & 0xff) << 8 |
-               (hmacResult[offset + 3] & 0xff);
+  const code =
+    ((hmacResult[offset] & 0x7f) << 24) |
+    ((hmacResult[offset + 1] & 0xff) << 16) |
+    ((hmacResult[offset + 2] & 0xff) << 8) |
+    (hmacResult[offset + 3] & 0xff);
 
   return (code % 1000000).toString().padStart(6, '0');
 }
@@ -47,9 +48,9 @@ export function testTOTPFlow(secret: string): {
 } {
   const currentCode = generateTOTP(secret);
   const isValid = verifyTOTP(secret, currentCode);
-  
+
   return {
     currentCode,
-    isValid
+    isValid,
   };
 }

@@ -37,12 +37,15 @@ export class WhatsAppIntegration {
   /**
    * Send a text message via WhatsApp Business API
    */
-  async sendTextMessage(to: string, message: string): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  async sendTextMessage(
+    to: string,
+    message: string
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/${this.config.phoneNumberId}/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
+          Authorization: `Bearer ${this.config.accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -50,9 +53,9 @@ export class WhatsAppIntegration {
           to: to,
           type: 'text',
           text: {
-            body: message
-          }
-        })
+            body: message,
+          },
+        }),
       });
 
       const data = await response.json();
@@ -60,18 +63,18 @@ export class WhatsAppIntegration {
       if (response.ok) {
         return {
           success: true,
-          messageId: data.messages[0].id
+          messageId: data.messages[0].id,
         };
       } else {
         return {
           success: false,
-          error: data.error?.message || 'Failed to send message'
+          error: data.error?.message || 'Failed to send message',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -80,14 +83,14 @@ export class WhatsAppIntegration {
    * Send a template message via WhatsApp Business API
    */
   async sendTemplateMessage(
-    to: string, 
+    to: string,
     template: WhatsAppTemplate
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/${this.config.phoneNumberId}/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
+          Authorization: `Bearer ${this.config.accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -97,11 +100,11 @@ export class WhatsAppIntegration {
           template: {
             name: template.name,
             language: {
-              code: template.language
+              code: template.language,
             },
-            components: template.components
-          }
-        })
+            components: template.components,
+          },
+        }),
       });
 
       const data = await response.json();
@@ -109,18 +112,18 @@ export class WhatsAppIntegration {
       if (response.ok) {
         return {
           success: true,
-          messageId: data.messages[0].id
+          messageId: data.messages[0].id,
         };
       } else {
         return {
           success: false,
-          error: data.error?.message || 'Failed to send template message'
+          error: data.error?.message || 'Failed to send template message',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -136,7 +139,7 @@ export class WhatsAppIntegration {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const mediaObject: any = {
-        link: mediaUrl
+        link: mediaUrl,
       };
 
       if (caption && (type === 'image' || type === 'video' || type === 'document')) {
@@ -146,15 +149,15 @@ export class WhatsAppIntegration {
       const response = await fetch(`${this.baseUrl}/${this.config.phoneNumberId}/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
+          Authorization: `Bearer ${this.config.accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           messaging_product: 'whatsapp',
           to: to,
           type: type,
-          [type]: mediaObject
-        })
+          [type]: mediaObject,
+        }),
       });
 
       const data = await response.json();
@@ -162,18 +165,18 @@ export class WhatsAppIntegration {
       if (response.ok) {
         return {
           success: true,
-          messageId: data.messages[0].id
+          messageId: data.messages[0].id,
         };
       } else {
         return {
           success: false,
-          error: data.error?.message || 'Failed to send media message'
+          error: data.error?.message || 'Failed to send media message',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -186,14 +189,14 @@ export class WhatsAppIntegration {
       const response = await fetch(`${this.baseUrl}/${this.config.phoneNumberId}/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
+          Authorization: `Bearer ${this.config.accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           messaging_product: 'whatsapp',
           status: 'read',
-          message_id: messageId
-        })
+          message_id: messageId,
+        }),
       });
 
       if (response.ok) {
@@ -202,13 +205,13 @@ export class WhatsAppIntegration {
         const data = await response.json();
         return {
           success: false,
-          error: data.error?.message || 'Failed to mark message as read'
+          error: data.error?.message || 'Failed to mark message as read',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -220,8 +223,8 @@ export class WhatsAppIntegration {
     try {
       const response = await fetch(`${this.baseUrl}/${mediaId}`, {
         headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
-        }
+          Authorization: `Bearer ${this.config.accessToken}`,
+        },
       });
 
       const data = await response.json();
@@ -229,18 +232,18 @@ export class WhatsAppIntegration {
       if (response.ok) {
         return {
           success: true,
-          url: data.url
+          url: data.url,
         };
       } else {
         return {
           success: false,
-          error: data.error?.message || 'Failed to get media URL'
+          error: data.error?.message || 'Failed to get media URL',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -248,30 +251,32 @@ export class WhatsAppIntegration {
   /**
    * Download media content
    */
-  async downloadMedia(mediaUrl: string): Promise<{ success: boolean; buffer?: Buffer; error?: string }> {
+  async downloadMedia(
+    mediaUrl: string
+  ): Promise<{ success: boolean; buffer?: Buffer; error?: string }> {
     try {
       const response = await fetch(mediaUrl, {
         headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
-        }
+          Authorization: `Bearer ${this.config.accessToken}`,
+        },
       });
 
       if (response.ok) {
         const buffer = Buffer.from(await response.arrayBuffer());
         return {
           success: true,
-          buffer
+          buffer,
         };
       } else {
         return {
           success: false,
-          error: 'Failed to download media'
+          error: 'Failed to download media',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -285,7 +290,7 @@ export class WhatsAppIntegration {
       .createHmac('sha256', appSecret)
       .update(payload, 'utf8')
       .digest('hex');
-    
+
     return signature === `sha256=${expectedSignature}`;
   }
 
@@ -307,7 +312,7 @@ export class WhatsAppIntegration {
         to: value.metadata?.phone_number_id || '',
         type: messages.type,
         content: '',
-        timestamp: messages.timestamp
+        timestamp: messages.timestamp,
       };
 
       // Extract content based on message type
@@ -345,8 +350,8 @@ export class WhatsAppIntegration {
     try {
       const response = await fetch(`${this.baseUrl}/${this.config.phoneNumberId}`, {
         headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
-        }
+          Authorization: `Bearer ${this.config.accessToken}`,
+        },
       });
 
       const data = await response.json();
@@ -354,18 +359,18 @@ export class WhatsAppIntegration {
       if (response.ok) {
         return {
           success: true,
-          profile: data
+          profile: data,
         };
       } else {
         return {
           success: false,
-          error: data.error?.message || 'Failed to get business profile'
+          error: data.error?.message || 'Failed to get business profile',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -385,10 +390,10 @@ export class WhatsAppIntegration {
       const response = await fetch(`${this.baseUrl}/${this.config.phoneNumberId}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.accessToken}`,
+          Authorization: `Bearer ${this.config.accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates),
       });
 
       if (response.ok) {
@@ -397,13 +402,13 @@ export class WhatsAppIntegration {
         const data = await response.json();
         return {
           success: false,
-          error: data.error?.message || 'Failed to update business profile'
+          error: data.error?.message || 'Failed to update business profile',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -422,28 +427,30 @@ export class WhatsAppConnectionManager {
   /**
    * Save WhatsApp connection to database
    */
-  async saveConnection(userId: string, chatbotId: string, config: WhatsAppConfig): Promise<{ success: boolean; error?: string }> {
+  async saveConnection(
+    userId: string,
+    chatbotId: string,
+    config: WhatsAppConfig
+  ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
-        .from('connections')
-        .upsert({
-          user_id: userId,
-          chatbot_id: chatbotId,
-          platform: 'whatsapp',
-          credentials: {
-            access_token: config.accessToken,
-            phone_number_id: config.phoneNumberId,
-            webhook_verify_token: config.webhookVerifyToken,
-            business_account_id: config.businessAccountId
-          },
-          active: true,
-          created_at: new Date().toISOString()
-        });
+      const { error } = await this.supabase.from('connections').upsert({
+        user_id: userId,
+        chatbot_id: chatbotId,
+        platform: 'whatsapp',
+        credentials: {
+          access_token: config.accessToken,
+          phone_number_id: config.phoneNumberId,
+          webhook_verify_token: config.webhookVerifyToken,
+          business_account_id: config.businessAccountId,
+        },
+        active: true,
+        created_at: new Date().toISOString(),
+      });
 
       if (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
@@ -451,7 +458,7 @@ export class WhatsAppConnectionManager {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -459,7 +466,10 @@ export class WhatsAppConnectionManager {
   /**
    * Get WhatsApp connection from database
    */
-  async getConnection(userId: string, chatbotId: string): Promise<{ success: boolean; connection?: any; error?: string }> {
+  async getConnection(
+    userId: string,
+    chatbotId: string
+  ): Promise<{ success: boolean; connection?: any; error?: string }> {
     try {
       const { data, error } = await this.supabase
         .from('connections')
@@ -473,18 +483,18 @@ export class WhatsAppConnectionManager {
       if (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
       return {
         success: true,
-        connection: data
+        connection: data,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -492,29 +502,30 @@ export class WhatsAppConnectionManager {
   /**
    * Store incoming message in database
    */
-  async storeMessage(chatbotId: string, message: WhatsAppMessage): Promise<{ success: boolean; error?: string }> {
+  async storeMessage(
+    chatbotId: string,
+    message: WhatsAppMessage
+  ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
-        .from('messages')
-        .insert({
-          chatbot_id: chatbotId,
-          role: 'user',
-          content: message.content,
-          metadata: {
-            platform: 'whatsapp',
-            message_id: message.id,
-            from: message.from,
-            type: message.type,
-            media_url: message.mediaUrl,
-            timestamp: message.timestamp
-          },
-          created_at: new Date().toISOString()
-        });
+      const { error } = await this.supabase.from('messages').insert({
+        chatbot_id: chatbotId,
+        role: 'user',
+        content: message.content,
+        metadata: {
+          platform: 'whatsapp',
+          message_id: message.id,
+          from: message.from,
+          type: message.type,
+          media_url: message.mediaUrl,
+          timestamp: message.timestamp,
+        },
+        created_at: new Date().toISOString(),
+      });
 
       if (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
@@ -522,7 +533,7 @@ export class WhatsAppConnectionManager {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -531,31 +542,29 @@ export class WhatsAppConnectionManager {
    * Store outgoing message in database
    */
   async storeOutgoingMessage(
-    chatbotId: string, 
-    to: string, 
-    content: string, 
+    chatbotId: string,
+    to: string,
+    content: string,
     messageId?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
-        .from('messages')
-        .insert({
-          chatbot_id: chatbotId,
-          role: 'assistant',
-          content: content,
-          metadata: {
-            platform: 'whatsapp',
-            message_id: messageId,
-            to: to,
-            timestamp: Date.now()
-          },
-          created_at: new Date().toISOString()
-        });
+      const { error } = await this.supabase.from('messages').insert({
+        chatbot_id: chatbotId,
+        role: 'assistant',
+        content: content,
+        metadata: {
+          platform: 'whatsapp',
+          message_id: messageId,
+          to: to,
+          timestamp: Date.now(),
+        },
+        created_at: new Date().toISOString(),
+      });
 
       if (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
@@ -563,7 +572,7 @@ export class WhatsAppConnectionManager {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }

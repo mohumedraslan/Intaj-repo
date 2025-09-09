@@ -12,7 +12,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         className={cn(
           'px-4 py-2 rounded font-medium transition-colors',
-          variant === 'destructive' ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-primary text-white hover:bg-primary/90',
+          variant === 'destructive'
+            ? 'bg-red-600 text-white hover:bg-red-700'
+            : 'bg-primary text-white hover:bg-primary/90',
           className
         )}
         ref={ref}

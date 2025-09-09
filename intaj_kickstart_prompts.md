@@ -1,6 +1,6 @@
 # INTAJ — Kickstart Prompts (senior prompt engineer)
 
-> A ready-to-queue, step-by-step list of prompts you can paste into GitHub Copilot Chat, ChatGPT, or any coding LLM to scaffold, build, and launch the Intaj MVP. Follow the prompts in order (1 → N). Each prompt specifies *where to run it* (Copilot/ChatGPT/Terminal), *context*, *expected outputs*, and *commit message suggestions*.
+> A ready-to-queue, step-by-step list of prompts you can paste into GitHub Copilot Chat, ChatGPT, or any coding LLM to scaffold, build, and launch the Intaj MVP. Follow the prompts in order (1 → N). Each prompt specifies _where to run it_ (Copilot/ChatGPT/Terminal), _context_, _expected outputs_, and _commit message suggestions_.
 
 ---
 
@@ -15,15 +15,16 @@
 
 ### ORDER: Foundations → Core Features → Integrations → Launch → Growth
 
-
 ---
 
 ## Prompt 001 — Project & repo initialization
+
 **Use with:** Terminal + Copilot/ChatGPT (for file contents)
 
 **Context:** Repo name: `intaj`. Tech: Next.js 15 (App Router), TypeScript, Tailwind, Shadcn UI, Supabase, Stripe, OpenRouter.
 
 **Prompt (paste into Copilot Chat / ChatGPT):**
+
 ```
 You are a senior full-stack engineer. Generate the exact shell commands and brief explanation to:
 1. Create a new GitHub repo named `intaj` (local folder), initialize git, and create main branch.
@@ -45,11 +46,13 @@ Output only the shell commands first, then a short checklist of the files create
 ---
 
 ## Prompt 002 — Project structure & starter README
+
 **Use with:** Copilot Chat / ChatGPT
 
 **Context:** After running Prompt 001 you have the repo skeleton.
 
 **Prompt:**
+
 ```
 You are a senior developer. Create a detailed README.md for the Intaj repo (MVP-first). Include: project description, tech stack, quick start (install, env vars, run), file structure, contribution note, and links to the DB schema file `db/DB_DESCRIPTION.md`. Keep it concise but actionable so a junior dev can get started in 10 minutes.
 
@@ -63,11 +66,13 @@ Output the full README.md content in markdown.
 ---
 
 ## Prompt 003 — Add DB folder and initial schema file
+
 **Use with:** Copilot Chat / ChatGPT
 
 **Context:** We already defined the schema earlier. Now create database migration SQL and DB_DESCRIPTION file.
 
 **Prompt:**
+
 ```
 You are a senior backend engineer. Create a `db/` folder and inside it:
 1. `database_updates.sql` file containing the SQL create statements for the following tables (with types and sensible defaults): profiles, chatbots, messages, faqs, data_sources, connections, workflows. Use Postgres SQL syntax and gen_random_uuid() defaults. Add indices on frequent lookup columns (chatbot_id, user_id, created_at).
@@ -83,9 +88,11 @@ Output both files in full.
 ---
 
 ## Prompt 004 — Supabase project setup checklist
+
 **Use with:** Terminal + ChatGPT (instructions)
 
 **Prompt:**
+
 ```
 You are a senior cloud engineer. Provide an exact step-by-step checklist to create a Supabase project for Intaj (no UI screenshots, only instructions):
 - How to create the project, add the DB schema (from db/database_updates.sql), enable pgvector extension (if using vector search), enable RLS policies, create storage bucket for files, and set service role keys.
@@ -102,9 +109,11 @@ Output the checklist with commands and SQL snippets where needed.
 ---
 
 ## Prompt 005 — Setup environment and secrets format
+
 **Use with:** Copilot Chat / ChatGPT
 
 **Prompt:**
+
 ```
 You are a senior devops/SRE. Produce a secure `.env.local.example` file content listing every environment variable the app will need for MVP. Include comments describing each variable. Variables must include: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, OPENROUTER_API_KEY, STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, VERCEL_URL (optional), DATABASE_URL (if direct), and a symmetric key for AES-256-GCM named ENC_MASTER_KEY (32 bytes placeholder). Output only the `.env.local.example` file content.
 ```
@@ -116,9 +125,11 @@ You are a senior devops/SRE. Produce a secure `.env.local.example` file content 
 ---
 
 ## Prompt 006 — Setup Tailwind + Shadcn base UI
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a frontend engineer. Generate the minimal set of files and code to configure Tailwind CSS and Shadcn UI in a Next.js 15 TypeScript app (App Router). Create `tailwind.config.cjs`, `postcss.config.cjs`, and example root layout `src/app/layout.tsx` using shadcn patterns and Tailwind. Add a simple dark-mode toggle in the layout and include global styles import.
 
@@ -132,11 +143,13 @@ Output full file contents and explain where to paste them.
 ---
 
 ## Prompt 007 — Supabase Auth integration (signup/login)
+
 **Use with:** Copilot Chat
 
 **Context:** Use Supabase Auth with email/password and OAuth later.
 
 **Prompt:**
+
 ```
 You are a senior full-stack developer. Implement Supabase Auth integration for Next.js App Router. Create `src/lib/supabaseClient.ts` (client wrapper), `src/app/(auth)/login/page.tsx` and `src/app/(auth)/signup/page.tsx` pages with simple Shadcn UI forms. Include server actions or client hooks for sign-in/sign-up, and redirect to `/dashboard` on success. Provide code for session protection: a `requireUser` server action that redirects to login if not authenticated.
 
@@ -150,9 +163,11 @@ Output full TypeScript files.
 ---
 
 ## Prompt 008 — Profiles table wiring and onboarding checklist
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a backend engineer. Create an API function and UI to ensure a `profiles` row exists after user signs up. Implement a `POST /api/profiles/create` server action that creates profile row from auth.user and returns profile. Add an onboarding checklist UI component (Shadcn) that appears on first login prompting to "Create your first bot" and stores completion in `profiles.onboarded`.
 
@@ -166,9 +181,11 @@ Output code for API route and UI component.
 ---
 
 ## Prompt 009 — Chatbot CRUD (create, list, edit)
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior full-stack dev. Implement CRUD for chatbots:
 - `src/app/dashboard/chatbots/page.tsx` — list user's chatbots with create button.
@@ -185,9 +202,11 @@ Provide TypeScript + React code for pages and server actions. Keep UI minimal bu
 ---
 
 ## Prompt 010 — FAQ & File Upload (data_sources)
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior dev. Add an interface to upload files (pdf/docx) into Supabase Storage and save metadata into `data_sources` table. Also create a FAQ editor UI where the user can add/edit FAQ pairs saved to `faqs` table. Ensure file uploads show upload progress and preview of uploaded files.
 
@@ -201,11 +220,13 @@ Provide full React components and server actions.
 ---
 
 ## Prompt 011 — Embeddings extraction & vector search (MVP)
+
 **Use with:** Copilot Chat
 
 **Context:** Use OpenRouter/OpenAI for embeddings. Use pgvector extension in Supabase if available.
 
 **Prompt:**
+
 ```
 You are a senior ML infra engineer. Implement a basic embeddings pipeline:
 1. A server action `src/lib/embeddings.ts` that accepts file text or FAQ text, calls OpenRouter/OpenAI embeddings API, and stores vectors in a `vectors` table (create SQL for `vectors` if necessary) using pgvector.
@@ -221,9 +242,11 @@ Provide SQL schema for vectors, TypeScript server functions, and example usage w
 ---
 
 ## Prompt 012 — Chat UI & streaming responses
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior frontend engineer. Build a production-ready chat interface in `src/app/chat/[chatbotId]/page.tsx` that:
 - Shows message history from `messages` table.
@@ -241,9 +264,11 @@ Provide the code for the chat page, message components, and the streaming server
 ---
 
 ## Prompt 013 — OpenRouter wrapper + fallback
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are an experienced backend engineer. Create `src/lib/openrouter.ts` that:
 - Provides a `streamChatResponse({model, messages, onToken})` function which connects to OpenRouter streaming endpoint, handles chunk parsing, and invokes `onToken` for each token.
@@ -260,9 +285,11 @@ Output TypeScript code suitable for Next.js server environment.
 ---
 
 ## Prompt 014 — Messages retention & free-tier limits
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a product-minded backend engineer. Implement a server-side middleware or server action that enforces free-tier usage caps per profile. Rules:
 - Free plan: 500 messages / month (configurable).
@@ -279,9 +306,11 @@ Also implement DB schema for `usage_metrics` table.
 ---
 
 ## Prompt 015 — Embeddable Website Widget
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior frontend engineer. Create an embeddable chat widget that customers can copy-paste into any website. Requirements:
 - A small JS snippet that injects an iframe and loads a hosted widget from `https://<VERCEL_URL>/widget.js`.
@@ -298,9 +327,11 @@ Produce the widget snippet for customers to paste and the server-side code gener
 ---
 
 ## Prompt 016 — Stripe Checkout + webhook handling
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior backend engineer. Add Stripe integration using hosted Checkout sessions and a webhook handler:
 - Create `src/app/api/stripe/create-checkout-session/route.ts` that creates a Checkout session (product ids: Free, Pro) and returns session URL.
@@ -317,9 +348,11 @@ Output full route code and testing instructions with `stripe-cli`.
 ---
 
 ## Prompt 017 — Admin dashboard (basic analytics)
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a product focused developer. Create a minimal admin dashboard at `/admin` that shows:
 - Total users, total chatbots, messages last 30 days, top 10 bots by messages.
@@ -338,9 +371,11 @@ Output admin page code and server helpers.
 ---
 
 ## Prompt 018 — Security: AES-256-GCM credential encryption helper
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior security engineer. Implement an AES-256-GCM helper in TypeScript `src/lib/crypto.ts` with functions `encryptJSON(obj, key)` and `decryptJSON(ciphertext, key)`. Use Web Crypto API (Node/Edge compatible), include nonce generation and authentication tag handling. Provide example usage saving `connections.credentials` (encrypted) and reading back.
 
@@ -354,9 +389,11 @@ Also create a migration note to store encrypted credentials in `connections.cred
 ---
 
 ## Prompt 019 — n8n integration plan + webhook bridge
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior automation engineer. Provide a clear plan and example code to integrate n8n as a helper automation engine (temporary) while Intaj builds its own workflow engine. The plan should include:
 - How to trigger n8n workflows from Intaj (HTTP webhook with auth token).
@@ -373,9 +410,11 @@ Output the plan and example server code for triggering and receiving webhooks.
 ---
 
 ## Prompt 020 — Minimal Workflow executor skeleton (internal)
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior systems engineer. Create a minimal internal workflow executor that can run simple JSON-defined workflows stored in `workflows.definition`. Requirements:
 - Support triggers: `on_message`, `on_new_user`.
@@ -392,9 +431,11 @@ Output TypeScript code for the executor and SQL for `workflow_runs` table.
 ---
 
 ## Prompt 021 — CI/CD: GitHub Actions for lint/build/test/deploy
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a senior devops engineer. Generate a GitHub Actions workflow file `.github/workflows/ci.yml` that:
 - Runs on push to main and PRs.
@@ -411,9 +452,11 @@ Output the YAML file content.
 ---
 
 ## Prompt 022 — Logging & monitoring integration (Sentry)
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are an SRE. Add Sentry to the Next.js app with environment-based initialization. Provide `src/lib/sentry.ts` and show how to wrap server and client errors. Also add a simple usage example in the chat API route to capture exceptions.
 
@@ -427,9 +470,11 @@ Output the files and setup instructions.
 ---
 
 ## Prompt 023 — Vercel deployment checklist + environment variables
+
 **Use with:** ChatGPT / Terminal
 
 **Prompt:**
+
 ```
 You are an experienced platform engineer. Produce an exact Vercel deployment checklist for Intaj including required environment variables in Vercel project settings, recommended runtime settings, and steps to enable automatic deploys from GitHub. Include notes about preview environments and secure storage of SUPABASE_SERVICE_ROLE_KEY.
 
@@ -443,9 +488,11 @@ Output the checklist.
 ---
 
 ## Prompt 024 — Beta testing & onboarding email
+
 **Use with:** ChatGPT
 
 **Prompt:**
+
 ```
 You are a growth/product manager. Draft a short onboarding email sequence (3 emails) to send to beta testers. Focus: signup, create first bot, install widget, and request feedback. Include subject lines and CTA.
 
@@ -459,9 +506,11 @@ Output full email content in plain text.
 ---
 
 ## Prompt 025 — Marketing launch checklist (first 30 days)
+
 **Use with:** ChatGPT
 
 **Prompt:**
+
 ```
 You are a growth hacker. Create a 30-day launch checklist for Intaj MVP focused on early traction: Product Hunt launch, LinkedIn posts, targeted outreach to 50 local SMEs, list of 10 demo script ideas, and a basic pricing pitch. Provide short templates the founder can use for outreach messages.
 
@@ -475,9 +524,11 @@ Output the checklist and templates.
 ---
 
 ## Prompt 026 — Add multi-model config and switcher
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are an ML platform developer. Implement a pluggable model provider pattern: `src/lib/models/providers.ts` that maps model keys like `openai:gpt-4`, `mistral:mix`, `anthropic:claude` to provider clients. Add a UI component in chatbot settings to select default provider and model. The code should allow switching provider at runtime.
 
@@ -491,9 +542,11 @@ Output TypeScript code.
 ---
 
 ## Prompt 027 — Add tests (basic)
+
 **Use with:** Copilot Chat
 
 **Prompt:**
+
 ```
 You are a TDD-focused engineer. Add a few basic tests using Jest + React Testing Library for the Chat UI and for API route `POST /api/chat/stream` (mock OpenRouter). Create `jest.config.js`, and sample tests: chat UI renders, messages appear, and server route returns streaming token chunks.
 
@@ -507,9 +560,11 @@ Output test config and tests.
 ---
 
 ## Prompt 028 — Runbook: incident, backup, and data export
+
 **Use with:** ChatGPT
 
 **Prompt:**
+
 ```
 You are a site reliability engineer. Write a short runbook with steps for:
 - What to do if Supabase DB becomes read-only.
@@ -526,9 +581,11 @@ Keep it actionable and concise.
 ---
 
 ## Prompt 029 — Roadmap & prioritized features list (3 quarters)
+
 **Use with:** ChatGPT
 
 **Prompt:**
+
 ```
 You are a senior PM. Produce a prioritized roadmap for next 3 quarters (Q1: MVP improvements, Q2: multi-channel + workflows, Q3: marketplace & enterprise). Include milestones, success metrics, and acceptance criteria for each milestone.
 
@@ -542,9 +599,11 @@ Output a markdown roadmap.
 ---
 
 ## Prompt 030 — Developer Onboarding checklist
+
 **Use with:** ChatGPT
 
 **Prompt:**
+
 ```
 You are a senior engineering manager. Create a short onboarding checklist for a new developer joining the Intaj project. Include local setup steps, how to run migrations, how to get access to Supabase/Vercel secrets, coding style, and code review expectations.
 
@@ -558,6 +617,7 @@ Output the checklist.
 ---
 
 ## Tips for using these prompts
+
 - Paste each prompt exactly into Copilot Chat or ChatGPT with repository context open. For Copilot, open the target file and ask Copilot to "create file X with content" and paste the prompt.
 - For server routes and secrets, always test locally with `supabase start` or `stripe-cli` for webhook verification.
 - Commit often and keep each prompt output in a separate commit.
@@ -565,7 +625,7 @@ Output the checklist.
 ---
 
 ## Final note
-This list is intentionally exhaustive to let you *queue tasks* and hand them to Copilot or an LLM one-by-one. If you want, I can now run a subset of these prompts and produce the actual files for you (for example: prompts 1–7 to create the working skeleton). Tell me which block (e.g., 001–007) you want me to expand into real files first.
+
+This list is intentionally exhaustive to let you _queue tasks_ and hand them to Copilot or an LLM one-by-one. If you want, I can now run a subset of these prompts and produce the actual files for you (for example: prompts 1–7 to create the working skeleton). Tell me which block (e.g., 001–007) you want me to expand into real files first.
 
 Good luck — you're set to move from zero to a marketable Intaj MVP fast.🔥
-

@@ -1,34 +1,34 @@
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '@/types/supabase'
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/types/supabase';
 
 interface ErrorLogEntry {
-  id: string
-  error_type: string
-  message: string
-  stack_trace?: string
-  metadata: Record<string, unknown>
-  resolved: boolean
-  created_at: string
+  id: string;
+  error_type: string;
+  message: string;
+  stack_trace?: string;
+  metadata: Record<string, unknown>;
+  resolved: boolean;
+  created_at: string;
 }
 
 interface RetryConfig {
-  maxAttempts: number
-  initialDelay: number
-  maxDelay: number
-  backoffFactor: number
+  maxAttempts: number;
+  initialDelay: number;
+  maxDelay: number;
+  backoffFactor: number;
 }
 
 export class ErrorHandler {
-  private supabase: ReturnType<typeof createClient<Database>>
+  private supabase: ReturnType<typeof createClient<Database>>;
   private defaultRetryConfig: RetryConfig = {
     maxAttempts: 3,
     initialDelay: 1000, // 1 second
-    maxDelay: 10000,    // 10 seconds
-    backoffFactor: 2
-  }
+    maxDelay: 10000, // 10 seconds
+    backoffFactor: 2,
+  };
 
   constructor(supabaseClient: ReturnType<typeof createClient<Database>>) {
-    this.supabase = supabaseClient
+    this.supabase = supabaseClient;
   }
 
   // Log error to database and external service
@@ -41,92 +41,87 @@ export class ErrorHandler {
         metadata: {
           ...metadata,
           timestamp: new Date().toISOString(),
-          environment: process.env.NODE_ENV
+          environment: process.env.NODE_ENV,
         },
-        resolved: false
-      }
+        resolved: false,
+      };
 
       // Log to Supabase
-      await this.supabase
-        .from('error_logs')
-        .insert(errorEntry)
+      await this.supabase.from('error_logs').insert(errorEntry);
 
       // Could add external logging service here (e.g., Sentry)
-      
+
       console.error('Error logged:', {
         type: error.name,
         message: error.message,
-        metadata
-      })
+        metadata,
+      });
     } catch (loggingError) {
       // Fallback to console if database logging fails
-      console.error('Error logging failed:', loggingError)
-      console.error('Original error:', error)
+      console.error('Error logging failed:', loggingError);
+      console.error('Original error:', error);
     }
   }
 
   // Retry mechanism with exponential backoff
-  async retry<T>(
-    operation: () => Promise<T>,
-    config: Partial<RetryConfig> = {}
-  ): Promise<T> {
-    const retryConfig = { ...this.defaultRetryConfig, ...config }
-    let lastError: Error
-    let delay = retryConfig.initialDelay
+  async retry<T>(operation: () => Promise<T>, config: Partial<RetryConfig> = {}): Promise<T> {
+    const retryConfig = { ...this.defaultRetryConfig, ...config };
+    let lastError: Error;
+    let delay = retryConfig.initialDelay;
 
     for (let attempt = 1; attempt <= retryConfig.maxAttempts; attempt++) {
       try {
-        return await operation()
+        return await operation();
       } catch (error: unknown) {
-        lastError = error instanceof Error ? error : new Error(String(error))
-        
+        lastError = error instanceof Error ? error : new Error(String(error));
+
         // Log each retry attempt
         await this.logError(lastError, {
           attempt,
           maxAttempts: retryConfig.maxAttempts,
-          operation: operation.name
-        })
+          operation: operation.name,
+        });
 
         // Check if we should retry based on error type
         if (!this.isRetryableError(error) || attempt === retryConfig.maxAttempts) {
-          throw error
+          throw error;
         }
 
         // Wait with exponential backoff
-        await new Promise(resolve => setTimeout(resolve, delay))
-        delay = Math.min(delay * retryConfig.backoffFactor, retryConfig.maxDelay)
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay = Math.min(delay * retryConfig.backoffFactor, retryConfig.maxDelay);
       }
     }
 
-    throw lastError!
+    throw lastError!;
   }
 
   // Check if error is retryable
   private isRetryableError(error: unknown): boolean {
     if (!(error instanceof Error)) return false;
-    
+
     const errorWithCode = error as Error & { code?: string; status?: number };
     // Network errors
     if (error.name === 'NetworkError' || error.name === 'TimeoutError') {
-      return true
+      return true;
     }
 
     // Database connection errors
     if (errorWithCode.code === 'ECONNRESET' || errorWithCode.code === 'ETIMEDOUT') {
-      return true
+      return true;
     }
 
     // Rate limiting errors (retry after backoff)
     if (errorWithCode.status === 429) {
-      return true
+      return true;
     }
 
     // Supabase specific errors
     if (errorWithCode.code === 'PGRST116' || errorWithCode.code === 'PGRST012') {
-      return true
+      return true;
     }
 
-    return false
+    return false;
   }
 
   // Handle database fallback
@@ -135,11 +130,11 @@ export class ErrorHandler {
     fallbackOperation: () => Promise<T>
   ): Promise<T> {
     try {
-      return await this.retry(primaryOperation)
+      return await this.retry(primaryOperation);
     } catch (error: unknown) {
-      const errorInstance = error instanceof Error ? error : new Error(String(error))
-      await this.logError(errorInstance, { usedFallback: true })
-      return fallbackOperation()
+      const errorInstance = error instanceof Error ? error : new Error(String(error));
+      await this.logError(errorInstance, { usedFallback: true });
+      return fallbackOperation();
     }
   }
 
@@ -152,20 +147,21 @@ export class ErrorHandler {
         message: this.getUserFriendlyMessage(error),
         metadata: {
           error_type: error.name,
-          ...metadata
+          ...metadata,
         },
-        seen: false
-      }
+        seen: false,
+      };
 
-      await this.supabase
-        .from('user_notifications')
-        .insert(notification)
+      await this.supabase.from('user_notifications').insert(notification);
     } catch (notificationError) {
-      const notificationErrorInstance = notificationError instanceof Error ? notificationError : new Error(String(notificationError))
+      const notificationErrorInstance =
+        notificationError instanceof Error
+          ? notificationError
+          : new Error(String(notificationError));
       await this.logError(notificationErrorInstance, {
         context: 'User notification failed',
-        originalError: error
-      })
+        originalError: error,
+      });
     }
   }
 
@@ -173,15 +169,15 @@ export class ErrorHandler {
   private getUserFriendlyMessage(error: Error): string {
     switch (error.name) {
       case 'NetworkError':
-        return 'Connection issue detected. Please check your internet connection.'
+        return 'Connection issue detected. Please check your internet connection.';
       case 'TimeoutError':
-        return 'The request took too long. Please try again.'
+        return 'The request took too long. Please try again.';
       case 'AuthenticationError':
-        return 'Your session has expired. Please sign in again.'
+        return 'Your session has expired. Please sign in again.';
       case 'RateLimitError':
-        return 'You\'ve reached the usage limit. Please try again later.'
+        return "You've reached the usage limit. Please try again later.";
       default:
-        return 'An unexpected error occurred. Our team has been notified.'
+        return 'An unexpected error occurred. Our team has been notified.';
     }
   }
 
@@ -190,48 +186,48 @@ export class ErrorHandler {
     try {
       switch (error.name) {
         case 'AuthenticationError':
-          return await this.refreshAuth()
+          return await this.refreshAuth();
         case 'ConnectionError':
-          return await this.reconnectDatabase()
+          return await this.reconnectDatabase();
         case 'StorageError':
-          return await this.cleanupStorage()
+          return await this.cleanupStorage();
         default:
-          return false
+          return false;
       }
     } catch (recoveryError) {
       await this.logError(recoveryError, {
         context: 'Recovery attempt failed',
-        originalError: error
-      })
-      return false
+        originalError: error,
+      });
+      return false;
     }
   }
 
   // Specific recovery procedures
   private async refreshAuth(): Promise<boolean> {
     try {
-      await this.supabase.auth.refreshSession()
-      return true
+      await this.supabase.auth.refreshSession();
+      return true;
     } catch {
-      return false
+      return false;
     }
   }
 
   private async reconnectDatabase(): Promise<boolean> {
     try {
       // Implement reconnection logic
-      return true
+      return true;
     } catch {
-      return false
+      return false;
     }
   }
 
   private async cleanupStorage(): Promise<boolean> {
     try {
       // Implement storage cleanup
-      return true
+      return true;
     } catch {
-      return false
+      return false;
     }
   }
 }

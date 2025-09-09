@@ -38,7 +38,7 @@ export default function ChatWidget({
   position = 'bottom-right',
   allowFileUpload = true,
   maxFileSize = 10,
-  allowedFileTypes = ['image/*', 'application/pdf', '.doc', '.docx', '.txt']
+  allowedFileTypes = ['image/*', 'application/pdf', '.doc', '.docx', '.txt'],
 }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -47,13 +47,13 @@ export default function ChatWidget({
       id: '1',
       content: welcomeMessage,
       sender: 'bot',
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [attachments, setAttachments] = useState<FileAttachment[]>([]);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,7 +73,7 @@ export default function ChatWidget({
       content: inputValue,
       sender: 'user',
       timestamp: new Date(),
-      attachments: attachments.length > 0 ? [...attachments] : undefined
+      attachments: attachments.length > 0 ? [...attachments] : undefined,
     };
 
     setMessages(prev => [...prev, newMessage]);
@@ -87,7 +87,7 @@ export default function ChatWidget({
         id: (Date.now() + 1).toString(),
         content: generateBotResponse(inputValue, attachments),
         sender: 'bot',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
       setMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
@@ -98,21 +98,21 @@ export default function ChatWidget({
     if (files.length > 0) {
       return `I've received your message along with ${files.length} file(s). Let me analyze them and get back to you shortly.`;
     }
-    
+
     const responses = [
       "Thank you for your message! I'm here to help you with any questions about our AI automation platform.",
-      "I understand your inquiry. Let me provide you with the information you need.",
+      'I understand your inquiry. Let me provide you with the information you need.',
       "That's a great question! Our team can definitely assist you with that.",
       "I'd be happy to help you with that. Would you like me to connect you with a specialist?",
-      "Thanks for reaching out! I can help you explore our solutions for your business needs."
+      'Thanks for reaching out! I can help you explore our solutions for your business needs.',
     ];
-    
+
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    
+
     files.forEach(file => {
       if (file.size > maxFileSize * 1024 * 1024) {
         alert(`File ${file.name} is too large. Maximum size is ${maxFileSize}MB.`);
@@ -124,7 +124,7 @@ export default function ChatWidget({
         name: file.name,
         size: file.size,
         type: file.type,
-        url: URL.createObjectURL(file)
+        url: URL.createObjectURL(file),
       };
 
       setAttachments(prev => [...prev, newAttachment]);
@@ -148,10 +148,13 @@ export default function ChatWidget({
   };
 
   const exportTranscript = () => {
-    const transcript = messages.map(msg => 
-      `[${msg.timestamp.toLocaleString()}] ${msg.sender === 'user' ? 'You' : botName}: ${msg.content}`
-    ).join('\n');
-    
+    const transcript = messages
+      .map(
+        msg =>
+          `[${msg.timestamp.toLocaleString()}] ${msg.sender === 'user' ? 'You' : botName}: ${msg.content}`
+      )
+      .join('\n');
+
     const blob = new Blob([transcript], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -163,9 +166,7 @@ export default function ChatWidget({
     URL.revokeObjectURL(url);
   };
 
-  const positionClasses = position === 'bottom-right' 
-    ? 'bottom-4 right-4' 
-    : 'bottom-4 left-4';
+  const positionClasses = position === 'bottom-right' ? 'bottom-4 right-4' : 'bottom-4 left-4';
 
   if (!isOpen) {
     return (
@@ -183,7 +184,9 @@ export default function ChatWidget({
 
   return (
     <div className={`fixed ${positionClasses} z-50`}>
-      <Card className={`w-96 bg-white dark:bg-gray-900 shadow-2xl border-0 ${isMinimized ? 'h-16' : 'h-[500px]'} transition-all duration-300`}>
+      <Card
+        className={`w-96 bg-white dark:bg-gray-900 shadow-2xl border-0 ${isMinimized ? 'h-16' : 'h-[500px]'} transition-all duration-300`}
+      >
         <CardHeader className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -223,7 +226,7 @@ export default function ChatWidget({
           <CardContent className="p-0 flex flex-col h-[436px]">
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
+              {messages.map(message => (
                 <div
                   key={message.id}
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -238,8 +241,11 @@ export default function ChatWidget({
                     <p className="text-sm">{message.content}</p>
                     {message.attachments && message.attachments.length > 0 && (
                       <div className="mt-2 space-y-1">
-                        {message.attachments.map((file) => (
-                          <div key={file.id} className="flex items-center space-x-2 text-xs opacity-80">
+                        {message.attachments.map(file => (
+                          <div
+                            key={file.id}
+                            className="flex items-center space-x-2 text-xs opacity-80"
+                          >
                             <Paperclip size={12} />
                             <span>{file.name}</span>
                             <span>({formatFileSize(file.size)})</span>
@@ -248,12 +254,15 @@ export default function ChatWidget({
                       </div>
                     )}
                     <p className="text-xs opacity-70 mt-1">
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {message.timestamp.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </p>
                   </div>
                 </div>
               ))}
-              
+
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
@@ -272,8 +281,12 @@ export default function ChatWidget({
             {attachments.length > 0 && (
               <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex flex-wrap gap-2">
-                  {attachments.map((file) => (
-                    <Badge key={file.id} variant="secondary" className="flex items-center space-x-1">
+                  {attachments.map(file => (
+                    <Badge
+                      key={file.id}
+                      variant="secondary"
+                      className="flex items-center space-x-1"
+                    >
                       <span className="text-xs">{file.name}</span>
                       <button
                         onClick={() => removeAttachment(file.id)}
@@ -311,8 +324,8 @@ export default function ChatWidget({
                 <input
                   type="text"
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onChange={e => setInputValue(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Type your message..."
                   className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />

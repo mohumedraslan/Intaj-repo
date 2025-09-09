@@ -85,10 +85,7 @@ export class ChatContextManager {
       const supabase = this.supabase;
       await Promise.all([
         redis.del(`chat:${chatId}`),
-        supabase
-          .from('messages')
-          .delete()
-          .eq('chatbot_id', chatId),
+        supabase.from('messages').delete().eq('chatbot_id', chatId),
       ]);
     } catch (error) {
       console.error('Error clearing chat context:', error);

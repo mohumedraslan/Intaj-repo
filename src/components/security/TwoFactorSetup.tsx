@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
-
 interface ToastProps {
   title: string;
   description: string;
@@ -32,9 +31,7 @@ const Alert = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const AlertDescription = ({ children }: { children: React.ReactNode }) => (
-  <div>{children}</div>
-);
+const AlertDescription = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
 
 const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
   <div className={`glass-card rounded-2xl border border-blue-100 shadow-xl ${className}`}>
@@ -54,19 +51,27 @@ const CardDescription = ({ children }: { children: React.ReactNode }) => (
   <p className="mt-1 text-sm text-gray-600">{children}</p>
 );
 
-const CardContent = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`px-6 py-4 ${className}`}>{children}</div>
-);
+const CardContent = ({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => <div className={`px-6 py-4 ${className}`}>{children}</div>;
 
-const CardFooter = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`px-6 py-4 bg-gray-50 ${className}`}>{children}</div>
-);
+const CardFooter = ({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => <div className={`px-6 py-4 bg-gray-50 ${className}`}>{children}</div>;
 
 const useToast = () => ({
   toast: ({ title, description, variant = 'default' }: ToastProps) => {
     // Temporary implementation - replace with actual toast implementation
     console.log(`Toast: ${variant} - ${title}: ${description}`);
-  }
+  },
 });
 
 interface TwoFactorSetupProps {
@@ -76,7 +81,12 @@ interface TwoFactorSetupProps {
   isEnabled?: boolean;
 }
 
-export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled = false }: TwoFactorSetupProps) {
+export function TwoFactorSetup({
+  onComplete,
+  onCancel,
+  mode = 'setup',
+  isEnabled = false,
+}: TwoFactorSetupProps) {
   const [step, setStep] = useState<'init' | 'qr' | 'verify'>('init');
   const [qrCode, setQrCode] = useState<string>('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
@@ -87,15 +97,17 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
   const disableTwoFactor = async () => {
     try {
       setLoading(true);
-      
+
       // Get the auth token from Supabase
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
-      
-      const { data: { session } } = await supabase.auth.getSession();
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
@@ -103,30 +115,31 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
       const response = await fetch('/api/auth/2fa/disable', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          code: verificationCode 
-        })
+        body: JSON.stringify({
+          code: verificationCode,
+        }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to disable 2FA');
       }
-      
+
       toast({
         title: 'Success',
-        description: 'Two-factor authentication has been disabled.'
+        description: 'Two-factor authentication has been disabled.',
       });
       onComplete();
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to disable 2FA. Please try again.';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to disable 2FA. Please try again.';
       toast({
         title: 'Error',
         description: errorMessage,
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -136,15 +149,17 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
   const startSetup = async () => {
     try {
       setLoading(true);
-      
+
       // Get the auth token from Supabase
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
-      
-      const { data: { session } } = await supabase.auth.getSession();
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
@@ -152,36 +167,37 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
       const response = await fetch('/api/auth/2fa/setup', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Setup failed');
       }
-      
+
       const data = await response.json();
-      
+
       // Generate QR code from otpauth_url
       const QRCode = await import('qrcode');
       const qrCodeDataUrl = await QRCode.toDataURL(data.otpauth_url);
       setQrCode(qrCodeDataUrl);
-      
+
       // Generate backup codes (placeholder for now)
       const backupCodes = Array.from({ length: 8 }, () =>
         Math.random().toString(36).slice(-8).toUpperCase()
       );
       setBackupCodes(backupCodes);
-      
+
       setStep('qr');
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to start 2FA setup. Please try again.';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to start 2FA setup. Please try again.';
       toast({
         title: 'Error',
         description: errorMessage,
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -191,47 +207,52 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
   const verifyAndEnable = async () => {
     try {
       setLoading(true);
-      
+
       // Get the auth token from Supabase
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
-      
-      const { data: { session } } = await supabase.auth.getSession();
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
 
       const response = await fetch('/api/auth/2fa/verify', {
         method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json' 
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           code: verificationCode,
-          enable: true 
-        })
+          enable: true,
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Verification failed');
       }
-      
+
       toast({
         title: 'Success',
-        description: 'Two-factor authentication has been enabled.'
+        description: 'Two-factor authentication has been enabled.',
       });
       onComplete();
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Verification failed. Please check your code and try again.';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Verification failed. Please check your code and try again.';
       toast({
         title: 'Error',
         description: errorMessage,
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -244,16 +265,22 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
         <Card className="w-full max-w-md mx-auto p-8 bg-gradient-to-br from-red-50 via-white to-red-100">
           <CardHeader>
             <CardTitle>
-              <span className="text-gradient text-2xl font-bold">Disable Two-Factor Authentication</span>
+              <span className="text-gradient text-2xl font-bold">
+                Disable Two-Factor Authentication
+              </span>
             </CardTitle>
             <CardDescription>
-              <span className="text-gray-600">Enter your current authentication code to disable 2FA for your account.</span>
+              <span className="text-gray-600">
+                Enter your current authentication code to disable 2FA for your account.
+              </span>
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Alert>
               <AlertDescription>
-                <span className="text-red-700 font-medium">Warning: Disabling 2FA will make your account less secure.</span>
+                <span className="text-red-700 font-medium">
+                  Warning: Disabling 2FA will make your account less secure.
+                </span>
               </AlertDescription>
             </Alert>
             <div className="mt-4">
@@ -268,10 +295,16 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="destructive" onClick={onCancel} className="px-6 py-2 rounded-lg font-bold">Cancel</Button>
-            <Button 
+            <Button
+              variant="destructive"
+              onClick={onCancel}
+              className="px-6 py-2 rounded-lg font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
               variant="default"
-              onClick={disableTwoFactor} 
+              onClick={disableTwoFactor}
               disabled={loading || verificationCode.length !== 6}
               className="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-red-500 to-red-600 text-white"
             >
@@ -286,22 +319,41 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
       <Card className="w-full max-w-md mx-auto p-8 bg-gradient-to-br from-blue-50 via-white to-blue-100">
         <CardHeader>
           <CardTitle>
-            <span className="text-gradient text-2xl font-bold">Enable Two-Factor Authentication</span>
+            <span className="text-gradient text-2xl font-bold">
+              Enable Two-Factor Authentication
+            </span>
           </CardTitle>
           <CardDescription>
-            <span className="text-gray-600">Add an extra layer of security to your account by requiring both your password and an authentication code.</span>
+            <span className="text-gray-600">
+              Add an extra layer of security to your account by requiring both your password and an
+              authentication code.
+            </span>
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
             <AlertDescription>
-              <span className="text-blue-700 font-medium">You&apos;ll need an authenticator app like Google Authenticator or Authy to complete this setup.</span>
+              <span className="text-blue-700 font-medium">
+                You&apos;ll need an authenticator app like Google Authenticator or Authy to complete
+                this setup.
+              </span>
             </AlertDescription>
           </Alert>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="destructive" onClick={onCancel} className="px-6 py-2 rounded-lg font-bold">Cancel</Button>
-          <Button variant="default" onClick={startSetup} disabled={loading} className="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+          <Button
+            variant="destructive"
+            onClick={onCancel}
+            className="px-6 py-2 rounded-lg font-bold"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            onClick={startSetup}
+            disabled={loading}
+            className="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+          >
             {loading ? 'Setting up...' : 'Start Setup'}
           </Button>
         </CardFooter>
@@ -332,20 +384,38 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
           </div>
           <Alert>
             <AlertDescription>
-              <span className="text-blue-700 font-medium">Keep these backup codes safe. You can use them to access your account if you lose your authenticator device.</span>
+              <span className="text-blue-700 font-medium">
+                Keep these backup codes safe. You can use them to access your account if you lose
+                your authenticator device.
+              </span>
             </AlertDescription>
           </Alert>
           <div className="grid grid-cols-2 gap-2">
             {backupCodes.map((code, i) => (
-              <code key={i} className="bg-gradient-to-r from-blue-100 to-purple-100 p-2 rounded-lg text-center font-mono text-blue-700 shadow">
+              <code
+                key={i}
+                className="bg-gradient-to-r from-blue-100 to-purple-100 p-2 rounded-lg text-center font-mono text-blue-700 shadow"
+              >
                 {code}
               </code>
             ))}
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="destructive" onClick={() => setStep('init')} className="px-6 py-2 rounded-lg font-bold">Back</Button>
-          <Button variant="default" onClick={() => setStep('verify')} className="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-blue-500 to-purple-600 text-white">Next</Button>
+          <Button
+            variant="destructive"
+            onClick={() => setStep('init')}
+            className="px-6 py-2 rounded-lg font-bold"
+          >
+            Back
+          </Button>
+          <Button
+            variant="default"
+            onClick={() => setStep('verify')}
+            className="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+          >
+            Next
+          </Button>
         </CardFooter>
       </Card>
     );
@@ -358,7 +428,9 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
           <span className="text-gradient text-2xl font-bold">Verify Setup</span>
         </CardTitle>
         <CardDescription>
-          <span className="text-gray-600">Enter the verification code from your authenticator app.</span>
+          <span className="text-gray-600">
+            Enter the verification code from your authenticator app.
+          </span>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -372,10 +444,16 @@ export function TwoFactorSetup({ onComplete, onCancel, mode = 'setup', isEnabled
         />
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="destructive" onClick={() => setStep('qr')} className="px-6 py-2 rounded-lg font-bold">Back</Button>
-        <Button 
+        <Button
+          variant="destructive"
+          onClick={() => setStep('qr')}
+          className="px-6 py-2 rounded-lg font-bold"
+        >
+          Back
+        </Button>
+        <Button
           variant="default"
-          onClick={verifyAndEnable} 
+          onClick={verifyAndEnable}
           disabled={loading || verificationCode.length !== 6}
           className="px-6 py-2 rounded-lg font-bold bg-gradient-to-r from-blue-500 to-purple-600 text-white"
         >

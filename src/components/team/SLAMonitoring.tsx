@@ -4,7 +4,16 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Clock, AlertTriangle, CheckCircle, TrendingUp, TrendingDown, Target, Users, MessageSquare } from 'lucide-react';
+import {
+  Clock,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp,
+  TrendingDown,
+  Target,
+  Users,
+  MessageSquare,
+} from 'lucide-react';
 
 interface SLAMetric {
   id: string;
@@ -49,7 +58,7 @@ const slaMetrics: SLAMetric[] = [
     status: 'meeting',
     trend: 'down',
     conversations: 156,
-    breaches: 8
+    breaches: 8,
   },
   {
     id: 'resolution-time',
@@ -60,7 +69,7 @@ const slaMetrics: SLAMetric[] = [
     status: 'meeting',
     trend: 'down',
     conversations: 89,
-    breaches: 12
+    breaches: 12,
   },
   {
     id: 'escalation-time',
@@ -71,7 +80,7 @@ const slaMetrics: SLAMetric[] = [
     status: 'breach',
     trend: 'up',
     conversations: 23,
-    breaches: 15
+    breaches: 15,
   },
   {
     id: 'follow-up-time',
@@ -82,8 +91,8 @@ const slaMetrics: SLAMetric[] = [
     status: 'warning',
     trend: 'stable',
     conversations: 34,
-    breaches: 3
-  }
+    breaches: 3,
+  },
 ];
 
 const slaAlerts: SLAAlert[] = [
@@ -95,7 +104,7 @@ const slaAlerts: SLAAlert[] = [
     timeRemaining: -15,
     severity: 'breach',
     assignedTo: 'John Doe',
-    channel: 'website'
+    channel: 'website',
   },
   {
     id: '2',
@@ -105,7 +114,7 @@ const slaAlerts: SLAAlert[] = [
     timeRemaining: 5,
     severity: 'critical',
     assignedTo: 'Sarah Wilson',
-    channel: 'email'
+    channel: 'email',
   },
   {
     id: '3',
@@ -114,7 +123,7 @@ const slaAlerts: SLAAlert[] = [
     subject: 'Feature Request',
     timeRemaining: 25,
     severity: 'warning',
-    channel: 'whatsapp'
+    channel: 'whatsapp',
   },
   {
     id: '4',
@@ -124,8 +133,8 @@ const slaAlerts: SLAAlert[] = [
     timeRemaining: -5,
     severity: 'breach',
     assignedTo: 'Mike Johnson',
-    channel: 'facebook'
-  }
+    channel: 'facebook',
+  },
 ];
 
 const teamPerformance: TeamPerformance[] = [
@@ -136,7 +145,7 @@ const teamPerformance: TeamPerformance[] = [
     slaCompliance: 92,
     conversationsHandled: 45,
     breaches: 3,
-    status: 'excellent'
+    status: 'excellent',
   },
   {
     agentId: '2',
@@ -145,7 +154,7 @@ const teamPerformance: TeamPerformance[] = [
     slaCompliance: 88,
     conversationsHandled: 38,
     breaches: 5,
-    status: 'good'
+    status: 'good',
   },
   {
     agentId: '3',
@@ -154,7 +163,7 @@ const teamPerformance: TeamPerformance[] = [
     slaCompliance: 75,
     conversationsHandled: 32,
     breaches: 8,
-    status: 'needs-improvement'
+    status: 'needs-improvement',
   },
   {
     agentId: '4',
@@ -163,8 +172,8 @@ const teamPerformance: TeamPerformance[] = [
     slaCompliance: 82,
     conversationsHandled: 28,
     breaches: 6,
-    status: 'good'
-  }
+    status: 'good',
+  },
 ];
 
 export default function SLAMonitoring() {
@@ -175,36 +184,51 @@ export default function SLAMonitoring() {
 
   const getMetricStatusColor = (status: string) => {
     switch (status) {
-      case 'meeting': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'warning': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'breach': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      case 'meeting':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'warning':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'breach':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
 
   const getAlertSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'warning': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'critical': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-      case 'breach': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      case 'warning':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'critical':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      case 'breach':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
 
   const getPerformanceStatusColor = (status: string) => {
     switch (status) {
-      case 'excellent': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'good': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'needs-improvement': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      case 'excellent':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'good':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'needs-improvement':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'up': return <TrendingUp size={16} className="text-red-400" />;
-      case 'down': return <TrendingDown size={16} className="text-green-400" />;
-      default: return <Target size={16} className="text-gray-400" />;
+      case 'up':
+        return <TrendingUp size={16} className="text-red-400" />;
+      case 'down':
+        return <TrendingDown size={16} className="text-green-400" />;
+      default:
+        return <Target size={16} className="text-gray-400" />;
     }
   };
 
@@ -220,10 +244,11 @@ export default function SLAMonitoring() {
     return Math.min((target / Math.max(current, 1)) * 100, 100);
   };
 
-  const overallCompliance = metrics.reduce((acc, metric) => {
-    const compliance = ((metric.conversations - metric.breaches) / metric.conversations) * 100;
-    return acc + compliance;
-  }, 0) / metrics.length;
+  const overallCompliance =
+    metrics.reduce((acc, metric) => {
+      const compliance = ((metric.conversations - metric.breaches) / metric.conversations) * 100;
+      return acc + compliance;
+    }, 0) / metrics.length;
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white p-8">
@@ -241,7 +266,7 @@ export default function SLAMonitoring() {
           <div className="flex items-center space-x-4">
             <select
               value={selectedTimeframe}
-              onChange={(e) => setSelectedTimeframe(e.target.value)}
+              onChange={e => setSelectedTimeframe(e.target.value)}
               className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="1h">Last Hour</option>
@@ -259,7 +284,9 @@ export default function SLAMonitoring() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400">Overall Compliance</p>
-                  <p className="text-2xl font-bold text-green-400">{overallCompliance.toFixed(1)}%</p>
+                  <p className="text-2xl font-bold text-green-400">
+                    {overallCompliance.toFixed(1)}%
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                   <CheckCircle className="w-6 h-6 text-green-400" />
@@ -322,13 +349,11 @@ export default function SLAMonitoring() {
               <Target size={20} />
               <span>SLA Metrics</span>
             </CardTitle>
-            <CardDescription>
-              Current performance against service level agreements
-            </CardDescription>
+            <CardDescription>Current performance against service level agreements</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {metrics.map((metric) => (
+              {metrics.map(metric => (
                 <div key={metric.id} className="p-4 bg-gray-800/30 rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <div>
@@ -337,9 +362,7 @@ export default function SLAMonitoring() {
                     </div>
                     <div className="flex items-center space-x-2">
                       {getTrendIcon(metric.trend)}
-                      <Badge className={getMetricStatusColor(metric.status)}>
-                        {metric.status}
-                      </Badge>
+                      <Badge className={getMetricStatusColor(metric.status)}>{metric.status}</Badge>
                     </div>
                   </div>
 
@@ -348,8 +371,8 @@ export default function SLAMonitoring() {
                       <span className="text-gray-400">Current: {formatTime(metric.current)}</span>
                       <span className="text-gray-400">Target: {formatTime(metric.target)}</span>
                     </div>
-                    
-                    <Progress 
+
+                    <Progress
                       value={calculateProgress(metric.current, metric.target)}
                       className="h-2"
                     />
@@ -373,13 +396,11 @@ export default function SLAMonitoring() {
                 <AlertTriangle size={20} />
                 <span>Active Alerts</span>
               </CardTitle>
-              <CardDescription>
-                Conversations requiring immediate attention
-              </CardDescription>
+              <CardDescription>Conversations requiring immediate attention</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {alerts.map((alert) => (
+                {alerts.map(alert => (
                   <div key={alert.id} className="p-4 bg-gray-800/30 rounded-lg">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
@@ -393,11 +414,13 @@ export default function SLAMonitoring() {
                         {alert.severity}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm ${
-                        alert.timeRemaining < 0 ? 'text-red-400' : 'text-yellow-400'
-                      }`}>
+                      <span
+                        className={`text-sm ${
+                          alert.timeRemaining < 0 ? 'text-red-400' : 'text-yellow-400'
+                        }`}
+                      >
                         {formatTime(alert.timeRemaining)}
                       </span>
                       <button className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors">
@@ -417,19 +440,20 @@ export default function SLAMonitoring() {
                 <Users size={20} />
                 <span>Team Performance</span>
               </CardTitle>
-              <CardDescription>
-                Individual agent SLA compliance and metrics
-              </CardDescription>
+              <CardDescription>Individual agent SLA compliance and metrics</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {performance.map((agent) => (
+                {performance.map(agent => (
                   <div key={agent.agentId} className="p-4 bg-gray-800/30 rounded-lg">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-semibold text-xs">
-                            {agent.agentName.split(' ').map(n => n[0]).join('')}
+                            {agent.agentName
+                              .split(' ')
+                              .map(n => n[0])
+                              .join('')}
                           </span>
                         </div>
                         <div>

@@ -3,7 +3,20 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Inbox, MessageSquare, Users, Clock, Filter, Search, MoreVertical, User, Tag, Archive, Reply, Forward } from 'lucide-react';
+import {
+  Inbox,
+  MessageSquare,
+  Users,
+  Clock,
+  Filter,
+  Search,
+  MoreVertical,
+  User,
+  Tag,
+  Archive,
+  Reply,
+  Forward,
+} from 'lucide-react';
 
 interface Conversation {
   id: string;
@@ -51,7 +64,7 @@ const defaultInboxes: SharedInbox[] = [
     conversationCount: 45,
     unreadCount: 12,
     avgResponseTime: 15,
-    color: 'bg-blue-500'
+    color: 'bg-blue-500',
   },
   {
     id: 'sales',
@@ -62,7 +75,7 @@ const defaultInboxes: SharedInbox[] = [
     conversationCount: 28,
     unreadCount: 8,
     avgResponseTime: 8,
-    color: 'bg-green-500'
+    color: 'bg-green-500',
   },
   {
     id: 'technical',
@@ -73,7 +86,7 @@ const defaultInboxes: SharedInbox[] = [
     conversationCount: 19,
     unreadCount: 5,
     avgResponseTime: 25,
-    color: 'bg-purple-500'
+    color: 'bg-purple-500',
   },
   {
     id: 'social',
@@ -84,8 +97,8 @@ const defaultInboxes: SharedInbox[] = [
     conversationCount: 33,
     unreadCount: 15,
     avgResponseTime: 12,
-    color: 'bg-pink-500'
-  }
+    color: 'bg-pink-500',
+  },
 ];
 
 const sampleConversations: Conversation[] = [
@@ -94,7 +107,7 @@ const sampleConversations: Conversation[] = [
     subject: 'Integration Help Needed',
     customer: {
       name: 'Alice Johnson',
-      email: 'alice@company.com'
+      email: 'alice@company.com',
     },
     channel: 'website',
     status: 'open',
@@ -103,20 +116,20 @@ const sampleConversations: Conversation[] = [
     lastMessage: {
       content: 'I need help setting up the WhatsApp integration for my business',
       timestamp: new Date(Date.now() - 1000 * 60 * 15),
-      sender: 'customer'
+      sender: 'customer',
     },
     tags: ['integration', 'whatsapp'],
     unreadCount: 2,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
     slaStatus: 'warning',
-    slaDeadline: new Date(Date.now() + 1000 * 60 * 45)
+    slaDeadline: new Date(Date.now() + 1000 * 60 * 45),
   },
   {
     id: '2',
     subject: 'Billing Question',
     customer: {
       name: 'Bob Smith',
-      email: 'bob@startup.io'
+      email: 'bob@startup.io',
     },
     channel: 'email',
     status: 'pending',
@@ -124,20 +137,20 @@ const sampleConversations: Conversation[] = [
     lastMessage: {
       content: 'Can you explain the pricing tiers for your platform?',
       timestamp: new Date(Date.now() - 1000 * 60 * 30),
-      sender: 'customer'
+      sender: 'customer',
     },
     tags: ['billing', 'pricing'],
     unreadCount: 1,
     createdAt: new Date(Date.now() - 1000 * 60 * 60),
     slaStatus: 'on-time',
-    slaDeadline: new Date(Date.now() + 1000 * 60 * 60 * 2)
+    slaDeadline: new Date(Date.now() + 1000 * 60 * 60 * 2),
   },
   {
     id: '3',
     subject: 'Feature Request',
     customer: {
       name: 'Carol Davis',
-      email: 'carol@enterprise.com'
+      email: 'carol@enterprise.com',
     },
     channel: 'whatsapp',
     status: 'open',
@@ -146,14 +159,14 @@ const sampleConversations: Conversation[] = [
     lastMessage: {
       content: 'Would love to see analytics export feature',
       timestamp: new Date(Date.now() - 1000 * 60 * 45),
-      sender: 'customer'
+      sender: 'customer',
     },
     tags: ['feature-request', 'analytics'],
     unreadCount: 0,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
     slaStatus: 'on-time',
-    slaDeadline: new Date(Date.now() + 1000 * 60 * 60 * 4)
-  }
+    slaDeadline: new Date(Date.now() + 1000 * 60 * 60 * 4),
+  },
 ];
 
 export default function SharedInboxes() {
@@ -171,37 +184,51 @@ export default function SharedInboxes() {
       facebook: '📘',
       instagram: '📷',
       website: '🌐',
-      email: '📧'
+      email: '📧',
     };
     return icons[channel as keyof typeof icons] || '💬';
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'pending': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'resolved': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'closed': return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      case 'open':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'resolved':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'closed':
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'high': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-      case 'medium': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'low': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      case 'urgent':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      case 'high':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      case 'medium':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'low':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
 
   const getSlaStatusColor = (status: string) => {
     switch (status) {
-      case 'on-time': return 'text-green-400';
-      case 'warning': return 'text-yellow-400';
-      case 'overdue': return 'text-red-400';
-      default: return 'text-gray-400';
+      case 'on-time':
+        return 'text-green-400';
+      case 'warning':
+        return 'text-yellow-400';
+      case 'overdue':
+        return 'text-red-400';
+      default:
+        return 'text-gray-400';
     }
   };
 
@@ -219,12 +246,13 @@ export default function SharedInboxes() {
   };
 
   const filteredConversations = conversations.filter(conv => {
-    const matchesSearch = conv.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         conv.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         conv.customer.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      conv.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      conv.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      conv.customer.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || conv.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || conv.priority === priorityFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
@@ -241,7 +269,7 @@ export default function SharedInboxes() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {inboxes.map((inbox) => (
+            {inboxes.map(inbox => (
               <Card
                 key={inbox.id}
                 className={`cursor-pointer transition-all duration-200 ${
@@ -299,18 +327,21 @@ export default function SharedInboxes() {
             {/* Search and Filters */}
             <div className="flex items-center space-x-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={16}
+                />
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Search conversations..."
                   className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={e => setStatusFilter(e.target.value)}
                 className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
@@ -321,7 +352,7 @@ export default function SharedInboxes() {
               </select>
               <select
                 value={priorityFilter}
-                onChange={(e) => setPriorityFilter(e.target.value)}
+                onChange={e => setPriorityFilter(e.target.value)}
                 className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Priority</option>
@@ -344,7 +375,7 @@ export default function SharedInboxes() {
               </div>
             ) : (
               <div className="divide-y divide-gray-800">
-                {filteredConversations.map((conversation) => (
+                {filteredConversations.map(conversation => (
                   <div
                     key={conversation.id}
                     className={`p-6 hover:bg-gray-800/30 cursor-pointer transition-colors ${
@@ -356,7 +387,10 @@ export default function SharedInboxes() {
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-semibold text-sm">
-                            {conversation.customer.name.split(' ').map(n => n[0]).join('')}
+                            {conversation.customer.name
+                              .split(' ')
+                              .map(n => n[0])
+                              .join('')}
                           </span>
                         </div>
                         <div>
@@ -366,7 +400,9 @@ export default function SharedInboxes() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-2xl">{getChannelIcon(conversation.channel)}</span>
-                        <span className="text-gray-400 text-sm">{formatTime(conversation.lastMessage.timestamp)}</span>
+                        <span className="text-gray-400 text-sm">
+                          {formatTime(conversation.lastMessage.timestamp)}
+                        </span>
                         {conversation.unreadCount > 0 && (
                           <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
                             {conversation.unreadCount}
@@ -405,8 +441,12 @@ export default function SharedInboxes() {
 
                     {conversation.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {conversation.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs flex items-center space-x-1">
+                        {conversation.tags.map(tag => (
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="text-xs flex items-center space-x-1"
+                          >
                             <Tag size={10} />
                             <span>{tag}</span>
                           </Badge>
@@ -433,7 +473,7 @@ export default function SharedInboxes() {
                   ×
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="text-sm text-gray-400">Customer</label>
@@ -467,14 +507,15 @@ export default function SharedInboxes() {
                 <div>
                   <label className="text-sm text-gray-400">SLA Status</label>
                   <p className={getSlaStatusColor(selectedConversation.slaStatus)}>
-                    {selectedConversation.slaStatus} - Due {formatTime(selectedConversation.slaDeadline)}
+                    {selectedConversation.slaStatus} - Due{' '}
+                    {formatTime(selectedConversation.slaDeadline)}
                   </p>
                 </div>
 
                 <div>
                   <label className="text-sm text-gray-400">Tags</label>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {selectedConversation.tags.map((tag) => (
+                    {selectedConversation.tags.map(tag => (
                       <Badge key={tag} variant="secondary" className="text-xs">
                         {tag}
                       </Badge>

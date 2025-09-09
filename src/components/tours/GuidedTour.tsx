@@ -1,6 +1,6 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import { X, ArrowRight, ArrowLeft, Target, Lightbulb, Zap } from "lucide-react";
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import { X, ArrowRight, ArrowLeft, Target, Lightbulb, Zap } from 'lucide-react';
 
 interface TourStep {
   id: string;
@@ -19,7 +19,13 @@ interface GuidedTourProps {
   onSkip: () => void;
 }
 
-export default function GuidedTour({ tourId, steps, isActive, onComplete, onSkip }: GuidedTourProps) {
+export default function GuidedTour({
+  tourId,
+  steps,
+  isActive,
+  onComplete,
+  onSkip,
+}: GuidedTourProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
@@ -32,13 +38,14 @@ export default function GuidedTour({ tourId, steps, isActive, onComplete, onSkip
     if (target) {
       setTargetElement(target);
       calculateTooltipPosition(target, steps[currentStep].position);
-      
+
       // Highlight the target element
       target.style.position = 'relative';
       target.style.zIndex = '1001';
-      target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 0 8px rgba(59, 130, 246, 0.2)';
+      target.style.boxShadow =
+        '0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 0 8px rgba(59, 130, 246, 0.2)';
       target.style.borderRadius = '8px';
-      
+
       // Scroll target into view
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -117,7 +124,7 @@ export default function GuidedTour({ tourId, steps, isActive, onComplete, onSkip
     <>
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/60 z-1000 pointer-events-none" />
-      
+
       {/* Tooltip */}
       <div
         ref={tooltipRef}
@@ -135,23 +142,20 @@ export default function GuidedTour({ tourId, steps, isActive, onComplete, onSkip
             </div>
             <div>
               <h3 className="font-semibold text-white text-sm">{steps[currentStep].title}</h3>
-              <p className="text-xs text-gray-400">Step {currentStep + 1} of {steps.length}</p>
+              <p className="text-xs text-gray-400">
+                Step {currentStep + 1} of {steps.length}
+              </p>
             </div>
           </div>
-          <button
-            onClick={onSkip}
-            className="text-gray-400 hover:text-white transition-colors p-1"
-          >
+          <button onClick={onSkip} className="text-gray-400 hover:text-white transition-colors p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content */}
         <div className="p-4">
-          <p className="text-gray-300 text-sm leading-relaxed mb-4">
-            {steps[currentStep].content}
-          </p>
-          
+          <p className="text-gray-300 text-sm leading-relaxed mb-4">{steps[currentStep].content}</p>
+
           {/* Progress dots */}
           <div className="flex items-center justify-center gap-1 mb-4">
             {steps.map((_, index) => (
@@ -161,8 +165,8 @@ export default function GuidedTour({ tourId, steps, isActive, onComplete, onSkip
                   index === currentStep
                     ? 'bg-blue-500 w-4'
                     : index < currentStep
-                    ? 'bg-green-500'
-                    : 'bg-gray-600'
+                      ? 'bg-green-500'
+                      : 'bg-gray-600'
                 }`}
               />
             ))}
@@ -203,95 +207,107 @@ export default function GuidedTour({ tourId, steps, isActive, onComplete, onSkip
 // Predefined tours for different pages
 export const dashboardTour: TourStep[] = [
   {
-    id: "welcome",
-    title: "Welcome to Your Dashboard",
-    content: "This is your main dashboard where you can see an overview of all your chatbots, conversations, and key metrics.",
+    id: 'welcome',
+    title: 'Welcome to Your Dashboard',
+    content:
+      'This is your main dashboard where you can see an overview of all your chatbots, conversations, and key metrics.',
     target: "[data-tour='dashboard-overview']",
-    position: "bottom"
+    position: 'bottom',
   },
   {
-    id: "chatbots",
-    title: "Your Chatbots",
-    content: "Here you can see all your active chatbots. Click on any chatbot to view detailed analytics or make changes.",
+    id: 'chatbots',
+    title: 'Your Chatbots',
+    content:
+      'Here you can see all your active chatbots. Click on any chatbot to view detailed analytics or make changes.',
     target: "[data-tour='chatbots-section']",
-    position: "top"
+    position: 'top',
   },
   {
-    id: "analytics",
-    title: "Real-time Analytics",
-    content: "Monitor your chatbot performance with real-time metrics including messages, satisfaction rates, and response times.",
+    id: 'analytics',
+    title: 'Real-time Analytics',
+    content:
+      'Monitor your chatbot performance with real-time metrics including messages, satisfaction rates, and response times.',
     target: "[data-tour='analytics-cards']",
-    position: "left"
+    position: 'left',
   },
   {
-    id: "quick-actions",
-    title: "Quick Actions",
-    content: "Use these buttons to quickly create new chatbots, connect channels, or access important features.",
+    id: 'quick-actions',
+    title: 'Quick Actions',
+    content:
+      'Use these buttons to quickly create new chatbots, connect channels, or access important features.',
     target: "[data-tour='quick-actions']",
-    position: "bottom"
-  }
+    position: 'bottom',
+  },
 ];
 
 export const chatbotTour: TourStep[] = [
   {
-    id: "create-chatbot",
-    title: "Create Your First Chatbot",
-    content: "Click here to start creating a new AI chatbot. You can customize its personality, knowledge base, and behavior.",
+    id: 'create-chatbot',
+    title: 'Create Your First Chatbot',
+    content:
+      'Click here to start creating a new AI chatbot. You can customize its personality, knowledge base, and behavior.',
     target: "[data-tour='create-chatbot-btn']",
-    position: "bottom"
+    position: 'bottom',
   },
   {
-    id: "chatbot-settings",
-    title: "Chatbot Configuration",
-    content: "Configure your chatbot's name, description, AI model, and system prompts to match your brand voice.",
+    id: 'chatbot-settings',
+    title: 'Chatbot Configuration',
+    content:
+      "Configure your chatbot's name, description, AI model, and system prompts to match your brand voice.",
     target: "[data-tour='chatbot-settings']",
-    position: "right"
+    position: 'right',
   },
   {
-    id: "knowledge-base",
-    title: "Knowledge Base",
-    content: "Upload documents, FAQs, and training data to make your chatbot more intelligent and context-aware.",
+    id: 'knowledge-base',
+    title: 'Knowledge Base',
+    content:
+      'Upload documents, FAQs, and training data to make your chatbot more intelligent and context-aware.',
     target: "[data-tour='knowledge-base']",
-    position: "left"
+    position: 'left',
   },
   {
-    id: "test-chatbot",
-    title: "Test Your Chatbot",
-    content: "Use this preview to test your chatbot before deploying it. Make sure it responds correctly to different queries.",
+    id: 'test-chatbot',
+    title: 'Test Your Chatbot',
+    content:
+      'Use this preview to test your chatbot before deploying it. Make sure it responds correctly to different queries.',
     target: "[data-tour='chatbot-preview']",
-    position: "left"
-  }
+    position: 'left',
+  },
 ];
 
 export const connectionsTour: TourStep[] = [
   {
-    id: "channels-overview",
-    title: "Channel Integrations",
-    content: "Connect your chatbots to multiple messaging platforms. Each platform has its own setup process and features.",
+    id: 'channels-overview',
+    title: 'Channel Integrations',
+    content:
+      'Connect your chatbots to multiple messaging platforms. Each platform has its own setup process and features.',
     target: "[data-tour='channels-grid']",
-    position: "top"
+    position: 'top',
   },
   {
-    id: "whatsapp-setup",
-    title: "WhatsApp Business",
-    content: "Connect to WhatsApp Business API to reach customers on the world's most popular messaging platform.",
+    id: 'whatsapp-setup',
+    title: 'WhatsApp Business',
+    content:
+      "Connect to WhatsApp Business API to reach customers on the world's most popular messaging platform.",
     target: "[data-tour='whatsapp-card']",
-    position: "bottom"
+    position: 'bottom',
   },
   {
-    id: "website-widget",
-    title: "Website Chat Widget",
-    content: "Add a chat widget to your website to provide instant customer support and lead generation.",
+    id: 'website-widget',
+    title: 'Website Chat Widget',
+    content:
+      'Add a chat widget to your website to provide instant customer support and lead generation.',
     target: "[data-tour='website-widget']",
-    position: "top"
+    position: 'top',
   },
   {
-    id: "social-media",
-    title: "Social Media Integration",
-    content: "Connect Facebook Messenger and Instagram DMs to manage all your social media conversations in one place.",
+    id: 'social-media',
+    title: 'Social Media Integration',
+    content:
+      'Connect Facebook Messenger and Instagram DMs to manage all your social media conversations in one place.',
     target: "[data-tour='social-media']",
-    position: "left"
-  }
+    position: 'left',
+  },
 ];
 
 // Hook for managing tours
@@ -332,6 +348,6 @@ export function useTour() {
     startTour,
     completeTour,
     skipTour,
-    resetTours
+    resetTours,
   };
 }

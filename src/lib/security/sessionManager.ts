@@ -35,9 +35,7 @@ export class SessionManager {
     };
 
     // Store session in database
-    const { error } = await this.supabase
-      .from('sessions')
-      .insert([session]);
+    const { error } = await this.supabase.from('sessions').insert([session]);
 
     if (error) throw new Error('Failed to create session');
 
@@ -90,10 +88,7 @@ export class SessionManager {
   }
 
   async destroySession(sessionId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('sessions')
-      .delete()
-      .eq('id', sessionId);
+    const { error } = await this.supabase.from('sessions').delete().eq('id', sessionId);
 
     if (error) throw new Error('Failed to destroy session');
   }

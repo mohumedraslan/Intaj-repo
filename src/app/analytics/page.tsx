@@ -3,7 +3,13 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/lib/supabaseClient';
@@ -16,17 +22,9 @@ import {
   Activity,
   Target,
   Download,
-  Eye
+  Eye,
 } from 'lucide-react';
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip
-} from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 interface MetricData {
   value: number;
@@ -62,31 +60,35 @@ export default function AnalyticsPage() {
     conversations: { value: 0, change: 0, trend: 'up' },
     activeBots: { value: 0, change: 0, trend: 'up' },
     responseTime: { value: 0, change: 0, trend: 'down' },
-    conversionRate: { value: 0, change: 0, trend: 'up' }
+    conversionRate: { value: 0, change: 0, trend: 'up' },
   });
 
   const [botPerformance, setBotPerformance] = useState<BotPerformance[]>([]);
 
   const [activities, setActivities] = useState<Activity[]>([]);
 
-  const [chartData, setChartData] = useState<{ name: string; value: number; [key: string]: string | number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { name: string; value: number; [key: string]: string | number }[]
+  >([]);
 
   const [insights] = useState([
     {
       type: 'optimization',
       title: 'Optimization Tip',
-      message: "Your Support Bot's response time improved by 15% this week. Consider scaling this configuration to other bots.",
+      message:
+        "Your Support Bot's response time improved by 15% this week. Consider scaling this configuration to other bots.",
       color: 'from-blue-900/30 to-purple-900/30',
       borderColor: 'border-blue-500/20',
-      iconColor: 'bg-blue-500'
+      iconColor: 'bg-blue-500',
     },
     {
       type: 'trend',
       title: 'Trend Alert',
-      message: 'Peak conversation hours: 2PM-4PM. Consider adding more automation during these times.',
+      message:
+        'Peak conversation hours: 2PM-4PM. Consider adding more automation during these times.',
       color: 'from-purple-900/30 to-cyan-900/30',
       borderColor: 'border-purple-500/20',
-      iconColor: 'bg-purple-500'
+      iconColor: 'bg-purple-500',
     },
     {
       type: 'growth',
@@ -94,8 +96,8 @@ export default function AnalyticsPage() {
       message: 'Instagram engagement up 34%. Consider expanding your social media bot presence.',
       color: 'from-cyan-900/30 to-green-900/30',
       borderColor: 'border-cyan-500/20',
-      iconColor: 'bg-cyan-500'
-    }
+      iconColor: 'bg-cyan-500',
+    },
   ]);
 
   const [timeRange, setTimeRange] = useState('7d');
@@ -106,13 +108,16 @@ export default function AnalyticsPage() {
 
   const fetchAnalyticsData = async () => {
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
       if (authError) {
         console.error('Auth error:', authError);
         setLoading(false);
         return;
       }
-      
+
       if (!user) {
         console.log('No authenticated user found');
         setLoading(false);
@@ -124,14 +129,17 @@ export default function AnalyticsPage() {
       // Call the new RPC function instead of separate queries
       const { data: analyticsData, error } = await supabase.rpc('get_analytics_metrics', {
         user_id_param: user.id,
-        time_range_param: timeRange
+        time_range_param: timeRange,
       });
 
       // Fetch chart data for conversations over time
-      const { data: conversationsOverTime, error: chartError } = await supabase.rpc('get_conversations_over_time', {
-        user_id_param: user.id,
-        time_range_param: timeRange
-      });
+      const { data: conversationsOverTime, error: chartError } = await supabase.rpc(
+        'get_conversations_over_time',
+        {
+          user_id_param: user.id,
+          time_range_param: timeRange,
+        }
+      );
 
       if (error) {
         console.error('Error fetching analytics data:', error);
@@ -140,15 +148,17 @@ export default function AnalyticsPage() {
           conversations: { value: 0, change: 0, trend: 'up' },
           activeBots: { value: 0, change: 0, trend: 'up' },
           responseTime: { value: 1.5, change: -10, trend: 'down' },
-          conversionRate: { value: 0, change: 0, trend: 'up' }
+          conversionRate: { value: 0, change: 0, trend: 'up' },
         });
         setBotPerformance([]);
-        setActivities([{
-          id: 'error-1',
-          message: 'Unable to load analytics data',
-          timestamp: 'Just now',
-          type: 'warning'
-        }]);
+        setActivities([
+          {
+            id: 'error-1',
+            message: 'Unable to load analytics data',
+            timestamp: 'Just now',
+            type: 'warning',
+          },
+        ]);
         setChartData([]);
         return;
       }
@@ -169,47 +179,56 @@ export default function AnalyticsPage() {
 
       // Update metrics using data from RPC function
       setMetrics({
-        conversations: { 
-          value: analyticsData.total_conversations || 0, 
+        conversations: {
+          value: analyticsData.total_conversations || 0,
           change: 15, // Keep hardcoded for now as requested
-          trend: 'up' 
+          trend: 'up',
         },
-        activeBots: { 
-          value: analyticsData.active_bots || 0, 
+        activeBots: {
+          value: analyticsData.active_bots || 0,
           change: 8, // Keep hardcoded for now as requested
-          trend: 'up' 
+          trend: 'up',
         },
-        responseTime: { 
-          value: parseFloat(analyticsData.avg_response_time) || 1.5, 
+        responseTime: {
+          value: parseFloat(analyticsData.avg_response_time) || 1.5,
           change: -10, // Keep hardcoded for now as requested
-          trend: 'down' 
+          trend: 'down',
         },
-        conversionRate: { 
-          value: Math.round(analyticsData.conversion_rate) || 0, 
+        conversionRate: {
+          value: Math.round(analyticsData.conversion_rate) || 0,
           change: 12, // Keep hardcoded for now as requested
-          trend: 'up' 
-        }
+          trend: 'up',
+        },
       });
 
       // Transform bot performance data from RPC response
-      const botPerformanceData: BotPerformance[] = analyticsData.bot_performance?.map((bot: {
-        name: string;
-        channel: string;
-        conversations?: number;
-        success_rate?: number;
-        response_time?: string;
-        status?: string;
-      }) => ({
-        name: bot.name,
-        channel: bot.channel === 'website' ? 'Website' : 
-                bot.channel === 'whatsapp' ? 'WhatsApp' :
-                bot.channel === 'facebook' ? 'Facebook' :
-                bot.channel === 'instagram' ? 'Instagram' : 'Website',
-        conversations: bot.conversations || 0,
-        successRate: Math.round(bot.success_rate || 85),
-        responseTime: bot.response_time || '1.2s',
-        status: bot.status as 'active' | 'optimizing' | 'inactive'
-      })) || [];
+      const botPerformanceData: BotPerformance[] =
+        analyticsData.bot_performance?.map(
+          (bot: {
+            name: string;
+            channel: string;
+            conversations?: number;
+            success_rate?: number;
+            response_time?: string;
+            status?: string;
+          }) => ({
+            name: bot.name,
+            channel:
+              bot.channel === 'website'
+                ? 'Website'
+                : bot.channel === 'whatsapp'
+                  ? 'WhatsApp'
+                  : bot.channel === 'facebook'
+                    ? 'Facebook'
+                    : bot.channel === 'instagram'
+                      ? 'Instagram'
+                      : 'Website',
+            conversations: bot.conversations || 0,
+            successRate: Math.round(bot.success_rate || 85),
+            responseTime: bot.response_time || '1.2s',
+            status: bot.status as 'active' | 'optimizing' | 'inactive',
+          })
+        ) || [];
 
       // Show sample data if no bots exist
       if (botPerformanceData.length === 0) {
@@ -219,7 +238,7 @@ export default function AnalyticsPage() {
           conversations: 0,
           successRate: 85,
           responseTime: '1.2s',
-          status: 'inactive'
+          status: 'inactive',
         });
       }
 
@@ -227,7 +246,7 @@ export default function AnalyticsPage() {
 
       // Generate activities based on bot performance data
       const recentActivities: Activity[] = [];
-      
+
       // Add activities for bots with conversations
       botPerformanceData.forEach(bot => {
         if (bot.conversations > 0) {
@@ -235,7 +254,7 @@ export default function AnalyticsPage() {
             id: `bot-activity-${bot.name}`,
             message: `${bot.name} handled ${bot.conversations} conversation${bot.conversations > 1 ? 's' : ''}`,
             timestamp: 'Recently',
-            type: 'success'
+            type: 'success',
           });
         }
       });
@@ -246,7 +265,7 @@ export default function AnalyticsPage() {
           id: 'bots-active',
           message: `${analyticsData.active_bots} chatbot${analyticsData.active_bots > 1 ? 's' : ''} currently active`,
           timestamp: 'Now',
-          type: 'info'
+          type: 'info',
         });
       }
 
@@ -256,12 +275,11 @@ export default function AnalyticsPage() {
           id: 'welcome-1',
           message: 'Welcome to your analytics dashboard',
           timestamp: 'Just now',
-          type: 'info'
+          type: 'info',
         });
       }
 
       setActivities(recentActivities.slice(0, 5));
-
     } catch (error) {
       console.error('Error fetching analytics data:', error);
       // Set fallback data on error
@@ -269,15 +287,17 @@ export default function AnalyticsPage() {
         conversations: { value: 0, change: 0, trend: 'up' },
         activeBots: { value: 0, change: 0, trend: 'up' },
         responseTime: { value: 1.5, change: -10, trend: 'down' },
-        conversionRate: { value: 0, change: 0, trend: 'up' }
+        conversionRate: { value: 0, change: 0, trend: 'up' },
       });
       setBotPerformance([]);
-      setActivities([{
-        id: 'error-1',
-        message: 'Error loading analytics data',
-        timestamp: 'Just now',
-        type: 'warning'
-      }]);
+      setActivities([
+        {
+          id: 'error-1',
+          message: 'Error loading analytics data',
+          timestamp: 'Just now',
+          type: 'warning',
+        },
+      ]);
       setChartData([]);
     } finally {
       setLoading(false);
@@ -288,7 +308,7 @@ export default function AnalyticsPage() {
     const now = new Date();
     const time = new Date(timestamp);
     const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
-    
+
     if (diffInMinutes < 1) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
@@ -297,26 +317,35 @@ export default function AnalyticsPage() {
 
   // Helper function to convert bot performance data to CSV
   const convertToCSV = (data: BotPerformance[]) => {
-    const headers = ['Bot Name', 'Channel', 'Conversations', 'Success Rate (%)', 'Response Time', 'Status'];
+    const headers = [
+      'Bot Name',
+      'Channel',
+      'Conversations',
+      'Success Rate (%)',
+      'Response Time',
+      'Status',
+    ];
     const csvContent = [
       headers.join(','),
-      ...data.map(bot => [
-        `"${bot.name}"`,
-        `"${bot.channel}"`,
-        bot.conversations,
-        bot.successRate,
-        `"${bot.responseTime}"`,
-        `"${bot.status}"`
-      ].join(','))
+      ...data.map(bot =>
+        [
+          `"${bot.name}"`,
+          `"${bot.channel}"`,
+          bot.conversations,
+          bot.successRate,
+          `"${bot.responseTime}"`,
+          `"${bot.status}"`,
+        ].join(',')
+      ),
     ].join('\n');
-    
+
     return csvContent;
   };
 
   const exportAnalyticsData = () => {
     // Convert bot performance data to CSV
     const csvData = convertToCSV(botPerformance);
-    
+
     // Create blob and download
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -332,7 +361,7 @@ export default function AnalyticsPage() {
   // Real-time updates for live data
   useEffect(() => {
     if (!user) return;
-    
+
     const interval = setInterval(() => {
       // Refresh data every 30 seconds
       fetchAnalyticsData();
@@ -419,7 +448,7 @@ export default function AnalyticsPage() {
                 <SelectItem value="90d">Last 90 days</SelectItem>
               </SelectContent>
             </Select>
-            <Button 
+            <Button
               className="border border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent"
               onClick={exportAnalyticsData}
             >
@@ -464,9 +493,7 @@ export default function AnalyticsPage() {
               </div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-white mb-1">
-                {metrics.activeBots.value}
-              </div>
+              <div className="text-3xl font-bold text-white mb-1">{metrics.activeBots.value}</div>
               <div className="text-gray-400 text-sm">Active AI Bots</div>
             </div>
           </CardContent>
@@ -520,11 +547,17 @@ export default function AnalyticsPage() {
         <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-blue-500/10">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-semibold text-white">Conversations Over Time</CardTitle>
+              <CardTitle className="text-xl font-semibold text-white">
+                Conversations Over Time
+              </CardTitle>
               <div className="flex items-center space-x-2">
                 <Button className="bg-blue-600 text-white text-sm px-3 py-1">Daily</Button>
-                <Button className="text-gray-300 hover:bg-gray-700 text-sm px-3 py-1">Weekly</Button>
-                <Button className="text-gray-300 hover:bg-gray-700 text-sm px-3 py-1">Monthly</Button>
+                <Button className="text-gray-300 hover:bg-gray-700 text-sm px-3 py-1">
+                  Weekly
+                </Button>
+                <Button className="text-gray-300 hover:bg-gray-700 text-sm px-3 py-1">
+                  Monthly
+                </Button>
               </div>
             </div>
           </CardHeader>
@@ -534,38 +567,29 @@ export default function AnalyticsPage() {
                 <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <defs>
                     <linearGradient id="conversationGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8} />
+                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.3} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-                  <XAxis 
-                    dataKey="formatted_date" 
-                    stroke="#9ca3af" 
+                  <XAxis
+                    dataKey="formatted_date"
+                    stroke="#9ca3af"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
-                  <YAxis 
-                    stroke="#9ca3af" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip 
+                  <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip
                     contentStyle={{
                       backgroundColor: '#1f2937',
                       border: '1px solid #374151',
                       borderRadius: '8px',
-                      color: '#f9fafb'
+                      color: '#f9fafb',
                     }}
                     labelStyle={{ color: '#d1d5db' }}
                   />
-                  <Bar 
-                    dataKey="count" 
-                    fill="url(#conversationGradient)"
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="count" fill="url(#conversationGradient)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -575,7 +599,9 @@ export default function AnalyticsPage() {
         <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-purple-500/10">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-semibold text-white">Channel Performance</CardTitle>
+              <CardTitle className="text-xl font-semibold text-white">
+                Channel Performance
+              </CardTitle>
               <div className="flex items-center space-x-1 text-blue-400 text-sm">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                 <span>Live</span>
@@ -603,12 +629,20 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="space-y-4">
               {botPerformance.slice(0, 3).map((bot, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-[#1f2024] rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 bg-[#1f2024] rounded-lg"
+                >
                   <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      index === 0 ? 'bg-gradient-to-br from-blue-500 to-purple-600' :
-                      index === 1 ? 'bg-purple-600' : 'bg-gradient-to-br from-cyan-500 to-blue-600'
-                    }`}>
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        index === 0
+                          ? 'bg-gradient-to-br from-blue-500 to-purple-600'
+                          : index === 1
+                            ? 'bg-purple-600'
+                            : 'bg-gradient-to-br from-cyan-500 to-blue-600'
+                      }`}
+                    >
                       <Bot className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -617,10 +651,15 @@ export default function AnalyticsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className={`font-bold ${
-                      bot.successRate >= 90 ? 'text-green-400' :
-                      bot.successRate >= 80 ? 'text-blue-400' : 'text-yellow-400'
-                    }`}>
+                    <div
+                      className={`font-bold ${
+                        bot.successRate >= 90
+                          ? 'text-green-400'
+                          : bot.successRate >= 80
+                            ? 'text-blue-400'
+                            : 'text-yellow-400'
+                      }`}
+                    >
                       {bot.successRate}%
                     </div>
                     <div className="text-sm text-gray-400">Success Rate</div>
@@ -638,9 +677,11 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {activities.map((activity) => (
+              {activities.map(activity => (
                 <div key={activity.id} className="flex items-start space-x-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 animate-pulse ${getActivityIcon(activity.type)}`}></div>
+                  <div
+                    className={`w-2 h-2 rounded-full mt-2 animate-pulse ${getActivityIcon(activity.type)}`}
+                  ></div>
                   <div className="flex-1">
                     <div className="text-white text-sm">{activity.message}</div>
                     <div className="text-gray-400 text-xs">{activity.timestamp}</div>
@@ -659,13 +700,23 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="space-y-4">
               {insights.map((insight, index) => (
-                <div key={index} className={`p-4 bg-gradient-to-r ${insight.color} rounded-lg border ${insight.borderColor}`}>
+                <div
+                  key={index}
+                  className={`p-4 bg-gradient-to-r ${insight.color} rounded-lg border ${insight.borderColor}`}
+                >
                   <div className="flex items-center space-x-2 mb-2">
-                    <div className={`w-4 h-4 ${insight.iconColor} rounded-full animate-pulse`}></div>
-                    <span className={`text-sm font-medium ${
-                      insight.type === 'optimization' ? 'text-blue-300' :
-                      insight.type === 'trend' ? 'text-purple-300' : 'text-cyan-300'
-                    }`}>
+                    <div
+                      className={`w-4 h-4 ${insight.iconColor} rounded-full animate-pulse`}
+                    ></div>
+                    <span
+                      className={`text-sm font-medium ${
+                        insight.type === 'optimization'
+                          ? 'text-blue-300'
+                          : insight.type === 'trend'
+                            ? 'text-purple-300'
+                            : 'text-cyan-300'
+                      }`}
+                    >
                       {insight.title}
                     </span>
                   </div>
@@ -681,7 +732,9 @@ export default function AnalyticsPage() {
       <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-blue-500/10">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-semibold text-white">Performance Breakdown</CardTitle>
+            <CardTitle className="text-xl font-semibold text-white">
+              Performance Breakdown
+            </CardTitle>
             <Button className="text-blue-400 hover:text-blue-300 bg-transparent">
               <Eye className="w-4 h-4 mr-2" />
               View All
@@ -709,16 +762,18 @@ export default function AnalyticsPage() {
                     <td className="py-4 text-gray-300">{bot.conversations.toLocaleString()}</td>
                     <td className="py-4">
                       <div className="flex items-center space-x-2">
-                        <div className={`font-medium ${
-                          bot.successRate >= 90 ? 'text-green-400' :
-                          bot.successRate >= 80 ? 'text-blue-400' : 'text-yellow-400'
-                        }`}>
+                        <div
+                          className={`font-medium ${
+                            bot.successRate >= 90
+                              ? 'text-green-400'
+                              : bot.successRate >= 80
+                                ? 'text-blue-400'
+                                : 'text-yellow-400'
+                          }`}
+                        >
                           {bot.successRate}%
                         </div>
-                        <Progress 
-                          value={bot.successRate} 
-                          className="w-16 h-2"
-                        />
+                        <Progress value={bot.successRate} className="w-16 h-2" />
                       </div>
                     </td>
                     <td className="py-4 text-gray-300">{bot.responseTime}</td>

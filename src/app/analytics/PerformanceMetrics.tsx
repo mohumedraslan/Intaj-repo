@@ -1,21 +1,21 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
 interface PerformanceMetricsProps {
   data: {
     responseTimes: Array<{
-      timestamp: string
-      value: number
-    }>
+      timestamp: string;
+      value: number;
+    }>;
     errorRates: Array<{
-      timestamp: string
-      value: number
-    }>
+      timestamp: string;
+      value: number;
+    }>;
     userEngagement: Array<{
-      timestamp: string
-      value: number
-    }>
-  }
+      timestamp: string;
+      value: number;
+    }>;
+  };
 }
 
 export function PerformanceMetrics({ data }: PerformanceMetricsProps) {
@@ -66,5 +66,5 @@ export function PerformanceMetrics({ data }: PerformanceMetricsProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

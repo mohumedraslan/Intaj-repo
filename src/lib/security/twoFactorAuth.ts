@@ -47,9 +47,7 @@ export class TwoFactorAuth {
   }
 
   private generateToken(secret: string, epoch: number, encoding: 'base32' | 'hex'): string {
-    const key = encoding === 'base32'
-      ? base32Decode(secret)
-      : Buffer.from(secret, 'hex');
+    const key = encoding === 'base32' ? base32Decode(secret) : Buffer.from(secret, 'hex');
 
     const msg = Buffer.alloc(8);
     msg.writeBigInt64BE(BigInt(epoch));

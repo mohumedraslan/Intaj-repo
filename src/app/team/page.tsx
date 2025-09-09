@@ -8,13 +8,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Users, Inbox, Clock, Shield, BarChart3, Settings } from 'lucide-react';
 
 export default function TeamPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'inboxes' | 'sla'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'inboxes' | 'sla'>(
+    'overview'
+  );
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'members', label: 'Team Members', icon: Users },
     { id: 'inboxes', label: 'Shared Inboxes', icon: Inbox },
-    { id: 'sla', label: 'SLA Monitoring', icon: Clock }
+    { id: 'sla', label: 'SLA Monitoring', icon: Clock },
   ];
 
   const renderContent = () => {
@@ -100,7 +102,7 @@ export default function TeamPage() {
 
               {/* Feature Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card 
+                <Card
                   className="bg-[#141517]/50 backdrop-blur-xl border-gray-800/50 hover:border-gray-700/50 transition-all duration-300 cursor-pointer"
                   onClick={() => setActiveTab('members')}
                 >
@@ -125,7 +127,7 @@ export default function TeamPage() {
                   </CardContent>
                 </Card>
 
-                <Card 
+                <Card
                   className="bg-[#141517]/50 backdrop-blur-xl border-gray-800/50 hover:border-gray-700/50 transition-all duration-300 cursor-pointer"
                   onClick={() => setActiveTab('inboxes')}
                 >
@@ -150,7 +152,7 @@ export default function TeamPage() {
                   </CardContent>
                 </Card>
 
-                <Card 
+                <Card
                   className="bg-[#141517]/50 backdrop-blur-xl border-gray-800/50 hover:border-gray-700/50 transition-all duration-300 cursor-pointer"
                   onClick={() => setActiveTab('sla')}
                 >
@@ -257,7 +259,7 @@ export default function TeamPage() {
       <div className="bg-[#141517] border-b border-gray-800 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex space-x-1 bg-gray-800/30 rounded-lg p-1 w-fit">
-            {tabs.map((tab) => {
+            {tabs.map(tab => {
               const Icon = tab.icon;
               return (
                 <button

@@ -8,7 +8,7 @@ export async function getEmbedding(text: string): Promise<number[]> {
   const res = await fetch(OPENROUTER_EMBEDDINGS_URL, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({

@@ -13,7 +13,7 @@ export const securityHeaders = {
   // Restrict browser features
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   // Enable strict CSP
-  'Content-Security-Policy': 
+  'Content-Security-Policy':
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.intaj.io; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
@@ -38,18 +38,8 @@ const corsConfig = {
     // Add other trusted domains here
   ],
   allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'Accept',
-    'X-Api-Key',
-  ],
-  exposedHeaders: [
-    'X-RateLimit-Limit',
-    'X-RateLimit-Remaining',
-    'X-RateLimit-Reset',
-  ],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'X-Api-Key'],
+  exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'],
   maxAge: 86400, // 24 hours
   credentials: true,
 };
@@ -64,7 +54,7 @@ export function applyCors(request: NextRequest): NextResponse {
     response.headers.set('Access-Control-Allow-Headers', corsConfig.allowedHeaders.join(', '));
     response.headers.set('Access-Control-Expose-Headers', corsConfig.exposedHeaders.join(', '));
     response.headers.set('Access-Control-Max-Age', corsConfig.maxAge.toString());
-    
+
     if (corsConfig.credentials) {
       response.headers.set('Access-Control-Allow-Credentials', 'true');
     }

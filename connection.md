@@ -145,6 +145,6 @@ Build custom React dashboard (Next.js + Supabase/MongoDB backend).
 Flow:
 Client → Your Website → Connect Platform → Store Access Token → n8n → API → Chatbot → Reply + Log
 
-[User Message] → [Platform API (WhatsApp/Facebook/Insta/X/Web)] 
-→ [n8n Webhook] → [LLM/GPT Logic Node] 
+[User Message] → [Platform API (WhatsApp/Facebook/Insta/X/Web)]
+→ [n8n Webhook] → [LLM/GPT Logic Node]
 → [API Response back to platform] + [Log in Google Sheets]

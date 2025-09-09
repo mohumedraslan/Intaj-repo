@@ -5,6 +5,7 @@
 ### Implementation Plan
 
 1. **Database Schema Updates**
+
 ```sql
 -- Add to profiles table
 ALTER TABLE profiles ADD COLUMN two_factor_enabled BOOLEAN DEFAULT FALSE;
@@ -13,6 +14,7 @@ ALTER TABLE profiles ADD COLUMN two_factor_backup_codes TEXT[];
 ```
 
 2. **Required Packages**
+
 ```bash
 npm install @simplewebauthn/server @simplewebauthn/browser
 # or
@@ -53,6 +55,7 @@ export async function POST(req: Request) {
 ```
 
 4. **Frontend Components**
+
 - 2FA Setup Wizard
 - QR Code Display
 - Code Verification Form
@@ -60,6 +63,7 @@ export async function POST(req: Request) {
 - 2FA Settings Management
 
 5. **Security Considerations**
+
 - Rate limiting on verification attempts
 - Secure storage of secrets
 - Session management with 2FA status
@@ -71,6 +75,7 @@ export async function POST(req: Request) {
 ### Required Implementations
 
 1. **Access Control**
+
 ```typescript
 // src/lib/security/access.ts
 export interface AccessPolicy {
@@ -87,6 +92,7 @@ export class AccessControl {
 ```
 
 2. **Audit Logging Enhancement**
+
 ```typescript
 // src/lib/security/auditLogger.ts
 export interface AuditEvent {
@@ -107,27 +113,29 @@ export class EnhancedAuditLogger {
 ```
 
 3. **Data Retention Policy**
+
 ```sql
 -- Automated data retention
 CREATE OR REPLACE FUNCTION cleanup_old_data()
 RETURNS void AS $$
 BEGIN
   -- Delete audit logs older than 1 year
-  DELETE FROM audit_logs 
+  DELETE FROM audit_logs
   WHERE timestamp < NOW() - INTERVAL '1 year';
-  
+
   -- Archive messages older than 2 years
-  INSERT INTO archived_messages 
-  SELECT * FROM messages 
+  INSERT INTO archived_messages
+  SELECT * FROM messages
   WHERE created_at < NOW() - INTERVAL '2 years';
-  
-  DELETE FROM messages 
+
+  DELETE FROM messages
   WHERE created_at < NOW() - INTERVAL '2 years';
 END;
 $$ LANGUAGE plpgsql;
 ```
 
 4. **Incident Response**
+
 ```typescript
 // src/lib/security/incidentResponse.ts
 export interface SecurityIncident {
@@ -148,6 +156,7 @@ export class IncidentResponse {
 ### Implementation Details
 
 1. **Database Schema**
+
 ```sql
 CREATE TABLE api_keys (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -167,6 +176,7 @@ CREATE INDEX idx_api_keys_status ON api_keys(status);
 ```
 
 2. **Key Management Service**
+
 ```typescript
 // src/lib/security/apiKeys.ts
 export interface APIKeyOptions {
@@ -178,22 +188,23 @@ export interface APIKeyOptions {
 export class APIKeyManager {
   // Generate new API key
   async createKey(userId: string, options: APIKeyOptions): Promise<string>;
-  
+
   // Rotate existing key
   async rotateKey(keyId: string, options?: APIKeyOptions): Promise<string>;
-  
+
   // Validate key
   async validateKey(key: string): Promise<boolean>;
-  
+
   // List active keys
   async listKeys(userId: string): Promise<APIKey[]>;
-  
+
   // Revoke key
   async revokeKey(keyId: string): Promise<void>;
 }
 ```
 
 3. **Auto-Rotation Policy**
+
 ```typescript
 // src/lib/security/keyRotation.ts
 export class KeyRotationPolicy {
@@ -222,6 +233,7 @@ export class KeyRotationPolicy {
 ```
 
 4. **API Endpoints**
+
 ```typescript
 // src/app/api/keys/route.ts
 export async function POST(req: Request) {

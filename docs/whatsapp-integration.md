@@ -78,14 +78,14 @@ Send messages via API:
 const response = await fetch('https://api.intaj.io/api/whatsapp/send', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer your_api_key',
-    'Content-Type': 'application/json'
+    Authorization: 'Bearer your_api_key',
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     to: 'recipient_phone_number',
     type: 'text',
-    content: 'Hello from Intaj!'
-  })
+    content: 'Hello from Intaj!',
+  }),
 });
 ```
 
@@ -102,7 +102,7 @@ const intaj = new Intaj({ apiKey: 'your_api_key' });
 await intaj.whatsapp.send({
   to: 'recipient_phone_number',
   type: 'text',
-  content: 'Hello from Intaj!'
+  content: 'Hello from Intaj!',
 });
 
 // Send template message
@@ -116,11 +116,11 @@ await intaj.whatsapp.sendTemplate({
         type: 'body',
         parameters: [
           { type: 'text', text: 'John' },
-          { type: 'text', text: '2:30 PM' }
-        ]
-      }
-    ]
-  }
+          { type: 'text', text: '2:30 PM' },
+        ],
+      },
+    ],
+  },
 });
 ```
 
@@ -132,7 +132,7 @@ await intaj.whatsapp.sendTemplate({
 await intaj.whatsapp.send({
   to: 'phone_number',
   type: 'text',
-  content: 'Hello!'
+  content: 'Hello!',
 });
 ```
 
@@ -144,8 +144,8 @@ await intaj.whatsapp.send({
   type: 'image',
   content: {
     url: 'https://example.com/image.jpg',
-    caption: 'Check this out!'
-  }
+    caption: 'Check this out!',
+  },
 });
 ```
 
@@ -157,8 +157,10 @@ await intaj.whatsapp.sendTemplate({
   template: {
     name: 'order_update',
     language: 'en',
-    components: [/* ... */]
-  }
+    components: [
+      /* ... */
+    ],
+  },
 });
 ```
 

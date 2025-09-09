@@ -77,21 +77,42 @@ export default function EditChatbotPage() {
       <form onSubmit={handleUpdate} className="space-y-4">
         <div>
           <label className="block text-sm">Name</label>
-          <input value={name} onChange={e => setName(e.target.value)} required className="input input-bordered w-full" placeholder="Chatbot name" title="Chatbot name" />
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            required
+            className="input input-bordered w-full"
+            placeholder="Chatbot name"
+            title="Chatbot name"
+          />
         </div>
         <div>
           <label className="block text-sm">Model</label>
-          <select value={model} onChange={e => setModel(e.target.value)} className="input input-bordered" title="Model">
+          <select
+            value={model}
+            onChange={e => setModel(e.target.value)}
+            className="input input-bordered"
+            title="Model"
+          >
             <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
             <option value="gpt-4">gpt-4</option>
           </select>
         </div>
         <div>
           <label className="block text-sm">Settings (JSON)</label>
-          <textarea value={settings} onChange={e => setSettings(e.target.value)} rows={4} className="input input-bordered w-full font-mono" placeholder="{}" title="Settings JSON" />
+          <textarea
+            value={settings}
+            onChange={e => setSettings(e.target.value)}
+            rows={4}
+            className="input input-bordered w-full font-mono"
+            placeholder="{}"
+            title="Settings JSON"
+          />
         </div>
         <Button type="submit">Save</Button>
-        <Button type="button" variant="destructive" onClick={handleDelete}>Delete</Button>
+        <Button type="button" variant="destructive" onClick={handleDelete}>
+          Delete
+        </Button>
       </form>
     </div>
   );

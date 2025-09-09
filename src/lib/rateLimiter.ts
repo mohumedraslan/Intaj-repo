@@ -1,56 +1,57 @@
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '@/types/supabase'
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/types/supabase';
 
 interface RateLimitConfig {
-  apiRateLimit: number      // Requests per minute
-  dailyMessageLimit: number
-  monthlyMessageLimit: number
-  fileUploadLimit: number   // MB per month
-  fileSizeLimit: number     // MB per file
-  maxChatbots: number
+  apiRateLimit: number; // Requests per minute
+  dailyMessageLimit: number;
+  monthlyMessageLimit: number;
+  fileUploadLimit: number; // MB per month
+  fileSizeLimit: number; // MB per file
+  maxChatbots: number;
 }
 
 interface UsageMetrics {
-  apiCallsCount: number
-  dailyMessagesCount: number
-  monthlyMessagesCount: number
-  fileUploadTotal: number   // In bytes
+  apiCallsCount: number;
+  dailyMessagesCount: number;
+  monthlyMessagesCount: number;
+  fileUploadTotal: number; // In bytes
 }
 
 export class RateLimiter {
-  private supabase: ReturnType<typeof createClient<Database>>
-  private cache: Map<string, { count: number; resetTime: number }> = new Map()
+  private supabase: ReturnType<typeof createClient<Database>>;
+  private cache: Map<string, { count: number; resetTime: number }> = new Map();
 
   constructor(supabaseClient: ReturnType<typeof createClient<Database>>) {
-    this.supabase = supabaseClient
+    this.supabase = supabaseClient;
   }
 
   // Check if user can make API call
   async canMakeApiCall(userId: string): Promise<boolean> {
     // First check cache to avoid database hits
-    const cacheKey = `api:${userId}`
-    const cached = this.cache.get(cacheKey)
-    const now = Date.now()
+    const cacheKey = `api:${userId}`;
+    const cached = this.cache.get(cacheKey);
+    const now = Date.now();
 
     if (cached && now < cached.resetTime) {
-      if (cached.count >= await this.getTierLimit(userId, 'apiRateLimit')) {
-        return false
+      if (cached.count >= (await this.getTierLimit(userId, 'apiRateLimit'))) {
+        return false;
       }
-      cached.count++
-      return true
+      cached.count++;
+      return true;
     }
 
     // Cache miss or expired, check database
-    const { data: usage } = await this.supabase
-      .rpc('check_api_rate_limit', { user_id_param: userId })
+    const { data: usage } = await this.supabase.rpc('check_api_rate_limit', {
+      user_id_param: userId,
+    });
 
     // Update cache
     this.cache.set(cacheKey, {
       count: 1,
-      resetTime: now + 60000 // 1 minute
-    })
+      resetTime: now + 60000, // 1 minute
+    });
 
-    return usage || false
+    return usage || false;
   }
 
   // Check if user can send message
@@ -59,14 +60,16 @@ export class RateLimiter {
       .from('user_usage')
       .select('daily_messages_count, monthly_messages_count')
       .eq('user_id', userId)
-      .single()
+      .single();
 
-    if (!usage) return false
+    if (!usage) return false;
 
-    const limits = await this.getTierLimits(userId)
-    
-    return usage.daily_messages_count < limits.dailyMessageLimit &&
-           usage.monthly_messages_count < limits.monthlyMessageLimit
+    const limits = await this.getTierLimits(userId);
+
+    return (
+      usage.daily_messages_count < limits.dailyMessageLimit &&
+      usage.monthly_messages_count < limits.monthlyMessageLimit
+    );
   }
 
   // Check if user can upload file
@@ -75,43 +78,47 @@ export class RateLimiter {
       .from('user_usage')
       .select('file_upload_total')
       .eq('user_id', userId)
-      .single()
+      .single();
 
-    if (!usage) return false
+    if (!usage) return false;
 
-    const limits = await this.getTierLimits(userId)
-    
-    return fileSize <= limits.fileSizeLimit * 1024 * 1024 && // Convert MB to bytes
-           usage.file_upload_total + fileSize <= limits.fileUploadLimit * 1024 * 1024
+    const limits = await this.getTierLimits(userId);
+
+    return (
+      fileSize <= limits.fileSizeLimit * 1024 * 1024 && // Convert MB to bytes
+      usage.file_upload_total + fileSize <= limits.fileUploadLimit * 1024 * 1024
+    );
   }
 
   // Record usage
-  async recordUsage(userId: string, type: 'api' | 'message' | 'file', amount: number = 1): Promise<void> {
-    const updates: Partial<Record<keyof UsageMetrics, number>> = {}
-    
+  async recordUsage(
+    userId: string,
+    type: 'api' | 'message' | 'file',
+    amount: number = 1
+  ): Promise<void> {
+    const updates: Partial<Record<keyof UsageMetrics, number>> = {};
+
     switch (type) {
       case 'api':
-        updates.apiCallsCount = amount
-        break
+        updates.apiCallsCount = amount;
+        break;
       case 'message':
-        updates.dailyMessagesCount = amount
-        updates.monthlyMessagesCount = amount
-        break
+        updates.dailyMessagesCount = amount;
+        updates.monthlyMessagesCount = amount;
+        break;
       case 'file':
-        updates.fileUploadTotal = amount
-        break
+        updates.fileUploadTotal = amount;
+        break;
     }
 
-    await this.supabase
-      .from('user_usage')
-      .upsert({
-        user_id: userId,
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
+    await this.supabase.from('user_usage').upsert({
+      user_id: userId,
+      ...updates,
+      updated_at: new Date().toISOString(),
+    });
 
     // Check limits and create notifications if needed
-    await this.checkAndNotifyLimits(userId)
+    await this.checkAndNotifyLimits(userId);
   }
 
   // Get user's subscription tier limits
@@ -120,17 +127,17 @@ export class RateLimiter {
       .from('profiles')
       .select('subscription')
       .eq('id', userId)
-      .single()
+      .single();
 
-    if (!profile) throw new Error('User not found')
+    if (!profile) throw new Error('User not found');
 
     const { data: tierLimits } = await this.supabase
       .from('subscription_tiers')
       .select('*')
       .eq('name', profile.subscription)
-      .single()
+      .single();
 
-    if (!tierLimits) throw new Error('Subscription tier not found')
+    if (!tierLimits) throw new Error('Subscription tier not found');
 
     return {
       apiRateLimit: tierLimits.api_rate_limit,
@@ -138,19 +145,19 @@ export class RateLimiter {
       monthlyMessageLimit: tierLimits.monthly_message_limit,
       fileUploadLimit: tierLimits.file_upload_limit,
       fileSizeLimit: tierLimits.file_size_limit,
-      maxChatbots: tierLimits.max_chatbots
-    }
+      maxChatbots: tierLimits.max_chatbots,
+    };
   }
 
   // Get specific tier limit
   private async getTierLimit(userId: string, limit: keyof RateLimitConfig): Promise<number> {
-    const limits = await this.getTierLimits(userId)
-    return limits[limit]
+    const limits = await this.getTierLimits(userId);
+    return limits[limit];
   }
 
   // Check limits and create notifications
   private async checkAndNotifyLimits(userId: string): Promise<void> {
-    await this.supabase.rpc('check_and_notify_limits')
+    await this.supabase.rpc('check_and_notify_limits');
   }
 
   // Get user's current usage metrics
@@ -159,27 +166,27 @@ export class RateLimiter {
       .from('user_usage')
       .select('*')
       .eq('user_id', userId)
-      .single()
+      .single();
 
-    if (!data) throw new Error('Usage metrics not found')
+    if (!data) throw new Error('Usage metrics not found');
 
     return {
       apiCallsCount: data.api_calls_count,
       dailyMessagesCount: data.daily_messages_count,
       monthlyMessagesCount: data.monthly_messages_count,
-      fileUploadTotal: data.file_upload_total
-    }
+      fileUploadTotal: data.file_upload_total,
+    };
   }
 
   // Get user's notifications
-  async getNotifications(userId: string): Promise<Array<{ type: string, message: string }>> {
+  async getNotifications(userId: string): Promise<Array<{ type: string; message: string }>> {
     const { data } = await this.supabase
       .from('usage_notifications')
       .select('type, message')
       .eq('user_id', userId)
       .eq('seen', false)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false });
 
-    return data || []
+    return data || [];
   }
 }

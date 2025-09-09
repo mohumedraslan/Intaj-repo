@@ -132,9 +132,9 @@ export async function GET(request: NextRequest) {
     </html>
   `;
 
-  return new NextResponse(errorHtml, { 
+  return new NextResponse(errorHtml, {
     status: 403,
-    headers: { 'Content-Type': 'text/html' }
+    headers: { 'Content-Type': 'text/html' },
   });
 }
 
@@ -144,16 +144,15 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('x-hub-signature-256');
 
     // Verify webhook signature
-    if (!signature || !WhatsAppIntegration.verifyWebhookSignature(
-      body,
-      signature,
-      process.env.WHATSAPP_APP_SECRET!
-    )) {
+    if (
+      !signature ||
+      !WhatsAppIntegration.verifyWebhookSignature(body, signature, process.env.WHATSAPP_APP_SECRET!)
+    ) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const webhookData = JSON.parse(body);
-    
+
     // Parse incoming message
     const message = WhatsAppIntegration.parseWebhookMessage(webhookData);
     if (!message) {
@@ -167,9 +166,7 @@ export async function POST(request: NextRequest) {
       .eq('platform', 'whatsapp')
       .eq('active', true);
 
-    const connection = connections?.find(conn => 
-      conn.credentials?.phone_number_id === message.to
-    );
+    const connection = connections?.find(conn => conn.credentials?.phone_number_id === message.to);
 
     if (!connection) {
       console.log('No active WhatsApp connection found for phone number:', message.to);
@@ -184,7 +181,7 @@ export async function POST(request: NextRequest) {
       accessToken: connection.credentials.access_token,
       phoneNumberId: connection.credentials.phone_number_id,
       webhookVerifyToken: connection.credentials.webhook_verify_token,
-      businessAccountId: connection.credentials.business_account_id
+      businessAccountId: connection.credentials.business_account_id,
     };
 
     const whatsapp = new WhatsAppIntegration(whatsappConfig);
@@ -197,7 +194,7 @@ export async function POST(request: NextRequest) {
 
     // Send response
     const sendResult = await whatsapp.sendTextMessage(message.from, aiResponse);
-    
+
     if (sendResult.success) {
       // Store outgoing message
       await connectionManager.storeOutgoingMessage(
@@ -218,7 +215,7 @@ export async function POST(request: NextRequest) {
 async function processMessageWithAI(message: string, chatbotId: string): Promise<string> {
   // This is a simplified AI processing function
   // You'll want to integrate this with your existing AI service/OpenRouter
-  
+
   try {
     // Get chatbot configuration
     const { data: chatbot } = await supabase
@@ -240,10 +237,11 @@ async function processMessageWithAI(message: string, chatbotId: string): Promise
       .limit(10);
 
     // Build conversation context
-    const conversationHistory = recentMessages?.reverse().map(msg => ({
-      role: msg.role,
-      content: msg.content
-    })) || [];
+    const conversationHistory =
+      recentMessages?.reverse().map(msg => ({
+        role: msg.role,
+        content: msg.content,
+      })) || [];
 
     // Add current message
     conversationHistory.push({ role: 'user', content: message });
@@ -252,27 +250,27 @@ async function processMessageWithAI(message: string, chatbotId: string): Promise
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://intaj.ai',
-        'X-Title': 'Intaj AI Platform'
+        'X-Title': 'Intaj AI Platform',
       } as HeadersInit,
       body: JSON.stringify({
         model: chatbot.model || 'openai/gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
-            content: `You are ${chatbot.name}, an AI assistant. ${chatbot.settings?.systemPrompt || 'Be helpful and professional.'}`
+            content: `You are ${chatbot.name}, an AI assistant. ${chatbot.settings?.systemPrompt || 'Be helpful and professional.'}`,
           },
-          ...conversationHistory
+          ...conversationHistory,
         ],
         max_tokens: 1000,
-        temperature: 0.7
-      })
+        temperature: 0.7,
+      }),
     });
 
     const aiData = await response.json();
-    
+
     if (aiData.choices && aiData.choices[0]) {
       return aiData.choices[0].message.content;
     }

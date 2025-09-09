@@ -34,9 +34,7 @@ export class TextExtractor {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      const pageText = content.items
-        .map((item: any) => item.str)
-        .join(' ');
+      const pageText = content.items.map((item: any) => item.str).join(' ');
       fullText += pageText + '\n';
     }
 
@@ -52,7 +50,9 @@ export class TextExtractor {
 
   async extractFromImage(fileUrl: string): Promise<string> {
     const worker = await createWorker('eng');
-    const { data: { text } } = await worker.recognize(fileUrl);
+    const {
+      data: { text },
+    } = await worker.recognize(fileUrl);
     await worker.terminate();
     return text;
   }

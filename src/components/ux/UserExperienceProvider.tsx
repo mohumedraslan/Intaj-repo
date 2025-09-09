@@ -1,7 +1,12 @@
-"use client";
-import { useState, useEffect, ReactNode } from "react";
-import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
-import GuidedTour, { useTour, dashboardTour, chatbotTour, connectionsTour } from "@/components/tours/GuidedTour";
+'use client';
+import { useState, useEffect, ReactNode } from 'react';
+import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
+import GuidedTour, {
+  useTour,
+  dashboardTour,
+  chatbotTour,
+  connectionsTour,
+} from '@/components/tours/GuidedTour';
 
 interface UserExperienceProviderProps {
   children: ReactNode;
@@ -10,14 +15,14 @@ interface UserExperienceProviderProps {
 export default function UserExperienceProvider({ children }: UserExperienceProviderProps) {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
-  
+
   const { activeTour, completedTours, startTour, completeTour, skipTour } = useTour();
 
   useEffect(() => {
     // Check if this is the user's first visit
     const hasVisited = localStorage.getItem('intaj-has-visited');
     const hasCompletedOnboarding = localStorage.getItem('intaj-onboarding-completed');
-    
+
     if (!hasVisited) {
       setIsFirstVisit(true);
       setShowOnboarding(true);
@@ -28,7 +33,7 @@ export default function UserExperienceProvider({ children }: UserExperienceProvi
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
     localStorage.setItem('intaj-onboarding-completed', 'true');
-    
+
     // Start dashboard tour after onboarding
     setTimeout(() => {
       if (!completedTours.has('dashboard')) {
@@ -59,11 +64,7 @@ export default function UserExperienceProvider({ children }: UserExperienceProvi
       {children}
 
       {/* Onboarding Flow */}
-      {showOnboarding && (
-        <OnboardingFlow
-          onComplete={handleOnboardingComplete}
-        />
-      )}
+      {showOnboarding && <OnboardingFlow onComplete={handleOnboardingComplete} />}
 
       {/* Guided Tours */}
       {activeTour && (
@@ -104,6 +105,6 @@ export function useUserExperience() {
     startDashboardTour,
     startChatbotTour,
     startConnectionsTour,
-    completedTours
+    completedTours,
   };
 }

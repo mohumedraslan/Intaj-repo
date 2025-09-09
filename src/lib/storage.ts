@@ -18,11 +18,7 @@ export class StorageService {
     'text/markdown',
   ];
 
-  async uploadFile(
-    file: File,
-    chatbotId: string,
-    userId: string
-  ): Promise<string> {
+  async uploadFile(file: File, chatbotId: string, userId: string): Promise<string> {
     // Validate file type
     if (!this.ALLOWED_TYPES.includes(file.type)) {
       throw new Error('File type not supported');
@@ -42,24 +38,20 @@ export class StorageService {
     }
 
     // Add file record to data_sources table
-    const { error: dbError } = await this.supabase
-      .from('data_sources')
-      .insert({
-        chatbot_id: chatbotId,
+    const { error: dbError } = await this.supabase.from('data_sources').insert({
+      chatbot_id: chatbotId,
+      type: file.type,
+      path: filePath,
+      metadata: {
+        originalName: file.name,
+        size: file.size,
         type: file.type,
-        path: filePath,
-        metadata: {
-          originalName: file.name,
-          size: file.size,
-          type: file.type,
-        },
-      });
+      },
+    });
 
     if (dbError) {
       // Cleanup uploaded file if database insert fails
-      await this.supabase.storage
-        .from(this.BUCKET_NAME)
-        .remove([filePath]);
+      await this.supabase.storage.from(this.BUCKET_NAME).remove([filePath]);
       throw new Error(`Error saving file metadata: ${dbError.message}`);
     }
 
@@ -100,9 +92,7 @@ export class StorageService {
   }
 
   async getFileContent(filePath: string): Promise<string> {
-    const { data, error } = await this.supabase.storage
-      .from(this.BUCKET_NAME)
-      .download(filePath);
+    const { data, error } = await this.supabase.storage.from(this.BUCKET_NAME).download(filePath);
 
     if (error) {
       throw new Error(`Error downloading file: ${error.message}`);

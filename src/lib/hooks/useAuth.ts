@@ -9,19 +9,19 @@ export function useAuth() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
 
-        if (event === 'SIGNED_IN') {
-          router.refresh();
-        }
-        if (event === 'SIGNED_OUT') {
-          router.refresh();
-        }
+      if (event === 'SIGNED_IN') {
+        router.refresh();
       }
-    );
+      if (event === 'SIGNED_OUT') {
+        router.refresh();
+      }
+    });
 
     // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -32,13 +32,7 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, [router]);
 
-  const signIn = async ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) => {
+  const signIn = async ({ email, password }: { email: string; password: string }) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,

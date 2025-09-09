@@ -14,7 +14,7 @@ yarn add intaj-sdk
 import { Intaj } from 'intaj-sdk';
 
 const intaj = new Intaj({
-  apiKey: 'your_api_key'
+  apiKey: 'your_api_key',
 });
 ```
 
@@ -28,7 +28,7 @@ Send messages:
 const response = await intaj.chat.send({
   botId: 'bot_123',
   message: 'Hello!',
-  platform: 'website'
+  platform: 'website',
 });
 ```
 
@@ -37,7 +37,7 @@ Get chat history:
 ```javascript
 const history = await intaj.chat.getHistory({
   botId: 'bot_123',
-  limit: 50
+  limit: 50,
 });
 ```
 
@@ -48,7 +48,7 @@ Upload file:
 ```javascript
 const file = await intaj.files.upload({
   file: fileBuffer,
-  filename: 'document.pdf'
+  filename: 'document.pdf',
 });
 ```
 
@@ -57,7 +57,7 @@ Process file:
 ```javascript
 const processed = await intaj.files.process({
   fileId: file.id,
-  type: 'text_extraction'
+  type: 'text_extraction',
 });
 ```
 
@@ -68,7 +68,7 @@ Get usage stats:
 ```javascript
 const stats = await intaj.analytics.getStats({
   startDate: '2025-09-01',
-  endDate: '2025-09-07'
+  endDate: '2025-09-07',
 });
 ```
 
@@ -76,7 +76,7 @@ Get performance metrics:
 
 ```javascript
 const metrics = await intaj.analytics.getMetrics({
-  type: 'response_times'
+  type: 'response_times',
 });
 ```
 
@@ -84,7 +84,9 @@ const metrics = await intaj.analytics.getMetrics({
 
 ```javascript
 try {
-  await intaj.chat.send({ /* ... */ });
+  await intaj.chat.send({
+    /* ... */
+  });
 } catch (error) {
   if (error.code === 'rate_limit_exceeded') {
     // Handle rate limiting
@@ -106,7 +108,7 @@ interface CustomMessage extends ChatMessage {
 }
 
 const response: ChatResponse = await intaj.chat.send({
-  message: customMessage
+  message: customMessage,
 });
 ```
 

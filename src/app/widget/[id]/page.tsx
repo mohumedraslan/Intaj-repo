@@ -57,7 +57,13 @@ export default function WidgetChatPage({ params }: { params: { id: string } }) {
       <div className="flex-1 overflow-y-auto border rounded p-2 bg-white">
         {messages.map((msg, i) => (
           <div key={i} className={msg.role === 'user' ? 'text-right mb-2' : 'text-left mb-2'}>
-            <span className={msg.role === 'user' ? 'bg-blue-100 px-2 py-1 rounded' : 'bg-gray-100 px-2 py-1 rounded'}>
+            <span
+              className={
+                msg.role === 'user'
+                  ? 'bg-blue-100 px-2 py-1 rounded'
+                  : 'bg-gray-100 px-2 py-1 rounded'
+              }
+            >
               {msg.content}
             </span>
           </div>

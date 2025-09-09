@@ -36,28 +36,22 @@ export function PricingTable() {
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
         {Object.entries(PLANS).map(([key, plan]) => {
           const isCurrentPlan = profile?.subscription?.toLowerCase() === key.toLowerCase();
-          
+
           return (
             <div
               key={key}
               className="relative rounded-2xl border border-gray-200 p-8 shadow-sm dark:border-gray-800"
             >
               <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold leading-8">
-                  {plan.name}
-                </h3>
+                <h3 className="text-lg font-semibold leading-8">{plan.name}</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold tracking-tight">
-                    ${plan.price}
-                  </span>
+                  <span className="text-4xl font-bold tracking-tight">${plan.price}</span>
                   {plan.price > 0 && (
-                    <span className="text-sm font-semibold leading-6">
-                      /month
-                    </span>
+                    <span className="text-sm font-semibold leading-6">/month</span>
                   )}
                 </div>
                 <ul className="mt-4 space-y-4">
-                  {plan.features.map((feature) => (
+                  {plan.features.map(feature => (
                     <li key={feature} className="flex gap-3">
                       <svg
                         className="h-6 w-6 flex-none text-green-500"
@@ -80,7 +74,7 @@ export function PricingTable() {
                   onClick={() => plan.stripePriceId && handleSubscribe(plan.stripePriceId)}
                   disabled={isCurrentPlan || loading === plan.stripePriceId || !plan.stripePriceId}
                   className="mt-6 w-full"
-                  variant={isCurrentPlan ? "outline" : "default"}
+                  variant={isCurrentPlan ? 'outline' : 'default'}
                 >
                   {loading === plan.stripePriceId ? (
                     <>

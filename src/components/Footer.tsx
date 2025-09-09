@@ -1,5 +1,5 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -10,15 +10,29 @@ export default function Footer() {
         <span className="text-white/70 ml-2 font-medium">&copy; {new Date().getFullYear()}</span>
       </div>
       <div className="flex gap-6 text-lg">
-        <Link href="/features" className="hover:underline hover:text-yellow-200">Features</Link>
-        <Link href="/pricing" className="hover:underline hover:text-yellow-200">Pricing</Link>
-        <Link href="/services" className="hover:underline hover:text-yellow-200">Services</Link>
+        <Link href="/features" className="hover:underline hover:text-yellow-200">
+          Features
+        </Link>
+        <Link href="/pricing" className="hover:underline hover:text-yellow-200">
+          Pricing
+        </Link>
+        <Link href="/services" className="hover:underline hover:text-yellow-200">
+          Services
+        </Link>
       </div>
       <div className="flex flex-col md:flex-row gap-2 md:gap-4 text-sm text-white/90">
-        <Link href="/about-us" className="hover:underline hover:text-yellow-200">About Us</Link>
-        <Link href="/faq" className="hover:underline hover:text-yellow-200">FAQ</Link>
-        <Link href="/contact-us" className="hover:underline hover:text-yellow-200">Contact</Link>
-        <Link href="/policy" className="hover:underline hover:text-yellow-200">Policy</Link>
+        <Link href="/about-us" className="hover:underline hover:text-yellow-200">
+          About Us
+        </Link>
+        <Link href="/faq" className="hover:underline hover:text-yellow-200">
+          FAQ
+        </Link>
+        <Link href="/contact-us" className="hover:underline hover:text-yellow-200">
+          Contact
+        </Link>
+        <Link href="/policy" className="hover:underline hover:text-yellow-200">
+          Policy
+        </Link>
       </div>
       <div className="flex gap-4">
         <a
@@ -27,10 +41,22 @@ export default function Footer() {
           rel="noopener"
           aria-label="Connect Facebook"
         >
-          <Image src="/facebook.png" alt="Connect Facebook" width={32} height={32} className="h-8 w-8 hover:opacity-80 rounded-lg" />
+          <Image
+            src="/facebook.png"
+            alt="Connect Facebook"
+            width={32}
+            height={32}
+            className="h-8 w-8 hover:opacity-80 rounded-lg"
+          />
         </a>
         <a href="#" aria-label="Connect Instagram" className="pointer-events-none opacity-60">
-          <Image src="/instagram.png" alt="Connect Instagram (coming soon)" width={32} height={32} className="h-8 w-8 rounded-lg" />
+          <Image
+            src="/instagram.png"
+            alt="Connect Instagram (coming soon)"
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-lg"
+          />
         </a>
       </div>
     </footer>

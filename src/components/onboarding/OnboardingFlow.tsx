@@ -1,6 +1,16 @@
-"use client";
-import { useState, useEffect } from "react";
-import { X, ArrowRight, ArrowLeft, Check, Sparkles, Bot, MessageSquare, Users, BarChart3 } from "lucide-react";
+'use client';
+import { useState, useEffect } from 'react';
+import {
+  X,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  Sparkles,
+  Bot,
+  MessageSquare,
+  Users,
+  BarChart3,
+} from 'lucide-react';
 
 interface OnboardingStep {
   id: string;
@@ -22,9 +32,9 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
 
   const steps: OnboardingStep[] = [
     {
-      id: "welcome",
-      title: "Welcome to Intaj AI",
-      description: "Your AI automation platform that never sleeps",
+      id: 'welcome',
+      title: 'Welcome to Intaj AI',
+      description: 'Your AI automation platform that never sleeps',
       icon: <Sparkles className="w-8 h-8 text-blue-500" />,
       content: (
         <div className="text-center space-y-6">
@@ -32,10 +42,13 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
             <Sparkles className="w-12 h-12 text-white" />
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-white mb-4">Welcome to the Future of AI Automation</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Welcome to the Future of AI Automation
+            </h3>
             <p className="text-gray-300 text-lg leading-relaxed">
-              Intaj AI helps you automate customer engagement across multiple channels with intelligent chatbots, 
-              seamless integrations, and powerful analytics. Let's get you started!
+              Intaj AI helps you automate customer engagement across multiple channels with
+              intelligent chatbots, seamless integrations, and powerful analytics. Let's get you
+              started!
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-8">
@@ -49,12 +62,12 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
             </div>
           </div>
         </div>
-      )
+      ),
     },
     {
-      id: "chatbots",
-      title: "Create Your First Chatbot",
-      description: "Build intelligent AI assistants for your business",
+      id: 'chatbots',
+      title: 'Create Your First Chatbot',
+      description: 'Build intelligent AI assistants for your business',
       icon: <Bot className="w-8 h-8 text-purple-500" />,
       content: (
         <div className="space-y-6">
@@ -63,9 +76,11 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
               <Bot className="w-10 h-10 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">AI-Powered Chatbots</h3>
-            <p className="text-gray-300">Create intelligent chatbots that understand context and provide human-like responses.</p>
+            <p className="text-gray-300">
+              Create intelligent chatbots that understand context and provide human-like responses.
+            </p>
           </div>
-          
+
           <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-700">
             <h4 className="font-semibold text-white mb-4">Key Features:</h4>
             <div className="space-y-3">
@@ -94,12 +109,12 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
             </button>
           </div>
         </div>
-      )
+      ),
     },
     {
-      id: "channels",
-      title: "Connect Your Channels",
-      description: "Integrate with WhatsApp, Facebook, Instagram, and more",
+      id: 'channels',
+      title: 'Connect Your Channels',
+      description: 'Integrate with WhatsApp, Facebook, Instagram, and more',
       icon: <MessageSquare className="w-8 h-8 text-cyan-500" />,
       content: (
         <div className="space-y-6">
@@ -108,7 +123,9 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
               <MessageSquare className="w-10 h-10 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Multi-Channel Integration</h3>
-            <p className="text-gray-300">Connect your chatbots to all major messaging platforms and your website.</p>
+            <p className="text-gray-300">
+              Connect your chatbots to all major messaging platforms and your website.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -148,12 +165,12 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
             </button>
           </div>
         </div>
-      )
+      ),
     },
     {
-      id: "team",
-      title: "Invite Your Team",
-      description: "Collaborate with team members and manage permissions",
+      id: 'team',
+      title: 'Invite Your Team',
+      description: 'Collaborate with team members and manage permissions',
       icon: <Users className="w-8 h-8 text-green-500" />,
       content: (
         <div className="space-y-6">
@@ -162,7 +179,9 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
               <Users className="w-10 h-10 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Team Collaboration</h3>
-            <p className="text-gray-300">Invite team members and manage roles to work together effectively.</p>
+            <p className="text-gray-300">
+              Invite team members and manage roles to work together effectively.
+            </p>
           </div>
 
           <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-700">
@@ -173,21 +192,27 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
                   <div className="font-medium text-white">Owner</div>
                   <div className="text-gray-400 text-sm">Full access to all features</div>
                 </div>
-                <div className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">Full Access</div>
+                <div className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">
+                  Full Access
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-medium text-white">Admin</div>
                   <div className="text-gray-400 text-sm">Manage chatbots and team members</div>
                 </div>
-                <div className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs">Admin</div>
+                <div className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs">
+                  Admin
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-medium text-white">Agent</div>
                   <div className="text-gray-400 text-sm">Handle conversations and support</div>
                 </div>
-                <div className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">Limited</div>
+                <div className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">
+                  Limited
+                </div>
               </div>
             </div>
           </div>
@@ -198,12 +223,12 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
             </button>
           </div>
         </div>
-      )
+      ),
     },
     {
-      id: "analytics",
-      title: "Track Your Success",
-      description: "Monitor performance with detailed analytics and insights",
+      id: 'analytics',
+      title: 'Track Your Success',
+      description: 'Monitor performance with detailed analytics and insights',
       icon: <BarChart3 className="w-8 h-8 text-orange-500" />,
       content: (
         <div className="space-y-6">
@@ -212,7 +237,9 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
               <BarChart3 className="w-10 h-10 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Advanced Analytics</h3>
-            <p className="text-gray-300">Get insights into your chatbot performance and customer interactions.</p>
+            <p className="text-gray-300">
+              Get insights into your chatbot performance and customer interactions.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -256,8 +283,8 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
             </div>
           </div>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const handleNext = () => {
@@ -292,7 +319,9 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">Getting Started with Intaj AI</h2>
-              <p className="text-gray-400 text-sm">Step {currentStep + 1} of {steps.length}</p>
+              <p className="text-gray-400 text-sm">
+                Step {currentStep + 1} of {steps.length}
+              </p>
             </div>
           </div>
           <button
@@ -320,10 +349,7 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
           </div>
           <div className="flex justify-between text-xs text-gray-400">
             {steps.map((step, index) => (
-              <span
-                key={step.id}
-                className={`${index === currentStep ? 'text-blue-400' : ''}`}
-              >
+              <span key={step.id} className={`${index === currentStep ? 'text-blue-400' : ''}`}>
                 {step.title}
               </span>
             ))}
@@ -331,9 +357,7 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
         </div>
 
         {/* Content */}
-        <div className="p-8 overflow-y-auto max-h-[60vh]">
-          {steps[currentStep].content}
-        </div>
+        <div className="p-8 overflow-y-auto max-h-[60vh]">{steps[currentStep].content}</div>
 
         {/* Footer */}
         <div className="flex items-center justify-between p-6 border-t border-gray-700">
@@ -354,8 +378,8 @@ export default function OnboardingFlow({ isOpen, onClose, onComplete }: Onboardi
                   index === currentStep
                     ? 'bg-blue-500 w-6'
                     : completedSteps.has(index)
-                    ? 'bg-green-500'
-                    : 'bg-gray-600'
+                      ? 'bg-green-500'
+                      : 'bg-gray-600'
                 }`}
               />
             ))}

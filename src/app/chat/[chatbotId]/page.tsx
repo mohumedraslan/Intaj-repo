@@ -38,8 +38,8 @@ export default function ChatPage({ params }: { params: { chatbotId: string } }) 
     e.preventDefault();
     if (!input.trim()) return;
     setLoading(true);
-  const newMessages: Message[] = [...messages, { role: 'user', content: input }];
-  setMessages(newMessages);
+    const newMessages: Message[] = [...messages, { role: 'user', content: input }];
+    setMessages(newMessages);
     setInput('');
     // Stream response
     const res = await fetch('/api/chat/stream', {
@@ -65,7 +65,13 @@ export default function ChatPage({ params }: { params: { chatbotId: string } }) 
       <div className="flex-1 overflow-y-auto border rounded p-4 bg-white">
         {messages.map((msg, i) => (
           <div key={i} className={msg.role === 'user' ? 'text-right mb-2' : 'text-left mb-2'}>
-            <span className={msg.role === 'user' ? 'bg-blue-100 px-2 py-1 rounded' : 'bg-gray-100 px-2 py-1 rounded'}>
+            <span
+              className={
+                msg.role === 'user'
+                  ? 'bg-blue-100 px-2 py-1 rounded'
+                  : 'bg-gray-100 px-2 py-1 rounded'
+              }
+            >
               {msg.content}
             </span>
           </div>

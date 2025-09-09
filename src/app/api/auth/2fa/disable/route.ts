@@ -17,8 +17,11 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -27,7 +30,10 @@ export async function POST(request: NextRequest) {
     const { code } = body;
 
     if (!code || typeof code !== 'string' || code.length !== 6) {
-      return NextResponse.json({ error: 'Verification code required to disable 2FA' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Verification code required to disable 2FA' },
+        { status: 400 }
+      );
     }
 
     // Get user's 2FA secret from database
@@ -77,11 +83,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to disable 2FA' }, { status: 500 });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: '2FA disabled successfully'
+    return NextResponse.json({
+      success: true,
+      message: '2FA disabled successfully',
     });
-
   } catch (error) {
     console.error('2FA disable error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

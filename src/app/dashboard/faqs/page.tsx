@@ -50,11 +50,25 @@ export default function FaqPage() {
       <form onSubmit={handleAdd} className="mb-6 flex gap-2 items-end">
         <div>
           <label className="block text-sm">Question</label>
-          <input value={question} onChange={e => setQuestion(e.target.value)} required className="input input-bordered w-full" placeholder="FAQ question" title="FAQ question" />
+          <input
+            value={question}
+            onChange={e => setQuestion(e.target.value)}
+            required
+            className="input input-bordered w-full"
+            placeholder="FAQ question"
+            title="FAQ question"
+          />
         </div>
         <div>
           <label className="block text-sm">Answer</label>
-          <input value={answer} onChange={e => setAnswer(e.target.value)} required className="input input-bordered w-full" placeholder="FAQ answer" title="FAQ answer" />
+          <input
+            value={answer}
+            onChange={e => setAnswer(e.target.value)}
+            required
+            className="input input-bordered w-full"
+            placeholder="FAQ answer"
+            title="FAQ answer"
+          />
         </div>
         <Button type="submit">Add</Button>
       </form>
@@ -67,7 +81,8 @@ export default function FaqPage() {
         <ul className="space-y-2">
           {faqs.map(faq => (
             <li key={faq.id} className="border rounded p-3">
-              <strong>Q:</strong> {faq.question}<br />
+              <strong>Q:</strong> {faq.question}
+              <br />
               <strong>A:</strong> {faq.answer}
             </li>
           ))}

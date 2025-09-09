@@ -13,11 +13,7 @@ export const PLANS = {
   FREE: {
     name: 'Free',
     price: 0,
-    features: [
-      '1,000 messages per month',
-      'Basic chatbot features',
-      'Email support',
-    ],
+    features: ['1,000 messages per month', 'Basic chatbot features', 'Email support'],
     stripeProductId: process.env.STRIPE_FREE_PRODUCT_ID,
     stripePriceId: process.env.STRIPE_FREE_PRICE_ID,
   },

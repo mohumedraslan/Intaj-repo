@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { InstagramIntegration, InstagramConnectionManager } from '@/lib/integrations/instagram';
+import {
+  InstagramIntegration,
+  InstagramConnectionManager,
+  InstagramMessage,
+} from '@/lib/integrations/instagram';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -133,9 +137,9 @@ export async function GET(request: NextRequest) {
     </html>
   `;
 
-  return new NextResponse(errorHtml, { 
+  return new NextResponse(errorHtml, {
     status: 403,
-    headers: { 'Content-Type': 'text/html' }
+    headers: { 'Content-Type': 'text/html' },
   });
 }
 
@@ -145,16 +149,19 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('x-hub-signature');
 
     // Verify webhook signature
-    if (!signature || !InstagramIntegration.verifyWebhookSignature(
-      body,
-      signature,
-      process.env.INSTAGRAM_APP_SECRET!
-    )) {
+    if (
+      !signature ||
+      !InstagramIntegration.verifyWebhookSignature(
+        body,
+        signature,
+        process.env.INSTAGRAM_APP_SECRET!
+      )
+    ) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const webhookData = JSON.parse(body);
-    
+
     // Handle direct messages
     const message = InstagramIntegration.parseWebhookMessage(webhookData);
     if (message) {
@@ -180,7 +187,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleMessage(message: any) {
+async function handleMessage(message: InstagramMessage) {
   try {
     // Find the chatbot associated with this Instagram account
     const { data: connections } = await supabase
@@ -189,8 +196,8 @@ async function handleMessage(message: any) {
       .eq('platform', 'instagram')
       .eq('active', true);
 
-    const connection = connections?.find(conn => 
-      conn.credentials?.instagram_business_account_id === message.recipientId
+    const connection = connections?.find(
+      conn => conn.credentials?.instagram_business_account_id === message.recipientId
     );
 
     if (!connection) {
@@ -199,7 +206,10 @@ async function handleMessage(message: any) {
     }
 
     // Store incoming message
-    await connectionManager.storeMessage(connection.chatbot_id, message);
+    await connectionManager.storeMessage(
+      connection.chatbot_id,
+      message as unknown as Record<string, unknown>
+    );
 
     // Get Instagram integration instance
     const instagramConfig = {
@@ -207,20 +217,20 @@ async function handleMessage(message: any) {
       instagramBusinessAccountId: connection.credentials.instagram_business_account_id,
       pageId: connection.credentials.page_id,
       appSecret: connection.credentials.app_secret,
-      webhookVerifyToken: connection.credentials.webhook_verify_token
+      webhookVerifyToken: connection.credentials.webhook_verify_token,
     };
 
     const instagram = new InstagramIntegration(instagramConfig);
 
     // Process message with AI
     const aiResponse = await processMessageWithAI(
-      message.message.text || 'Media message', 
+      message.message.text || 'Media message',
       connection.chatbot_id
     );
 
     // Send response
-    const sendResult = await instagram.sendTextMessage(message.senderId, aiResponse);
-    
+    const sendResult = await instagram.sendMessage(message.senderId, aiResponse, 'text');
+
     if (sendResult.success) {
       // Store outgoing message
       await connectionManager.storeOutgoingMessage(
@@ -236,7 +246,13 @@ async function handleMessage(message: any) {
   }
 }
 
-async function handleStoryMention(storyMention: any) {
+interface InstagramStoryMention {
+  id: string;
+  mentionedUserId: string;
+  // Add other relevant fields as needed
+}
+
+async function handleStoryMention(storyMention: InstagramStoryMention) {
   try {
     // Find the chatbot associated with this Instagram account
     const { data: connections } = await supabase
@@ -253,27 +269,34 @@ async function handleStoryMention(storyMention: any) {
     }
 
     // Store story mention
-    await connectionManager.storeStoryMention(connection.chatbot_id, storyMention);
+    await connectionManager.storeStoryMention(
+      connection.chatbot_id,
+      storyMention as import('@/lib/integrations/instagram').InstagramStoryMention
+    );
 
     const instagramConfig = {
       accessToken: connection.credentials.access_token,
       instagramBusinessAccountId: connection.credentials.instagram_business_account_id,
       pageId: connection.credentials.page_id,
       appSecret: connection.credentials.app_secret,
-      webhookVerifyToken: connection.credentials.webhook_verify_token
+      webhookVerifyToken: connection.credentials.webhook_verify_token,
     };
 
     const instagram = new InstagramIntegration(instagramConfig);
 
     // Generate AI response for story mention
     const aiResponse = await processMessageWithAI(
-      'User mentioned me in their story', 
+      'User mentioned me in their story',
       connection.chatbot_id
     );
 
     // Reply to story mention
-    const sendResult = await instagram.replyToStoryMention(storyMention.id, aiResponse);
-    
+    const sendResult = await instagram.sendMessage(
+      storyMention.mentionedUserId,
+      aiResponse,
+      'story_reply'
+    );
+
     if (sendResult.success) {
       // Store outgoing message
       await connectionManager.storeOutgoingMessage(
@@ -289,7 +312,14 @@ async function handleStoryMention(storyMention: any) {
   }
 }
 
-async function handleCommentMention(commentMention: any) {
+interface InstagramCommentMention {
+  commentId: string;
+  userId: string;
+  text: string;
+  // Add other relevant fields as needed
+}
+
+async function handleCommentMention(commentMention: InstagramCommentMention) {
   try {
     // Find the chatbot associated with this Instagram account
     const { data: connections } = await supabase
@@ -310,27 +340,24 @@ async function handleCommentMention(commentMention: any) {
       instagramBusinessAccountId: connection.credentials.instagram_business_account_id,
       pageId: connection.credentials.page_id,
       appSecret: connection.credentials.app_secret,
-      webhookVerifyToken: connection.credentials.webhook_verify_token
+      webhookVerifyToken: connection.credentials.webhook_verify_token,
     };
 
     const instagram = new InstagramIntegration(instagramConfig);
 
     // Generate AI response for comment
-    const aiResponse = await processMessageWithAI(
-      commentMention.text, 
-      connection.chatbot_id
-    );
+    const aiResponse = await processMessageWithAI(commentMention.text, connection.chatbot_id);
 
     // Reply to comment
-    const sendResult = await instagram.replyToComment(commentMention.commentId, aiResponse);
-    
+    const sendResult = await instagram.sendMessage(commentMention.userId, aiResponse, 'text');
+
     if (sendResult.success) {
       // Store the comment and reply in database
       await connectionManager.storeOutgoingMessage(
         connection.chatbot_id,
         commentMention.userId,
         aiResponse,
-        sendResult.replyId,
+        sendResult.messageId,
         'comment_reply'
       );
     }
@@ -361,10 +388,11 @@ async function processMessageWithAI(message: string, chatbotId: string): Promise
       .limit(10);
 
     // Build conversation context
-    const conversationHistory = recentMessages?.reverse().map(msg => ({
-      role: msg.role,
-      content: msg.content
-    })) || [];
+    const conversationHistory =
+      recentMessages?.reverse().map(msg => ({
+        role: msg.role,
+        content: msg.content,
+      })) || [];
 
     // Add current message
     conversationHistory.push({ role: 'user', content: message });
@@ -373,27 +401,27 @@ async function processMessageWithAI(message: string, chatbotId: string): Promise
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://intaj.nabih.tech',
-        'X-Title': 'Intaj AI Platform'
+        'X-Title': 'Intaj AI Platform',
       } as HeadersInit,
       body: JSON.stringify({
         model: chatbot.model || 'openai/gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
-            content: `You are ${chatbot.name}, an AI assistant on Instagram. Keep responses concise and engaging for social media. ${chatbot.settings?.systemPrompt || 'Be helpful and professional.'}`
+            content: `You are ${chatbot.name}, an AI assistant on Instagram. Keep responses concise and engaging for social media. ${chatbot.settings?.systemPrompt || 'Be helpful and professional.'}`,
           },
-          ...conversationHistory
+          ...conversationHistory,
         ],
         max_tokens: 500, // Shorter for Instagram
-        temperature: 0.7
-      })
+        temperature: 0.7,
+      }),
     });
 
     const aiData = await response.json();
-    
+
     if (aiData.choices && aiData.choices[0]) {
       return aiData.choices[0].message.content;
     }

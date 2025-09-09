@@ -39,7 +39,7 @@ const defaultTemplates: WidgetTemplate[] = [
     category: 'customer-support',
     config: {
       botName: 'Support Assistant',
-      welcomeMessage: 'Hello! I\'m here to help you with any questions or issues you may have.',
+      welcomeMessage: "Hello! I'm here to help you with any questions or issues you may have.",
       primaryColor: '#3b82f6',
       position: 'bottom-right',
       allowFileUpload: true,
@@ -56,13 +56,13 @@ const defaultTemplates: WidgetTemplate[] = [
           thursday: { start: '09:00', end: '17:00', enabled: true },
           friday: { start: '09:00', end: '17:00', enabled: true },
           saturday: { start: '10:00', end: '14:00', enabled: false },
-          sunday: { start: '10:00', end: '14:00', enabled: false }
-        }
-      }
+          sunday: { start: '10:00', end: '14:00', enabled: false },
+        },
+      },
     },
     isActive: true,
     createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20')
+    updatedAt: new Date('2024-01-20'),
   },
   {
     id: '2',
@@ -71,17 +71,17 @@ const defaultTemplates: WidgetTemplate[] = [
     category: 'sales',
     config: {
       botName: 'Sales Bot',
-      welcomeMessage: 'Hi there! Looking to learn more about our solutions? I\'d love to help!',
+      welcomeMessage: "Hi there! Looking to learn more about our solutions? I'd love to help!",
       primaryColor: '#10b981',
       position: 'bottom-right',
       allowFileUpload: false,
       maxFileSize: 5,
       allowedFileTypes: ['image/*'],
-      autoGreeting: true
+      autoGreeting: true,
     },
     isActive: false,
     createdAt: new Date('2024-01-10'),
-    updatedAt: new Date('2024-01-18')
+    updatedAt: new Date('2024-01-18'),
   },
   {
     id: '3',
@@ -96,12 +96,12 @@ const defaultTemplates: WidgetTemplate[] = [
       allowFileUpload: false,
       maxFileSize: 5,
       allowedFileTypes: [],
-      autoGreeting: false
+      autoGreeting: false,
     },
     isActive: false,
     createdAt: new Date('2024-01-12'),
-    updatedAt: new Date('2024-01-19')
-  }
+    updatedAt: new Date('2024-01-19'),
+  },
 ];
 
 export default function WidgetTemplates() {
@@ -113,10 +113,10 @@ export default function WidgetTemplates() {
 
   const categoryColors = {
     'customer-support': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-    'sales': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    sales: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
     'lead-generation': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-    'feedback': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-    'custom': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+    feedback: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    custom: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
   };
 
   const handleCreateTemplate = () => {
@@ -133,9 +133,9 @@ export default function WidgetTemplates() {
         allowFileUpload: true,
         maxFileSize: 10,
         allowedFileTypes: ['image/*', 'application/pdf'],
-        autoGreeting: true
+        autoGreeting: true,
       },
-      isActive: false
+      isActive: false,
     });
   };
 
@@ -148,20 +148,22 @@ export default function WidgetTemplates() {
   const handleSaveTemplate = () => {
     if (isCreating) {
       const newTemplate: WidgetTemplate = {
-        ...editForm as WidgetTemplate,
+        ...(editForm as WidgetTemplate),
         id: Date.now().toString(),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
       setTemplates(prev => [...prev, newTemplate]);
     } else if (selectedTemplate) {
-      setTemplates(prev => prev.map(t => 
-        t.id === selectedTemplate.id 
-          ? { ...editForm as WidgetTemplate, updatedAt: new Date() }
-          : t
-      ));
+      setTemplates(prev =>
+        prev.map(t =>
+          t.id === selectedTemplate.id
+            ? { ...(editForm as WidgetTemplate), updatedAt: new Date() }
+            : t
+        )
+      );
     }
-    
+
     setIsEditing(false);
     setIsCreating(false);
     setSelectedTemplate(null);
@@ -181,15 +183,15 @@ export default function WidgetTemplates() {
       name: `${template.name} (Copy)`,
       isActive: false,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
     setTemplates(prev => [...prev, duplicated]);
   };
 
   const toggleTemplateStatus = (id: string) => {
-    setTemplates(prev => prev.map(t => 
-      t.id === id ? { ...t, isActive: !t.isActive, updatedAt: new Date() } : t
-    ));
+    setTemplates(prev =>
+      prev.map(t => (t.id === id ? { ...t, isActive: !t.isActive, updatedAt: new Date() } : t))
+    );
   };
 
   const generateEmbedCode = (template: WidgetTemplate) => {
@@ -227,23 +229,29 @@ export default function WidgetTemplates() {
                 {/* Basic Information */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-white mb-4">Basic Information</h3>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Template Name</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Template Name
+                    </label>
                     <input
                       type="text"
                       value={editForm.name || ''}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={e => setEditForm(prev => ({ ...prev, name: e.target.value }))}
                       className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter template name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Description
+                    </label>
                     <textarea
                       value={editForm.description || ''}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={e =>
+                        setEditForm(prev => ({ ...prev, description: e.target.value }))
+                      }
                       className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={3}
                       placeholder="Describe this template"
@@ -254,7 +262,9 @@ export default function WidgetTemplates() {
                     <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
                     <select
                       value={editForm.category || 'custom'}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value as any }))}
+                      onChange={e =>
+                        setEditForm(prev => ({ ...prev, category: e.target.value as any }))
+                      }
                       className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="customer-support">Customer Support</option>
@@ -269,29 +279,35 @@ export default function WidgetTemplates() {
                 {/* Widget Configuration */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-white mb-4">Widget Configuration</h3>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Bot Name</label>
                     <input
                       type="text"
                       value={editForm.config?.botName || ''}
-                      onChange={(e) => setEditForm(prev => ({ 
-                        ...prev, 
-                        config: { ...prev.config!, botName: e.target.value }
-                      }))}
+                      onChange={e =>
+                        setEditForm(prev => ({
+                          ...prev,
+                          config: { ...prev.config!, botName: e.target.value },
+                        }))
+                      }
                       className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Assistant name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Welcome Message</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Welcome Message
+                    </label>
                     <textarea
                       value={editForm.config?.welcomeMessage || ''}
-                      onChange={(e) => setEditForm(prev => ({ 
-                        ...prev, 
-                        config: { ...prev.config!, welcomeMessage: e.target.value }
-                      }))}
+                      onChange={e =>
+                        setEditForm(prev => ({
+                          ...prev,
+                          config: { ...prev.config!, welcomeMessage: e.target.value },
+                        }))
+                      }
                       className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={2}
                       placeholder="First message users will see"
@@ -299,14 +315,18 @@ export default function WidgetTemplates() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Primary Color</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Primary Color
+                    </label>
                     <input
                       type="color"
                       value={editForm.config?.primaryColor || '#3b82f6'}
-                      onChange={(e) => setEditForm(prev => ({ 
-                        ...prev, 
-                        config: { ...prev.config!, primaryColor: e.target.value }
-                      }))}
+                      onChange={e =>
+                        setEditForm(prev => ({
+                          ...prev,
+                          config: { ...prev.config!, primaryColor: e.target.value },
+                        }))
+                      }
                       className="w-full h-12 bg-gray-800 border border-gray-700 rounded-lg"
                     />
                   </div>
@@ -315,10 +335,12 @@ export default function WidgetTemplates() {
                     <label className="block text-sm font-medium text-gray-300 mb-2">Position</label>
                     <select
                       value={editForm.config?.position || 'bottom-right'}
-                      onChange={(e) => setEditForm(prev => ({ 
-                        ...prev, 
-                        config: { ...prev.config!, position: e.target.value as any }
-                      }))}
+                      onChange={e =>
+                        setEditForm(prev => ({
+                          ...prev,
+                          config: { ...prev.config!, position: e.target.value as any },
+                        }))
+                      }
                       className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="bottom-right">Bottom Right</option>
@@ -330,10 +352,12 @@ export default function WidgetTemplates() {
                     <input
                       type="checkbox"
                       checked={editForm.config?.allowFileUpload || false}
-                      onChange={(e) => setEditForm(prev => ({ 
-                        ...prev, 
-                        config: { ...prev.config!, allowFileUpload: e.target.checked }
-                      }))}
+                      onChange={e =>
+                        setEditForm(prev => ({
+                          ...prev,
+                          config: { ...prev.config!, allowFileUpload: e.target.checked },
+                        }))
+                      }
                       className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500"
                     />
                     <label className="text-sm font-medium text-gray-300">Allow File Upload</label>
@@ -343,10 +367,12 @@ export default function WidgetTemplates() {
                     <input
                       type="checkbox"
                       checked={editForm.config?.autoGreeting || false}
-                      onChange={(e) => setEditForm(prev => ({ 
-                        ...prev, 
-                        config: { ...prev.config!, autoGreeting: e.target.checked }
-                      }))}
+                      onChange={e =>
+                        setEditForm(prev => ({
+                          ...prev,
+                          config: { ...prev.config!, autoGreeting: e.target.checked },
+                        }))
+                      }
                       className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500"
                     />
                     <label className="text-sm font-medium text-gray-300">Auto Greeting</label>
@@ -405,8 +431,11 @@ export default function WidgetTemplates() {
 
         {/* Templates Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((template) => (
-            <Card key={template.id} className="bg-[#141517]/50 backdrop-blur-xl border-gray-800/50 hover:border-gray-700/50 transition-all duration-300">
+          {templates.map(template => (
+            <Card
+              key={template.id}
+              className="bg-[#141517]/50 backdrop-blur-xl border-gray-800/50 hover:border-gray-700/50 transition-all duration-300"
+            >
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -427,7 +456,7 @@ export default function WidgetTemplates() {
                   {template.description}
                 </CardDescription>
               </CardHeader>
-              
+
               <CardContent>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -437,12 +466,14 @@ export default function WidgetTemplates() {
                     </div>
                     <div>
                       <span className="text-gray-400">Position:</span>
-                      <p className="text-white font-medium capitalize">{template.config.position.replace('-', ' ')}</p>
+                      <p className="text-white font-medium capitalize">
+                        {template.config.position.replace('-', ' ')}
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-2 text-sm">
-                    <div 
+                    <div
                       className="w-4 h-4 rounded-full"
                       style={{ backgroundColor: template.config.primaryColor }}
                     ></div>

@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from '@supabase/auth-helpers-react';
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  Database, 
+import {
+  LayoutDashboard,
+  MessageSquare,
+  Database,
   HelpCircle,
   BarChart2,
   Settings,
@@ -16,7 +16,7 @@ import {
   CreditCard,
   Code,
   Plug,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 interface SidebarItem {
@@ -111,24 +111,28 @@ export default function Sidebar() {
   }
 
   const isActive = (href: string) => pathname === href;
-  const isDropdownActive = (item: SidebarItem) => 
+  const isDropdownActive = (item: SidebarItem) =>
     item.children?.some(child => isActive(child.href)) || isActive(item.href);
 
   return (
     <div className="flex h-full w-64 flex-col bg-white shadow-sm">
       <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
         <div className="flex-1 space-y-1 bg-white px-3">
-          {sidebarItems.map((item) => (
+          {sidebarItems.map(item => (
             <div key={item.href}>
               {item.children ? (
                 <div>
                   <button
-                    onClick={() => setActiveDropdown(activeDropdown === item.label ? null : item.label)}
+                    onClick={() =>
+                      setActiveDropdown(activeDropdown === item.label ? null : item.label)
+                    }
                     className={`
                       group flex w-full items-center rounded-md px-3 py-2 text-sm font-medium
-                      ${isDropdownActive(item) 
-                        ? 'bg-primary-50 text-primary-600' 
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-primary-500'}
+                      ${
+                        isDropdownActive(item)
+                          ? 'bg-primary-50 text-primary-600'
+                          : 'text-gray-700 hover:bg-gray-50 hover:text-primary-500'
+                      }
                     `}
                   >
                     <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -149,15 +153,17 @@ export default function Sidebar() {
                   </button>
                   {activeDropdown === item.label && (
                     <div className="mt-1 space-y-1">
-                      {item.children.map((child) => (
+                      {item.children.map(child => (
                         <Link
                           key={child.href}
                           href={child.href}
                           className={`
                             group flex items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium
-                            ${isActive(child.href)
-                              ? 'bg-primary-50 text-primary-600'
-                              : 'text-gray-700 hover:bg-gray-50 hover:text-primary-500'}
+                            ${
+                              isActive(child.href)
+                                ? 'bg-primary-50 text-primary-600'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-primary-500'
+                            }
                           `}
                         >
                           <child.icon className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -172,9 +178,11 @@ export default function Sidebar() {
                   href={item.href}
                   className={`
                     group flex items-center rounded-md px-3 py-2 text-sm font-medium
-                    ${isActive(item.href)
-                      ? 'bg-primary-50 text-primary-600'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-primary-500'}
+                    ${
+                      isActive(item.href)
+                        ? 'bg-primary-50 text-primary-600'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-primary-500'
+                    }
                   `}
                 >
                   <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -185,7 +193,7 @@ export default function Sidebar() {
           ))}
         </div>
       </div>
-      
+
       {/* User Section */}
       <div className="border-t border-gray-200 p-4">
         <div className="flex items-center">
@@ -195,9 +203,7 @@ export default function Sidebar() {
             </div>
           </div>
           <div className="ml-3">
-            <p className="text-sm font-medium text-gray-700 truncate">
-              {session.user?.email}
-            </p>
+            <p className="text-sm font-medium text-gray-700 truncate">{session.user?.email}</p>
             <Link
               href="/profile"
               className="text-xs font-medium text-gray-500 hover:text-primary-500"

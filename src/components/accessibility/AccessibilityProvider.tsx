@@ -1,6 +1,6 @@
-"use client";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { Moon, Sun, Type, Eye, EyeOff, Volume2, VolumeX } from "lucide-react";
+'use client';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Moon, Sun, Type, Eye, EyeOff, Volume2, VolumeX } from 'lucide-react';
 
 interface AccessibilitySettings {
   highContrast: boolean;
@@ -27,7 +27,7 @@ const defaultSettings: AccessibilitySettings = {
   screenReader: false,
   soundEnabled: true,
   fontSize: 16,
-  focusVisible: true
+  focusVisible: true,
 };
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
@@ -56,14 +56,14 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
       ...prev,
       darkMode: saved ? prev.darkMode : prefersDark,
       reducedMotion: saved ? prev.reducedMotion : prefersReducedMotion,
-      highContrast: saved ? prev.highContrast : prefersHighContrast
+      highContrast: saved ? prev.highContrast : prefersHighContrast,
     }));
   }, []);
 
   useEffect(() => {
     // Apply settings to document
     const root = document.documentElement;
-    
+
     // Dark mode
     if (settings.darkMode) {
       root.classList.add('dark');
@@ -154,7 +154,11 @@ export function AccessibilityPanel({ isOpen, onClose }: { isOpen: boolean; onClo
           {/* Dark Mode */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {settings.darkMode ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-yellow-400" />}
+              {settings.darkMode ? (
+                <Moon className="w-5 h-5 text-blue-400" />
+              ) : (
+                <Sun className="w-5 h-5 text-yellow-400" />
+              )}
               <div>
                 <div className="font-medium text-white">Dark Mode</div>
                 <div className="text-sm text-gray-400">Reduce eye strain in low light</div>
@@ -167,9 +171,11 @@ export function AccessibilityPanel({ isOpen, onClose }: { isOpen: boolean; onClo
               }`}
               aria-label={`${settings.darkMode ? 'Disable' : 'Enable'} dark mode`}
             >
-              <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                settings.darkMode ? 'translate-x-6' : 'translate-x-0.5'
-              }`} />
+              <div
+                className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                  settings.darkMode ? 'translate-x-6' : 'translate-x-0.5'
+                }`}
+              />
             </button>
           </div>
 
@@ -189,9 +195,11 @@ export function AccessibilityPanel({ isOpen, onClose }: { isOpen: boolean; onClo
               }`}
               aria-label={`${settings.highContrast ? 'Disable' : 'Enable'} high contrast`}
             >
-              <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                settings.highContrast ? 'translate-x-6' : 'translate-x-0.5'
-              }`} />
+              <div
+                className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                  settings.highContrast ? 'translate-x-6' : 'translate-x-0.5'
+                }`}
+              />
             </button>
           </div>
 
@@ -211,9 +219,11 @@ export function AccessibilityPanel({ isOpen, onClose }: { isOpen: boolean; onClo
               }`}
               aria-label={`${settings.largeText ? 'Disable' : 'Enable'} large text`}
             >
-              <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                settings.largeText ? 'translate-x-6' : 'translate-x-0.5'
-              }`} />
+              <div
+                className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                  settings.largeText ? 'translate-x-6' : 'translate-x-0.5'
+                }`}
+              />
             </button>
           </div>
 
@@ -233,16 +243,22 @@ export function AccessibilityPanel({ isOpen, onClose }: { isOpen: boolean; onClo
               }`}
               aria-label={`${settings.reducedMotion ? 'Disable' : 'Enable'} reduced motion`}
             >
-              <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                settings.reducedMotion ? 'translate-x-6' : 'translate-x-0.5'
-              }`} />
+              <div
+                className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                  settings.reducedMotion ? 'translate-x-6' : 'translate-x-0.5'
+                }`}
+              />
             </button>
           </div>
 
           {/* Sound */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {settings.soundEnabled ? <Volume2 className="w-5 h-5 text-cyan-400" /> : <VolumeX className="w-5 h-5 text-red-400" />}
+              {settings.soundEnabled ? (
+                <Volume2 className="w-5 h-5 text-cyan-400" />
+              ) : (
+                <VolumeX className="w-5 h-5 text-red-400" />
+              )}
               <div>
                 <div className="font-medium text-white">Sound Effects</div>
                 <div className="text-sm text-gray-400">Audio feedback for actions</div>
@@ -255,9 +271,11 @@ export function AccessibilityPanel({ isOpen, onClose }: { isOpen: boolean; onClo
               }`}
               aria-label={`${settings.soundEnabled ? 'Disable' : 'Enable'} sound effects`}
             >
-              <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                settings.soundEnabled ? 'translate-x-6' : 'translate-x-0.5'
-              }`} />
+              <div
+                className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                  settings.soundEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                }`}
+              />
             </button>
           </div>
 
@@ -272,7 +290,7 @@ export function AccessibilityPanel({ isOpen, onClose }: { isOpen: boolean; onClo
               min="12"
               max="24"
               value={settings.fontSize}
-              onChange={(e) => updateSetting('fontSize', parseInt(e.target.value))}
+              onChange={e => updateSetting('fontSize', parseInt(e.target.value))}
               className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"
               aria-label="Adjust font size"
             />
@@ -316,11 +334,8 @@ export function AccessibilityButton() {
       >
         <Eye className="w-5 h-5" />
       </button>
-      
-      <AccessibilityPanel 
-        isOpen={isPanelOpen} 
-        onClose={() => setIsPanelOpen(false)} 
-      />
+
+      <AccessibilityPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
     </>
   );
 }

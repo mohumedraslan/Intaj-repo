@@ -12,7 +12,10 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -33,20 +36,18 @@ export async function POST(request: NextRequest) {
     const secret = speakeasy.generateSecret({
       name: `Intaj AI (${user.email})`,
       issuer: 'Intaj AI Platform',
-      length: 32
+      length: 32,
     });
 
     // Encrypt the secret before storing
     const encryptedSecret = encrypt(secret.base32);
 
     // Store or update the secret in database
-    const { error: dbError } = await supabase
-      .from('user_2fa_secrets')
-      .upsert({
-        user_id: user.id,
-        secret: encryptedSecret,
-        enabled: false
-      });
+    const { error: dbError } = await supabase.from('user_2fa_secrets').upsert({
+      user_id: user.id,
+      secret: encryptedSecret,
+      enabled: false,
+    });
 
     if (dbError) {
       console.error('Database error:', dbError);
@@ -56,9 +57,8 @@ export async function POST(request: NextRequest) {
     // Return the otpauth_url for QR code generation
     return NextResponse.json({
       otpauth_url: secret.otpauth_url,
-      manual_entry_key: secret.base32
+      manual_entry_key: secret.base32,
     });
-
   } catch (error) {
     console.error('2FA setup error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

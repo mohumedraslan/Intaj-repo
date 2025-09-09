@@ -16,7 +16,10 @@ const PUBLIC_ROUTES = [
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
-  const { data: { session }, error } = await supabase.auth.getSession();
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
 
   // Check if the route is public
   const isPublicRoute = PUBLIC_ROUTES.some(route => req.nextUrl.pathname === route);

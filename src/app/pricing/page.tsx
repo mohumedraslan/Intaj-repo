@@ -16,29 +16,35 @@ export default function PricingPage() {
           <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-float"></div>
           <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float delay-2000"></div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
           <div className="animate-slide-up">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Simple, <span className="text-gradient">Transparent</span><br />
+              Simple, <span className="text-gradient">Transparent</span>
+              <br />
               <span className="text-gradient">AI Automation</span> Pricing
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
-              Choose the perfect plan to scale your business with intelligent automation. No hidden fees, cancel anytime.
+              Choose the perfect plan to scale your business with intelligent automation. No hidden
+              fees, cancel anytime.
             </p>
-            
+
             {/* Billing Toggle */}
             <div className="flex items-center justify-center space-x-4 mb-12">
               <span className="text-gray-300">Monthly</span>
-              <button 
+              <button
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${isAnnual ? 'bg-blue-600' : 'bg-gray-700'}`}
                 onClick={() => setIsAnnual(!isAnnual)}
                 aria-label="Toggle billing period"
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${isAnnual ? 'translate-x-5' : 'translate-x-1'}`} />
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${isAnnual ? 'translate-x-5' : 'translate-x-1'}`}
+                />
               </button>
               <span className="text-white font-medium">Annual</span>
-              <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-medium">Save 20%</span>
+              <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-medium">
+                Save 20%
+              </span>
             </div>
           </div>
         </div>
@@ -48,12 +54,13 @@ export default function PricingPage() {
       <section id="pricing" className="py-20 bg-bg-secondary">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            
             {/* Starter Plan */}
             <div className="glass-card p-8 rounded-2xl pricing-card relative animate-scale-in">
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-2">Starter</h3>
-                <p className="text-gray-400 mb-6">Perfect for small businesses getting started with AI automation</p>
+                <p className="text-gray-400 mb-6">
+                  Perfect for small businesses getting started with AI automation
+                </p>
                 <div className="flex items-end">
                   <span className="text-5xl font-bold">$0</span>
                   <span className="text-gray-400 ml-2 mb-1">/month</span>
@@ -80,17 +87,27 @@ export default function PricingPage() {
             {/* Professional Plan */}
             <div className="glass-card-popular p-8 rounded-2xl pricing-card relative animate-scale-in delay-200">
               <div className="popular-badge">Most Popular</div>
-              
+
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-2">Professional</h3>
-                <p className="text-gray-400 mb-6">Ideal for growing businesses ready to scale their automation</p>
+                <p className="text-gray-400 mb-6">
+                  Ideal for growing businesses ready to scale their automation
+                </p>
                 <div className="flex items-end">
-                  <span className={`text-5xl font-bold text-gradient ${!isAnnual ? '' : 'hidden'}`}>$49</span>
-                  <span className={`text-5xl font-bold text-gradient ${isAnnual ? '' : 'hidden'}`}>$39</span>
+                  <span className={`text-5xl font-bold text-gradient ${!isAnnual ? '' : 'hidden'}`}>
+                    $49
+                  </span>
+                  <span className={`text-5xl font-bold text-gradient ${isAnnual ? '' : 'hidden'}`}>
+                    $39
+                  </span>
                   <span className="text-gray-400 ml-2 mb-1">/month</span>
                 </div>
-                <p className={`text-sm text-gray-500 ${!isAnnual ? '' : 'hidden'}`}>Billed monthly • 14-day free trial</p>
-                <p className={`text-sm text-gray-500 ${isAnnual ? '' : 'hidden'}`}>Billed annually • Save $120/year</p>
+                <p className={`text-sm text-gray-500 ${!isAnnual ? '' : 'hidden'}`}>
+                  Billed monthly • 14-day free trial
+                </p>
+                <p className={`text-sm text-gray-500 ${isAnnual ? '' : 'hidden'}`}>
+                  Billed annually • Save $120/year
+                </p>
               </div>
 
               <ul className="space-y-4 mb-8">
@@ -114,14 +131,24 @@ export default function PricingPage() {
             <div className="glass-card p-8 rounded-2xl pricing-card relative animate-scale-in delay-400">
               <div className="mb-8">
                 <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
-                <p className="text-gray-400 mb-6">For large organizations needing advanced automation and support</p>
+                <p className="text-gray-400 mb-6">
+                  For large organizations needing advanced automation and support
+                </p>
                 <div className="flex items-end">
-                  <span className={`text-5xl font-bold text-gradient ${!isAnnual ? '' : 'hidden'}`}>$149</span>
-                  <span className={`text-5xl font-bold text-gradient ${isAnnual ? '' : 'hidden'}`}>$119</span>
+                  <span className={`text-5xl font-bold text-gradient ${!isAnnual ? '' : 'hidden'}`}>
+                    $149
+                  </span>
+                  <span className={`text-5xl font-bold text-gradient ${isAnnual ? '' : 'hidden'}`}>
+                    $119
+                  </span>
                   <span className="text-gray-400 ml-2 mb-1">/month</span>
                 </div>
-                <p className={`text-sm text-gray-500 ${!isAnnual ? '' : 'hidden'}`}>Billed monthly • Custom setup included</p>
-                <p className={`text-sm text-gray-500 ${isAnnual ? '' : 'hidden'}`}>Billed annually • Save $360/year</p>
+                <p className={`text-sm text-gray-500 ${!isAnnual ? '' : 'hidden'}`}>
+                  Billed monthly • Custom setup included
+                </p>
+                <p className={`text-sm text-gray-500 ${isAnnual ? '' : 'hidden'}`}>
+                  Billed annually • Save $360/year
+                </p>
               </div>
 
               <ul className="space-y-4 mb-8">
@@ -221,11 +248,17 @@ export default function PricingPage() {
 function PricingFeature({ text, included }: { text: string; included: boolean }) {
   return (
     <li className="flex items-center space-x-3">
-      <div className={`w-5 h-5 ${included ? 'bg-blue-500' : 'bg-gray-500'} rounded-full flex items-center justify-center`}>
+      <div
+        className={`w-5 h-5 ${included ? 'bg-blue-500' : 'bg-gray-500'} rounded-full flex items-center justify-center`}
+      >
         <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
-            d={included ? "M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" : "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"}
+            d={
+              included
+                ? 'M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                : 'M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
+            }
             clipRule="evenodd"
           />
         </svg>
@@ -243,7 +276,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
       <button
         className="w-full text-left flex items-center justify-between"
         onClick={() => setIsOpen(!isOpen)}
-        aria-expanded={isOpen ? "true" : "false"}
+        aria-expanded={isOpen ? 'true' : 'false'}
       >
         <h3 className="text-lg font-semibold">{question}</h3>
         <svg

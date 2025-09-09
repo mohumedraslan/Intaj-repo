@@ -1,7 +1,7 @@
 // src/app/api/data_sources/route.ts
 // API route for file upload metadata (Prompt 010)
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from '@/lib/supabaseClient';
 
 export async function POST(req: NextRequest) {
   // supabase is already imported and ready to use

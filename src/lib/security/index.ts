@@ -19,13 +19,13 @@ export async function securityMiddleware(request: NextRequest) {
     // Validate session
     const sessionId = request.headers.get('X-Session-ID');
     const tokenId = request.headers.get('X-Token-ID');
-    
+
     if (!sessionId || !tokenId) {
       throw new Error('Missing session credentials');
     }
 
     const session = await sessionManager.validateSession(sessionId, tokenId);
-    
+
     if (!session) {
       throw new Error('Invalid session');
     }
@@ -66,15 +66,11 @@ export async function securityMiddleware(request: NextRequest) {
   } catch (err) {
     const error = err as Error;
     // Log security events
-    await auditLogger.logSecurityEvent(
-      'anonymous',
-      'auth_failure',
-      {
-        error: error.message || 'Unknown error',
-        path: request.nextUrl.pathname,
-        headers: Object.fromEntries(request.headers.entries()),
-      }
-    );
+    await auditLogger.logSecurityEvent('anonymous', 'auth_failure', {
+      error: error.message || 'Unknown error',
+      path: request.nextUrl.pathname,
+      headers: Object.fromEntries(request.headers.entries()),
+    });
 
     // Return appropriate error response
     return new NextResponse(
@@ -82,14 +78,14 @@ export async function securityMiddleware(request: NextRequest) {
         error: {
           code: getErrorCode(error),
           message: getErrorMessage(error),
-        }
+        },
       }),
       {
         status: getErrorStatus(error),
         headers: {
           'Content-Type': 'application/json',
           ...Object.fromEntries(response.headers.entries()),
-        }
+        },
       }
     );
   }
@@ -142,7 +138,7 @@ function validateRequestBody(pathname: string, body: unknown): void {
 }
 
 function getErrorCode(error: Error): string {
-  switch(error.message) {
+  switch (error.message) {
     case 'Missing session credentials':
       return 'auth/missing-credentials';
     case 'Invalid session':
@@ -155,7 +151,7 @@ function getErrorCode(error: Error): string {
 }
 
 function getErrorMessage(error: Error): string {
-  switch(error.message) {
+  switch (error.message) {
     case 'Missing session credentials':
       return 'Authentication credentials are missing';
     case 'Invalid session':
@@ -168,7 +164,7 @@ function getErrorMessage(error: Error): string {
 }
 
 function getErrorStatus(error: Error): number {
-  switch(error.message) {
+  switch (error.message) {
     case 'Missing session credentials':
       return 401;
     case 'Invalid session':

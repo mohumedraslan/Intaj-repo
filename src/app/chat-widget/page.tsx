@@ -23,13 +23,13 @@ export default function ChatWidgetPage() {
     position: 'bottom-right',
     allowFileUpload: true,
     maxFileSize: 10,
-    allowedFileTypes: ['image/*', 'application/pdf', '.doc', '.docx', '.txt']
+    allowedFileTypes: ['image/*', 'application/pdf', '.doc', '.docx', '.txt'],
   });
 
   const tabs = [
     { id: 'demo', label: 'Live Demo', icon: MessageCircle },
     { id: 'templates', label: 'Templates', icon: FileText },
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   if (activeTab === 'templates') {
@@ -44,14 +44,12 @@ export default function ChatWidgetPage() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent mb-4">
             Chat Widget
           </h1>
-          <p className="text-gray-400 text-lg">
-            Create and customize your website chat widget
-          </p>
+          <p className="text-gray-400 text-lg">Create and customize your website chat widget</p>
         </div>
 
         {/* Navigation Tabs */}
         <div className="flex space-x-1 mb-8 bg-gray-800/30 rounded-lg p-1">
-          {tabs.map((tab) => {
+          {tabs.map(tab => {
             const Icon = tab.icon;
             return (
               <button
@@ -95,7 +93,7 @@ export default function ChatWidgetPage() {
                       <div className="h-4 bg-gray-600 rounded w-1/3"></div>
                       <div className="h-4 bg-gray-600 rounded w-3/4"></div>
                     </div>
-                    
+
                     {/* Chat Widget */}
                     <ChatWidget {...widgetConfig} />
                   </div>
@@ -154,24 +152,32 @@ export default function ChatWidgetPage() {
                   {/* Basic Settings */}
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-4">Basic Settings</h3>
-                    
+
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Bot Name</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Bot Name
+                        </label>
                         <input
                           type="text"
                           value={widgetConfig.botName}
-                          onChange={(e) => setWidgetConfig(prev => ({ ...prev, botName: e.target.value }))}
+                          onChange={e =>
+                            setWidgetConfig(prev => ({ ...prev, botName: e.target.value }))
+                          }
                           className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Assistant name"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Welcome Message</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Welcome Message
+                        </label>
                         <textarea
                           value={widgetConfig.welcomeMessage}
-                          onChange={(e) => setWidgetConfig(prev => ({ ...prev, welcomeMessage: e.target.value }))}
+                          onChange={e =>
+                            setWidgetConfig(prev => ({ ...prev, welcomeMessage: e.target.value }))
+                          }
                           className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                           rows={3}
                           placeholder="First message users will see"
@@ -179,18 +185,24 @@ export default function ChatWidgetPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Primary Color</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Primary Color
+                        </label>
                         <div className="flex items-center space-x-3">
                           <input
                             type="color"
                             value={widgetConfig.primaryColor}
-                            onChange={(e) => setWidgetConfig(prev => ({ ...prev, primaryColor: e.target.value }))}
+                            onChange={e =>
+                              setWidgetConfig(prev => ({ ...prev, primaryColor: e.target.value }))
+                            }
                             className="w-12 h-12 bg-gray-800 border border-gray-700 rounded-lg"
                           />
                           <input
                             type="text"
                             value={widgetConfig.primaryColor}
-                            onChange={(e) => setWidgetConfig(prev => ({ ...prev, primaryColor: e.target.value }))}
+                            onChange={e =>
+                              setWidgetConfig(prev => ({ ...prev, primaryColor: e.target.value }))
+                            }
                             className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="#3b82f6"
                           />
@@ -198,10 +210,17 @@ export default function ChatWidgetPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Position</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Position
+                        </label>
                         <select
                           value={widgetConfig.position}
-                          onChange={(e) => setWidgetConfig(prev => ({ ...prev, position: e.target.value as 'bottom-right' | 'bottom-left' }))}
+                          onChange={e =>
+                            setWidgetConfig(prev => ({
+                              ...prev,
+                              position: e.target.value as 'bottom-right' | 'bottom-left',
+                            }))
+                          }
                           className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="bottom-right">Bottom Right</option>
@@ -214,16 +233,23 @@ export default function ChatWidgetPage() {
                   {/* File Upload Settings */}
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-4">File Upload Settings</h3>
-                    
+
                     <div className="space-y-4">
                       <div className="flex items-center space-x-3">
                         <input
                           type="checkbox"
                           checked={widgetConfig.allowFileUpload}
-                          onChange={(e) => setWidgetConfig(prev => ({ ...prev, allowFileUpload: e.target.checked }))}
+                          onChange={e =>
+                            setWidgetConfig(prev => ({
+                              ...prev,
+                              allowFileUpload: e.target.checked,
+                            }))
+                          }
                           className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500"
                         />
-                        <label className="text-sm font-medium text-gray-300">Allow File Upload</label>
+                        <label className="text-sm font-medium text-gray-300">
+                          Allow File Upload
+                        </label>
                       </div>
 
                       {widgetConfig.allowFileUpload && (
@@ -235,7 +261,12 @@ export default function ChatWidgetPage() {
                             <input
                               type="number"
                               value={widgetConfig.maxFileSize}
-                              onChange={(e) => setWidgetConfig(prev => ({ ...prev, maxFileSize: parseInt(e.target.value) }))}
+                              onChange={e =>
+                                setWidgetConfig(prev => ({
+                                  ...prev,
+                                  maxFileSize: parseInt(e.target.value),
+                                }))
+                              }
                               className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                               min="1"
                               max="50"
@@ -247,21 +278,23 @@ export default function ChatWidgetPage() {
                               Allowed File Types
                             </label>
                             <div className="space-y-2">
-                              {['image/*', 'application/pdf', '.doc', '.docx', '.txt'].map((type) => (
+                              {['image/*', 'application/pdf', '.doc', '.docx', '.txt'].map(type => (
                                 <div key={type} className="flex items-center space-x-3">
                                   <input
                                     type="checkbox"
                                     checked={widgetConfig.allowedFileTypes.includes(type)}
-                                    onChange={(e) => {
+                                    onChange={e => {
                                       if (e.target.checked) {
                                         setWidgetConfig(prev => ({
                                           ...prev,
-                                          allowedFileTypes: [...prev.allowedFileTypes, type]
+                                          allowedFileTypes: [...prev.allowedFileTypes, type],
                                         }));
                                       } else {
                                         setWidgetConfig(prev => ({
                                           ...prev,
-                                          allowedFileTypes: prev.allowedFileTypes.filter(t => t !== type)
+                                          allowedFileTypes: prev.allowedFileTypes.filter(
+                                            t => t !== type
+                                          ),
                                         }));
                                       }
                                     }}

@@ -60,11 +60,18 @@ export class FacebookMessengerIntegration {
   /**
    * Send a message via Facebook Messenger
    */
-  async sendMessage(recipientId: string, message: string, messageType: 'text' | 'image' | 'file' = 'text'): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  async sendMessage(
+    recipientId: string,
+    message: string,
+    messageType: 'text' | 'image' | 'file' = 'text'
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const messageData: { recipient: { id: string }; message: { text?: string; attachment?: { type: string; payload: { url: string } } } } = {
+      const messageData: {
+        recipient: { id: string };
+        message: { text?: string; attachment?: { type: string; payload: { url: string } } };
+      } = {
         recipient: { id: recipientId },
-        message: {}
+        message: {},
       };
 
       if (messageType === 'text') {
@@ -73,18 +80,18 @@ export class FacebookMessengerIntegration {
         messageData.message.attachment = {
           type: messageType,
           payload: {
-            url: message
-          }
+            url: message,
+          },
         };
       }
 
       const response = await fetch(`${this.baseUrl}/me/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.pageAccessToken}`,
+          Authorization: `Bearer ${this.config.pageAccessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(messageData)
+        body: JSON.stringify(messageData),
       });
 
       const data = await response.json();
@@ -92,18 +99,18 @@ export class FacebookMessengerIntegration {
       if (response.ok) {
         return {
           success: true,
-          messageId: data.message_id
+          messageId: data.message_id,
         };
       } else {
         return {
           success: false,
-          error: data.error?.message || 'Failed to send message'
+          error: data.error?.message || 'Failed to send message',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -112,25 +119,25 @@ export class FacebookMessengerIntegration {
    * Send a message with quick replies
    */
   async sendQuickReplyMessage(
-    recipientId: string, 
-    text: string, 
+    recipientId: string,
+    text: string,
     quickReplies: FacebookQuickReply[]
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/me/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.pageAccessToken}`,
+          Authorization: `Bearer ${this.config.pageAccessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           recipient: { id: recipientId },
           message: {
             text: text,
-            quick_replies: quickReplies
+            quick_replies: quickReplies,
           },
-          messaging_type: 'RESPONSE'
-        })
+          messaging_type: 'RESPONSE',
+        }),
       });
 
       const data = await response.json();
@@ -138,18 +145,18 @@ export class FacebookMessengerIntegration {
       if (response.ok) {
         return {
           success: true,
-          messageId: data.message_id
+          messageId: data.message_id,
         };
       } else {
         return {
           success: false,
-          error: data.error?.message || 'Failed to send quick reply message'
+          error: data.error?.message || 'Failed to send quick reply message',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -158,14 +165,14 @@ export class FacebookMessengerIntegration {
    * Send a generic template message (carousel)
    */
   async sendGenericTemplate(
-    recipientId: string, 
+    recipientId: string,
     template: FacebookGenericTemplate
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/me/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.pageAccessToken}`,
+          Authorization: `Bearer ${this.config.pageAccessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -173,11 +180,11 @@ export class FacebookMessengerIntegration {
           message: {
             attachment: {
               type: 'template',
-              payload: template
-            }
+              payload: template,
+            },
           },
-          messaging_type: 'RESPONSE'
-        })
+          messaging_type: 'RESPONSE',
+        }),
       });
 
       const data = await response.json();
@@ -185,18 +192,18 @@ export class FacebookMessengerIntegration {
       if (response.ok) {
         return {
           success: true,
-          messageId: data.message_id
+          messageId: data.message_id,
         };
       } else {
         return {
           success: false,
-          error: data.error?.message || 'Failed to send template message'
+          error: data.error?.message || 'Failed to send template message',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -204,18 +211,21 @@ export class FacebookMessengerIntegration {
   /**
    * Send typing indicator
    */
-  async sendTypingIndicator(recipientId: string, action: 'typing_on' | 'typing_off' = 'typing_on'): Promise<{ success: boolean; error?: string }> {
+  async sendTypingIndicator(
+    recipientId: string,
+    action: 'typing_on' | 'typing_off' = 'typing_on'
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/me/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.pageAccessToken}`,
+          Authorization: `Bearer ${this.config.pageAccessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           recipient: { id: recipientId },
-          sender_action: action
-        })
+          sender_action: action,
+        }),
       });
 
       if (response.ok) {
@@ -224,13 +234,13 @@ export class FacebookMessengerIntegration {
         const data = await response.json();
         return {
           success: false,
-          error: data.error?.message || 'Failed to send typing indicator'
+          error: data.error?.message || 'Failed to send typing indicator',
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -238,7 +248,9 @@ export class FacebookMessengerIntegration {
   /**
    * Process incoming webhook data
    */
-  async processWebhookData(webhookData: Record<string, unknown>): Promise<{ success: boolean; messages?: Record<string, unknown>[]; error?: string }> {
+  async processWebhookData(
+    webhookData: Record<string, unknown>
+  ): Promise<{ success: boolean; messages?: Record<string, unknown>[]; error?: string }> {
     try {
       const messages: Record<string, unknown>[] = [];
 
@@ -255,12 +267,12 @@ export class FacebookMessengerIntegration {
 
       return {
         success: true,
-        messages
+        messages,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -268,24 +280,28 @@ export class FacebookMessengerIntegration {
   /**
    * Verify webhook signature
    */
-  async verifyWebhook(signature: string, body: string): Promise<{ valid: boolean; error?: string }> {
+  async verifyWebhook(
+    signature: string,
+    body: string
+  ): Promise<{ valid: boolean; error?: string }> {
     try {
-      const expectedSignature = crypto.createHmac('sha256', this.config.appSecret)
+      const expectedSignature = crypto
+        .createHmac('sha256', this.config.appSecret)
         .update(body)
         .digest('hex');
-      
+
       const providedSignature = signature.replace('sha256=', '');
-      
+
       return {
         valid: crypto.timingSafeEqual(
           Buffer.from(expectedSignature, 'hex'),
           Buffer.from(providedSignature, 'hex')
-        )
+        ),
       };
     } catch (error: unknown) {
       return {
         valid: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -304,28 +320,30 @@ export class FacebookConnectionManager {
   /**
    * Save Facebook connection to database
    */
-  async saveConnection(userId: string, chatbotId: string, config: FacebookConfig): Promise<{ success: boolean; error?: string }> {
+  async saveConnection(
+    userId: string,
+    chatbotId: string,
+    config: FacebookConfig
+  ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
-        .from('connections')
-        .upsert({
-          user_id: userId,
-          chatbot_id: chatbotId,
-          platform: 'facebook',
-          credentials: {
-            page_access_token: config.pageAccessToken,
-            page_id: config.pageId,
-            app_secret: config.appSecret,
-            webhook_verify_token: config.webhookVerifyToken
-          },
-          active: true,
-          created_at: new Date().toISOString()
-        });
+      const { error } = await this.supabase.from('connections').upsert({
+        user_id: userId,
+        chatbot_id: chatbotId,
+        platform: 'facebook',
+        credentials: {
+          page_access_token: config.pageAccessToken,
+          page_id: config.pageId,
+          app_secret: config.appSecret,
+          webhook_verify_token: config.webhookVerifyToken,
+        },
+        active: true,
+        created_at: new Date().toISOString(),
+      });
 
       if (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
@@ -333,7 +351,7 @@ export class FacebookConnectionManager {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -341,7 +359,9 @@ export class FacebookConnectionManager {
   /**
    * Get user profile
    */
-  async getUserProfile(userId: string): Promise<{ success: boolean; profile?: Record<string, unknown>; error?: string }> {
+  async getUserProfile(
+    userId: string
+  ): Promise<{ success: boolean; profile?: Record<string, unknown>; error?: string }> {
     try {
       const { data, error } = await this.supabase
         .from('users')
@@ -354,18 +374,18 @@ export class FacebookConnectionManager {
       if (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
       return {
         success: true,
-        connection: data
+        connection: data,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -373,29 +393,30 @@ export class FacebookConnectionManager {
   /**
    * Store incoming message in database
    */
-  async storeMessage(chatbotId: string, message: FacebookMessage): Promise<{ success: boolean; error?: string }> {
+  async storeMessage(
+    chatbotId: string,
+    message: FacebookMessage
+  ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
-        .from('messages')
-        .insert({
-          chatbot_id: chatbotId,
-          role: 'user',
-          content: message.message.text || 'Media message',
-          metadata: {
-            platform: 'facebook',
-            message_id: message.id,
-            sender_id: message.senderId,
-            recipient_id: message.recipientId,
-            timestamp: message.timestamp,
-            attachments: message.message.attachments
-          },
-          created_at: new Date().toISOString()
-        });
+      const { error } = await this.supabase.from('messages').insert({
+        chatbot_id: chatbotId,
+        role: 'user',
+        content: message.message.text || 'Media message',
+        metadata: {
+          platform: 'facebook',
+          message_id: message.id,
+          sender_id: message.senderId,
+          recipient_id: message.recipientId,
+          timestamp: message.timestamp,
+          attachments: message.message.attachments,
+        },
+        created_at: new Date().toISOString(),
+      });
 
       if (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
@@ -403,7 +424,7 @@ export class FacebookConnectionManager {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -412,31 +433,29 @@ export class FacebookConnectionManager {
    * Store outgoing message in database
    */
   async storeOutgoingMessage(
-    chatbotId: string, 
-    recipientId: string, 
-    content: string, 
+    chatbotId: string,
+    recipientId: string,
+    content: string,
     messageId?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
-        .from('messages')
-        .insert({
-          chatbot_id: chatbotId,
-          role: 'assistant',
-          content: content,
-          metadata: {
-            platform: 'facebook',
-            message_id: messageId,
-            recipient_id: recipientId,
-            timestamp: Date.now()
-          },
-          created_at: new Date().toISOString()
-        });
+      const { error } = await this.supabase.from('messages').insert({
+        chatbot_id: chatbotId,
+        role: 'assistant',
+        content: content,
+        metadata: {
+          platform: 'facebook',
+          message_id: messageId,
+          recipient_id: recipientId,
+          timestamp: Date.now(),
+        },
+        created_at: new Date().toISOString(),
+      });
 
       if (error) {
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
@@ -444,7 +463,7 @@ export class FacebookConnectionManager {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }

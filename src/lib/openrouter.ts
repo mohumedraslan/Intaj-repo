@@ -11,8 +11,8 @@ export async function getResponse(messages: Message[]): Promise<string> {
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://intaj.ai', 
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://intaj.ai',
         'X-Title': 'Intaj AI Demo',
         'Content-Type': 'application/json',
       },
@@ -43,7 +43,7 @@ export async function streamResponse(
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         'HTTP-Referer': 'https://intaj.ai',
         'X-Title': 'Intaj AI Demo',
         'Content-Type': 'application/json',

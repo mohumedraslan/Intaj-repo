@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FacebookMessengerIntegration, FacebookConnectionManager } from '@/lib/integrations/facebook';
+import {
+  FacebookMessengerIntegration,
+  FacebookConnectionManager,
+  FacebookMessage,
+} from '@/lib/integrations/facebook';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -133,9 +137,9 @@ export async function GET(request: NextRequest) {
     </html>
   `;
 
-  return new NextResponse(errorHtml, { 
+  return new NextResponse(errorHtml, {
     status: 403,
-    headers: { 'Content-Type': 'text/html' }
+    headers: { 'Content-Type': 'text/html' },
   });
 }
 
@@ -145,16 +149,19 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('x-hub-signature');
 
     // Verify webhook signature
-    if (!signature || !FacebookMessengerIntegration.verifyWebhookSignature(
-      body,
-      signature,
-      process.env.FACEBOOK_APP_SECRET!
-    )) {
+    if (
+      !signature ||
+      !FacebookMessengerIntegration.verifyWebhookSignature(
+        body,
+        signature,
+        process.env.FACEBOOK_APP_SECRET!
+      )
+    ) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const webhookData = JSON.parse(body);
-    
+
     // Handle message events
     const message = FacebookMessengerIntegration.parseWebhookMessage(webhookData);
     if (message) {
@@ -174,7 +181,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleMessage(message: any) {
+async function handleMessage(message: FacebookMessage) {
   try {
     // Find the chatbot associated with this Facebook page
     const { data: connections } = await supabase
@@ -183,9 +190,7 @@ async function handleMessage(message: any) {
       .eq('platform', 'facebook')
       .eq('active', true);
 
-    const connection = connections?.find(conn => 
-      conn.credentials?.page_id === message.recipientId
-    );
+    const connection = connections?.find(conn => conn.credentials?.page_id === message.recipientId);
 
     if (!connection) {
       console.log('No active Facebook connection found for page:', message.recipientId);
@@ -200,7 +205,7 @@ async function handleMessage(message: any) {
       pageAccessToken: connection.credentials.page_access_token,
       pageId: connection.credentials.page_id,
       appSecret: connection.credentials.app_secret,
-      webhookVerifyToken: connection.credentials.webhook_verify_token
+      webhookVerifyToken: connection.credentials.webhook_verify_token,
     };
 
     const facebook = new FacebookMessengerIntegration(facebookConfig);
@@ -210,13 +215,13 @@ async function handleMessage(message: any) {
 
     // Process message with AI
     const aiResponse = await processMessageWithAI(
-      message.message.text || 'Media message', 
+      message.message.text || 'Media message',
       connection.chatbot_id
     );
 
     // Send response
-    const sendResult = await facebook.sendTextMessage(message.senderId, aiResponse);
-    
+    const sendResult = await facebook.sendMessage(message.senderId, aiResponse, 'text');
+
     if (sendResult.success) {
       // Store outgoing message
       await connectionManager.storeOutgoingMessage(
@@ -234,7 +239,13 @@ async function handleMessage(message: any) {
   }
 }
 
-async function handlePostback(postback: any) {
+interface FacebookPostback {
+  senderId: string;
+  payload: string;
+  // Add other relevant fields as needed
+}
+
+async function handlePostback(postback: FacebookPostback) {
   try {
     // Find the chatbot associated with this Facebook page
     const { data: connections } = await supabase
@@ -254,7 +265,7 @@ async function handlePostback(postback: any) {
       pageAccessToken: connection.credentials.page_access_token,
       pageId: connection.credentials.page_id,
       appSecret: connection.credentials.app_secret,
-      webhookVerifyToken: connection.credentials.webhook_verify_token
+      webhookVerifyToken: connection.credentials.webhook_verify_token,
     };
 
     const facebook = new FacebookMessengerIntegration(facebookConfig);
@@ -273,7 +284,7 @@ async function handlePostback(postback: any) {
     }
 
     // Send response
-    await facebook.sendTextMessage(postback.senderId, response);
+    await facebook.sendMessage(postback.senderId, response, 'text');
   } catch (error) {
     console.error('Error handling Facebook postback:', error);
   }
@@ -301,10 +312,11 @@ async function processMessageWithAI(message: string, chatbotId: string): Promise
       .limit(10);
 
     // Build conversation context
-    const conversationHistory = recentMessages?.reverse().map(msg => ({
-      role: msg.role,
-      content: msg.content
-    })) || [];
+    const conversationHistory =
+      recentMessages?.reverse().map(msg => ({
+        role: msg.role,
+        content: msg.content,
+      })) || [];
 
     // Add current message
     conversationHistory.push({ role: 'user', content: message });
@@ -313,27 +325,27 @@ async function processMessageWithAI(message: string, chatbotId: string): Promise
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://intaj.ai',
-        'X-Title': 'Intaj AI Platform'
+        'X-Title': 'Intaj AI Platform',
       } as HeadersInit,
       body: JSON.stringify({
         model: chatbot.model || 'openai/gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
-            content: `You are ${chatbot.name}, an AI assistant on Facebook Messenger. ${chatbot.settings?.systemPrompt || 'Be helpful and professional.'}`
+            content: `You are ${chatbot.name}, an AI assistant on Facebook Messenger. ${chatbot.settings?.systemPrompt || 'Be helpful and professional.'}`,
           },
-          ...conversationHistory
+          ...conversationHistory,
         ],
         max_tokens: 1000,
-        temperature: 0.7
-      })
+        temperature: 0.7,
+      }),
     });
 
     const aiData = await response.json();
-    
+
     if (aiData.choices && aiData.choices[0]) {
       return aiData.choices[0].message.content;
     }

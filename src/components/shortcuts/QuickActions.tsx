@@ -1,7 +1,18 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import { Search, Plus, MessageSquare, Bot, Users, BarChart3, Settings, Zap, Command, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import {
+  Search,
+  Plus,
+  MessageSquare,
+  Bot,
+  Users,
+  BarChart3,
+  Settings,
+  Zap,
+  Command,
+  X,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface QuickAction {
   id: string;
@@ -19,109 +30,113 @@ interface QuickActionsProps {
 }
 
 export default function QuickActions({ isOpen, onClose }: QuickActionsProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const actions: QuickAction[] = [
     {
-      id: "create-chatbot",
-      title: "Create New Chatbot",
-      description: "Build a new AI chatbot from scratch",
+      id: 'create-chatbot',
+      title: 'Create New Chatbot',
+      description: 'Build a new AI chatbot from scratch',
       icon: <Bot className="w-5 h-5" />,
-      shortcut: "⌘+N",
-      action: () => router.push("/chatbots/new"),
-      category: "Create"
+      shortcut: '⌘+N',
+      action: () => router.push('/chatbots/new'),
+      category: 'Create',
     },
     {
-      id: "new-conversation",
-      title: "Start New Conversation",
-      description: "Begin a new chat conversation",
+      id: 'new-conversation',
+      title: 'Start New Conversation',
+      description: 'Begin a new chat conversation',
       icon: <MessageSquare className="w-5 h-5" />,
-      shortcut: "⌘+T",
-      action: () => router.push("/conversations/new"),
-      category: "Create"
+      shortcut: '⌘+T',
+      action: () => router.push('/conversations/new'),
+      category: 'Create',
     },
     {
-      id: "invite-team",
-      title: "Invite Team Member",
-      description: "Add a new member to your team",
+      id: 'invite-team',
+      title: 'Invite Team Member',
+      description: 'Add a new member to your team',
       icon: <Users className="w-5 h-5" />,
-      shortcut: "⌘+I",
-      action: () => router.push("/team?action=invite"),
-      category: "Team"
+      shortcut: '⌘+I',
+      action: () => router.push('/team?action=invite'),
+      category: 'Team',
     },
     {
-      id: "view-analytics",
-      title: "View Analytics",
-      description: "Check your chatbot performance metrics",
+      id: 'view-analytics',
+      title: 'View Analytics',
+      description: 'Check your chatbot performance metrics',
       icon: <BarChart3 className="w-5 h-5" />,
-      shortcut: "⌘+A",
-      action: () => router.push("/analytics"),
-      category: "Analytics"
+      shortcut: '⌘+A',
+      action: () => router.push('/analytics'),
+      category: 'Analytics',
     },
     {
-      id: "dashboard",
-      title: "Go to Dashboard",
-      description: "Navigate to your main dashboard",
+      id: 'dashboard',
+      title: 'Go to Dashboard',
+      description: 'Navigate to your main dashboard',
       icon: <Zap className="w-5 h-5" />,
-      shortcut: "⌘+D",
-      action: () => router.push("/dashboard"),
-      category: "Navigation"
+      shortcut: '⌘+D',
+      action: () => router.push('/dashboard'),
+      category: 'Navigation',
     },
     {
-      id: "connections",
-      title: "Manage Connections",
-      description: "Connect or manage your messaging channels",
+      id: 'connections',
+      title: 'Manage Connections',
+      description: 'Connect or manage your messaging channels',
       icon: <MessageSquare className="w-5 h-5" />,
-      shortcut: "⌘+C",
-      action: () => router.push("/connections"),
-      category: "Integration"
+      shortcut: '⌘+C',
+      action: () => router.push('/connections'),
+      category: 'Integration',
     },
     {
-      id: "chat-widget",
-      title: "Chat Widget Settings",
-      description: "Configure your website chat widget",
+      id: 'chat-widget',
+      title: 'Chat Widget Settings',
+      description: 'Configure your website chat widget',
       icon: <MessageSquare className="w-5 h-5" />,
-      shortcut: "⌘+W",
-      action: () => router.push("/chat-widget"),
-      category: "Integration"
+      shortcut: '⌘+W',
+      action: () => router.push('/chat-widget'),
+      category: 'Integration',
     },
     {
-      id: "team-management",
-      title: "Team Management",
-      description: "Manage team members and permissions",
+      id: 'team-management',
+      title: 'Team Management',
+      description: 'Manage team members and permissions',
       icon: <Users className="w-5 h-5" />,
-      shortcut: "⌘+M",
-      action: () => router.push("/team"),
-      category: "Team"
+      shortcut: '⌘+M',
+      action: () => router.push('/team'),
+      category: 'Team',
     },
     {
-      id: "settings",
-      title: "Account Settings",
-      description: "Manage your account and preferences",
+      id: 'settings',
+      title: 'Account Settings',
+      description: 'Manage your account and preferences',
       icon: <Settings className="w-5 h-5" />,
-      shortcut: "⌘+,",
-      action: () => router.push("/settings"),
-      category: "Settings"
-    }
+      shortcut: '⌘+,',
+      action: () => router.push('/settings'),
+      category: 'Settings',
+    },
   ];
 
-  const filteredActions = actions.filter(action =>
-    action.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    action.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    action.category.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredActions = actions.filter(
+    action =>
+      action.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      action.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      action.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const groupedActions = filteredActions.reduce((groups, action) => {
-    const category = action.category;
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-    groups[category].push(action);
-    return groups;
-  }, {} as Record<string, QuickAction[]>);
+  const groupedActions = filteredActions.reduce(
+    (groups, action) => {
+      const category = action.category;
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(action);
+      return groups;
+    },
+    {} as Record<string, QuickAction[]>
+  );
 
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
@@ -138,30 +153,30 @@ export default function QuickActions({ isOpen, onClose }: QuickActionsProps) {
       if (!isOpen) return;
 
       switch (e.key) {
-        case "ArrowDown":
+        case 'ArrowDown':
           e.preventDefault();
           setSelectedIndex(prev => Math.min(prev + 1, filteredActions.length - 1));
           break;
-        case "ArrowUp":
+        case 'ArrowUp':
           e.preventDefault();
           setSelectedIndex(prev => Math.max(prev - 1, 0));
           break;
-        case "Enter":
+        case 'Enter':
           e.preventDefault();
           if (filteredActions[selectedIndex]) {
             filteredActions[selectedIndex].action();
             onClose();
           }
           break;
-        case "Escape":
+        case 'Escape':
           e.preventDefault();
           onClose();
           break;
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, selectedIndex, filteredActions, onClose]);
 
   const handleActionClick = (action: QuickAction) => {
@@ -182,7 +197,7 @@ export default function QuickActions({ isOpen, onClose }: QuickActionsProps) {
             type="text"
             placeholder="Search for actions..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none"
           />
           <button
@@ -218,24 +233,20 @@ export default function QuickActions({ isOpen, onClose }: QuickActionsProps) {
                           : 'hover:bg-gray-800/50'
                       }`}
                     >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        globalIndex === selectedIndex
-                          ? 'bg-blue-500/30 text-blue-400'
-                          : 'bg-gray-700/50 text-gray-400'
-                      }`}>
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          globalIndex === selectedIndex
+                            ? 'bg-blue-500/30 text-blue-400'
+                            : 'bg-gray-700/50 text-gray-400'
+                        }`}
+                      >
                         {action.icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-white truncate">
-                          {action.title}
-                        </div>
-                        <div className="text-sm text-gray-400 truncate">
-                          {action.description}
-                        </div>
+                        <div className="font-medium text-white truncate">{action.title}</div>
+                        <div className="text-sm text-gray-400 truncate">{action.description}</div>
                       </div>
-                      <div className="text-xs text-gray-500 font-mono">
-                        {action.shortcut}
-                      </div>
+                      <div className="text-xs text-gray-500 font-mono">{action.shortcut}</div>
                     </button>
                   );
                 })}
@@ -260,9 +271,7 @@ export default function QuickActions({ isOpen, onClose }: QuickActionsProps) {
               <span>Close</span>
             </div>
           </div>
-          <div className="text-xs text-gray-500">
-            {filteredActions.length} actions
-          </div>
+          <div className="text-xs text-gray-500">{filteredActions.length} actions</div>
         </div>
       </div>
     </div>
@@ -335,7 +344,7 @@ export function useKeyboardShortcuts() {
 
   return {
     isQuickActionsOpen,
-    setIsQuickActionsOpen
+    setIsQuickActionsOpen,
   };
 }
 
@@ -344,16 +353,16 @@ export function KeyboardShortcutsHelp() {
   const [isOpen, setIsOpen] = useState(false);
 
   const shortcuts = [
-    { key: "⌘+K", description: "Open quick actions" },
-    { key: "⌘+N", description: "Create new chatbot" },
-    { key: "⌘+T", description: "Start new conversation" },
-    { key: "⌘+D", description: "Go to dashboard" },
-    { key: "⌘+A", description: "View analytics" },
-    { key: "⌘+C", description: "Manage connections" },
-    { key: "⌘+W", description: "Chat widget settings" },
-    { key: "⌘+M", description: "Team management" },
-    { key: "⌘+I", description: "Invite team member" },
-    { key: "⌘+,", description: "Account settings" },
+    { key: '⌘+K', description: 'Open quick actions' },
+    { key: '⌘+N', description: 'Create new chatbot' },
+    { key: '⌘+T', description: 'Start new conversation' },
+    { key: '⌘+D', description: 'Go to dashboard' },
+    { key: '⌘+A', description: 'View analytics' },
+    { key: '⌘+C', description: 'Manage connections' },
+    { key: '⌘+W', description: 'Chat widget settings' },
+    { key: '⌘+M', description: 'Team management' },
+    { key: '⌘+I', description: 'Invite team member' },
+    { key: '⌘+,', description: 'Account settings' },
   ];
 
   return (

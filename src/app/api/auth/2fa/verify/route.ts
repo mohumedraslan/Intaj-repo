@@ -17,8 +17,11 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -75,11 +78,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: enable ? '2FA enabled successfully' : 'Code verified successfully'
+    return NextResponse.json({
+      success: true,
+      message: enable ? '2FA enabled successfully' : 'Code verified successfully',
     });
-
   } catch (error) {
     console.error('2FA verification error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

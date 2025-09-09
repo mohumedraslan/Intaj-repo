@@ -67,14 +67,14 @@ Send messages via API:
 const response = await fetch('https://api.intaj.io/api/instagram/send', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer your_api_key',
-    'Content-Type': 'application/json'
+    Authorization: 'Bearer your_api_key',
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     recipientId: 'user_ig_id',
     type: 'text',
-    content: 'Hello from Intaj!'
-  })
+    content: 'Hello from Intaj!',
+  }),
 });
 ```
 
@@ -91,7 +91,7 @@ const intaj = new Intaj({ apiKey: 'your_api_key' });
 await intaj.instagram.send({
   recipientId: 'user_ig_id',
   type: 'text',
-  content: 'Hello from Intaj!'
+  content: 'Hello from Intaj!',
 });
 
 // Send media message
@@ -100,8 +100,8 @@ await intaj.instagram.send({
   type: 'image',
   content: {
     url: 'https://example.com/image.jpg',
-    caption: 'Check this out!'
-  }
+    caption: 'Check this out!',
+  },
 });
 ```
 
@@ -113,7 +113,7 @@ await intaj.instagram.send({
 await intaj.instagram.send({
   recipientId: 'user_ig_id',
   type: 'text',
-  content: 'Hello!'
+  content: 'Hello!',
 });
 ```
 
@@ -125,8 +125,8 @@ await intaj.instagram.send({
   type: 'image',
   content: {
     url: 'https://example.com/image.jpg',
-    caption: 'Check this out!'
-  }
+    caption: 'Check this out!',
+  },
 });
 ```
 
@@ -138,12 +138,14 @@ await intaj.instagram.send({
   type: 'quick_replies',
   content: {
     text: 'Choose an option:',
-    quick_replies: [{
-      content_type: 'text',
-      title: 'Option 1',
-      payload: 'OPTION_1'
-    }]
-  }
+    quick_replies: [
+      {
+        content_type: 'text',
+        title: 'Option 1',
+        payload: 'OPTION_1',
+      },
+    ],
+  },
 });
 ```
 

@@ -43,7 +43,7 @@ export function useDashboardData() {
       responseTime: 0,
       responseTimeImprovement: 0,
       satisfaction: 0,
-      satisfactionGrowth: 0
+      satisfactionGrowth: 0,
     },
     recentActivity: [],
     platforms: {
@@ -59,7 +59,10 @@ export function useDashboardData() {
   useEffect(() => {
     async function fetchDashboardData() {
       try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
         if (authError || !user) {
           setLoading(false);
           return;
@@ -117,16 +120,18 @@ export function useDashboardData() {
         });
 
         // Calculate response times
-        const responseTimes = messages?.map((msg: any) => {
-          return 1.5; // Example: 1.5 seconds response time
-        }) || [];
-        const avgResponseTime = responseTimes.length > 0 
-          ? responseTimes.reduce((a: number, b: number) => a + b, 0) / responseTimes.length
-          : 1.5;
+        const responseTimes =
+          messages?.map((msg: any) => {
+            return 1.5; // Example: 1.5 seconds response time
+          }) || [];
+        const avgResponseTime =
+          responseTimes.length > 0
+            ? responseTimes.reduce((a: number, b: number) => a + b, 0) / responseTimes.length
+            : 1.5;
 
         // Generate recent activity from messages and chatbots
         const recentActivity: ActivityItem[] = [];
-        
+
         if (messages && messages.length > 0) {
           const recentMessages = messages.slice(-3);
           recentMessages.forEach((msg: any) => {
@@ -134,7 +139,7 @@ export function useDashboardData() {
               id: msg.id,
               type: 'conversation' as const,
               message: `New message received`,
-              timestamp: msg.created_at || new Date().toISOString()
+              timestamp: msg.created_at || new Date().toISOString(),
             });
           });
         }
@@ -146,7 +151,7 @@ export function useDashboardData() {
               id: `bot-${bot.id}`,
               type: 'update' as const,
               message: `Chatbot "${bot.name}" was created`,
-              timestamp: bot.created_at || new Date().toISOString()
+              timestamp: bot.created_at || new Date().toISOString(),
             });
           });
         }
@@ -157,20 +162,24 @@ export function useDashboardData() {
               id: `conn-${conn.id}`,
               type: 'connection' as const,
               message: `Connected to ${conn.platform}`,
-              timestamp: conn.created_at || new Date().toISOString()
+              timestamp: conn.created_at || new Date().toISOString(),
             });
           });
         }
 
         // Sort by timestamp and take the 5 most recent
-        recentActivity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        recentActivity.sort(
+          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
 
         setData({
           stats: {
             activeBots: chatbots?.filter((bot: any) => bot.status === 'active').length || 0,
             weeklyBotGrowth: Math.max(0, (chatbots?.length || 0) - 2),
             conversations: messages?.length || 0,
-            conversationGrowth: Math.round(((messages?.length || 0) / Math.max(1, (messages?.length || 1) - 10)) * 100 - 100),
+            conversationGrowth: Math.round(
+              ((messages?.length || 0) / Math.max(1, (messages?.length || 1) - 10)) * 100 - 100
+            ),
             responseTime: avgResponseTime,
             responseTimeImprovement: -0.2,
             satisfaction: 95,
@@ -193,31 +202,25 @@ export function useDashboardData() {
     // Set up real-time subscription for chatbots
     const chatbotsSubscription = supabase
       .channel('chatbots-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chatbots' }, 
-        () => {
-          fetchDashboardData(); // Refresh data on any change
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chatbots' }, () => {
+        fetchDashboardData(); // Refresh data on any change
+      })
       .subscribe();
 
     // Set up real-time subscription for messages
     const messagesSubscription = supabase
       .channel('messages-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' },
-        () => {
-          fetchDashboardData(); // Refresh data on any change
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+        fetchDashboardData(); // Refresh data on any change
+      })
       .subscribe();
 
     // Set up real-time subscription for connections
     const connectionsSubscription = supabase
       .channel('connections-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'connections' },
-        () => {
-          fetchDashboardData(); // Refresh data on any change
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'connections' }, () => {
+        fetchDashboardData(); // Refresh data on any change
+      })
       .subscribe();
 
     // Cleanup subscriptions

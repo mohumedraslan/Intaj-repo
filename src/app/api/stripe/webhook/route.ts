@@ -19,11 +19,7 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      Buffer.from(body),
-      signature,
-      endpointSecret
-    );
+    event = stripe.webhooks.constructEvent(Buffer.from(body), signature, endpointSecret);
   } catch (err) {
     const error = err as Error;
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -35,10 +31,7 @@ export async function POST(req: NextRequest) {
       const session = event.data.object as Stripe.Checkout.Session;
       const user_id = session.metadata?.user_id;
       if (user_id) {
-        await supabase
-          .from('profiles')
-          .update({ subscription: 'pro' })
-          .eq('id', user_id);
+        await supabase.from('profiles').update({ subscription: 'pro' }).eq('id', user_id);
       }
       break;
     }

@@ -15,15 +15,8 @@ export function ChatWidget({ chatbotId, defaultOpen = false }: ChatWidgetProps) 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { profile } = useProfile();
-  
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    error,
-  } = useChat({
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: '/api/chat/stream',
     body: {
       chatbotId,
@@ -68,11 +61,7 @@ export function ChatWidget({ chatbotId, defaultOpen = false }: ChatWidgetProps) 
       {/* Header */}
       <div className="p-4 border-b flex justify-between items-center">
         <h3 className="font-semibold">Chat Support</h3>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsOpen(false)}
-        >
+        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
           <X className="h-4 w-4" />
         </Button>
       </div>
@@ -82,15 +71,11 @@ export function ChatWidget({ chatbotId, defaultOpen = false }: ChatWidgetProps) 
         {messages.map((message, i) => (
           <div
             key={i}
-            className={`flex ${
-              message.role === 'user' ? 'justify-end' : 'justify-start'
-            }`}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
               className={`max-w-[80%] rounded-lg p-3 ${
-                message.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted'
+                message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
               }`}
             >
               {message.content}
@@ -108,11 +93,7 @@ export function ChatWidget({ chatbotId, defaultOpen = false }: ChatWidgetProps) 
       </div>
 
       {/* Error message */}
-      {error && (
-        <div className="px-4 py-2 text-sm text-red-500 bg-red-50">
-          {error.message}
-        </div>
-      )}
+      {error && <div className="px-4 py-2 text-sm text-red-500 bg-red-50">{error.message}</div>}
 
       {/* Input */}
       <form onSubmit={handleSubmit} className="p-4 border-t">

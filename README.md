@@ -1,7 +1,7 @@
-
 # Intaj — Automation Platform MVP
 
 Intaj is a modern automation platform for business, sales, marketing, and content creation. It enables you to build, deploy, and manage:
+
 - AI chatbots (MVP)
 - Sales agents
 - Marketing agents
@@ -10,9 +10,7 @@ Intaj is a modern automation platform for business, sales, marketing, and conten
 
 **MVP Focus:** Chatbots (with extensible architecture for future automation agents)
 
-
 ## Getting Started
-
 
 First, install dependencies and run the development server:
 
@@ -28,8 +26,8 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-
 ## Features
+
 - Next.js 15 (App Router, TypeScript)
 - Tailwind CSS, Shadcn UI
 - Supabase (auth, database, storage, vector search)
@@ -38,17 +36,39 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Extensible for future automation agents
 
 ## File Structure
+
 - `src/app/` — Next.js app routes (dashboard, chat, widget, etc)
 - `src/lib/` — Core libraries (supabase, embeddings, usage, etc)
 - `db/` — Database schema and SQL functions
 
 ## Contributing
+
 See `db/DB_DESCRIPTION.md` for schema and table docs. PRs welcome!
 
+### Code Quality & Standards
+
+This project uses several tools to maintain code quality and consistency:
+
+```bash
+# Run ESLint to check for code issues
+npm run lint
+
+# Fix ESLint issues automatically
+npm run lint:fix
+
+# Format code with Prettier
+npm run format
+```
+
+We use husky and lint-staged to automatically run linting and formatting on staged files before commits.
+
 ## Links
+
 - [DB Schema](db/DB_DESCRIPTION.md)
+- [Code Style Guidelines](CODE_STYLE.md)
 
 ---
+
 This project is the foundation for a full automation platform. MVP = chatbots, but architecture supports sales, marketing, and content agents.
 
 ## Learn More

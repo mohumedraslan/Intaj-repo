@@ -63,7 +63,7 @@ export default function Header() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <Image 
+              <Image
                 src="/logo.svg"
                 alt="Intaj Logo"
                 width={120}
@@ -75,7 +75,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:gap-x-8">
-            {navigationItems.map((item) => (
+            {navigationItems.map(item => (
               <div
                 key={item.label}
                 className="relative"
@@ -92,11 +92,7 @@ export default function Header() {
                 >
                   {item.label}
                   {item.children && (
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
+                    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path
                         fillRule="evenodd"
                         d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -105,11 +101,11 @@ export default function Header() {
                     </svg>
                   )}
                 </Link>
-                
+
                 {/* Dropdown Menu */}
                 {item.children && activeDropdown === item.label && (
                   <div className="absolute left-0 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5">
-                    {item.children.map((child) => (
+                    {item.children.map(child => (
                       <Link
                         key={child.href}
                         href={child.href}
@@ -190,10 +186,12 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="lg:hidden">
             <div className="space-y-1 pb-3 pt-2">
-              {navigationItems.map((item) => (
+              {navigationItems.map(item => (
                 <div key={item.label}>
                   <button
-                    onClick={() => setActiveDropdown(activeDropdown === item.label ? null : item.label)}
+                    onClick={() =>
+                      setActiveDropdown(activeDropdown === item.label ? null : item.label)
+                    }
                     className={`flex w-full items-center justify-between px-3 py-2 text-base font-medium ${
                       isActive(item.href)
                         ? 'bg-primary-50 text-primary-600'
@@ -219,7 +217,7 @@ export default function Header() {
                   </button>
                   {item.children && activeDropdown === item.label && (
                     <div className="space-y-1 px-4 py-2">
-                      {item.children.map((child) => (
+                      {item.children.map(child => (
                         <Link
                           key={child.href}
                           href={child.href}

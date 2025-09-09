@@ -23,10 +23,12 @@ export default function DataSourcesPage() {
     setError(null);
     try {
       // Upload to Supabase Storage bucket 'files'
-      const { data, error } = await supabase.storage.from('files').upload(`public/${file.name}`, file, {
-        cacheControl: '3600',
-        upsert: true,
-      });
+      const { data, error } = await supabase.storage
+        .from('files')
+        .upload(`public/${file.name}`, file, {
+          cacheControl: '3600',
+          upsert: true,
+        });
       if (error) throw error;
       // Save metadata to DB
       const res = await fetch('/api/data_sources', {
@@ -51,12 +53,12 @@ export default function DataSourcesPage() {
     <div className="max-w-xl mx-auto py-8">
       <h1 className="text-2xl font-bold mb-4">Upload Data Source</h1>
       <form onSubmit={handleUpload} className="mb-4">
-        <input 
-          type="file" 
-          accept=".pdf,.docx" 
-          onChange={handleFileChange} 
+        <input
+          type="file"
+          accept=".pdf,.docx"
+          onChange={handleFileChange}
           className="mb-2 block"
-          title="Upload file" 
+          title="Upload file"
         />
         <Button type="submit" disabled={uploading || !file}>
           {uploading ? 'Uploading...' : 'Upload'}

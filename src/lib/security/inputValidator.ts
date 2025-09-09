@@ -15,11 +15,9 @@ export const commonSchemas = {
 
 // Sanitization options
 const sanitizeOptions: sanitizeHtml.IOptions = {
-  allowedTags: [
-    'b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li'
-  ],
+  allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li'],
   allowedAttributes: {
-    'a': ['href', 'target', 'rel']
+    a: ['href', 'target', 'rel'],
   },
   allowedIframeHostnames: [],
 };

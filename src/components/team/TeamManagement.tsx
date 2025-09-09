@@ -3,7 +3,19 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, UserPlus, Settings, Shield, Mail, Phone, MoreVertical, Edit, Trash2, Crown, User } from 'lucide-react';
+import {
+  Users,
+  UserPlus,
+  Settings,
+  Shield,
+  Mail,
+  Phone,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Crown,
+  User,
+} from 'lucide-react';
 
 interface TeamMember {
   id: string;
@@ -33,36 +45,42 @@ const defaultRoles: Role[] = [
     name: 'Owner',
     description: 'Full access to all features and settings',
     permissions: ['*'],
-    color: 'bg-yellow-500'
+    color: 'bg-yellow-500',
   },
   {
     id: 'admin',
     name: 'Admin',
     description: 'Manage team, settings, and all conversations',
-    permissions: ['manage_team', 'manage_settings', 'view_analytics', 'manage_conversations', 'manage_integrations'],
-    color: 'bg-red-500'
+    permissions: [
+      'manage_team',
+      'manage_settings',
+      'view_analytics',
+      'manage_conversations',
+      'manage_integrations',
+    ],
+    color: 'bg-red-500',
   },
   {
     id: 'manager',
     name: 'Manager',
     description: 'Manage conversations and view analytics',
     permissions: ['view_analytics', 'manage_conversations', 'assign_conversations'],
-    color: 'bg-purple-500'
+    color: 'bg-purple-500',
   },
   {
     id: 'agent',
     name: 'Agent',
     description: 'Handle assigned conversations',
     permissions: ['view_conversations', 'respond_conversations'],
-    color: 'bg-blue-500'
+    color: 'bg-blue-500',
   },
   {
     id: 'viewer',
     name: 'Viewer',
     description: 'View-only access to conversations and analytics',
     permissions: ['view_conversations', 'view_analytics'],
-    color: 'bg-gray-500'
-  }
+    color: 'bg-gray-500',
+  },
 ];
 
 const defaultTeamMembers: TeamMember[] = [
@@ -76,7 +94,7 @@ const defaultTeamMembers: TeamMember[] = [
     lastActive: new Date(),
     permissions: ['*'],
     assignedInboxes: ['general', 'support', 'sales'],
-    createdAt: new Date('2024-01-01')
+    createdAt: new Date('2024-01-01'),
   },
   {
     id: '2',
@@ -88,7 +106,7 @@ const defaultTeamMembers: TeamMember[] = [
     lastActive: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
     permissions: ['manage_team', 'manage_settings', 'view_analytics', 'manage_conversations'],
     assignedInboxes: ['support', 'sales'],
-    createdAt: new Date('2024-01-05')
+    createdAt: new Date('2024-01-05'),
   },
   {
     id: '3',
@@ -99,7 +117,7 @@ const defaultTeamMembers: TeamMember[] = [
     lastActive: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
     permissions: ['view_conversations', 'respond_conversations'],
     assignedInboxes: ['support'],
-    createdAt: new Date('2024-01-10')
+    createdAt: new Date('2024-01-10'),
   },
   {
     id: '4',
@@ -110,7 +128,7 @@ const defaultTeamMembers: TeamMember[] = [
     lastActive: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 days ago
     permissions: ['view_conversations', 'respond_conversations'],
     assignedInboxes: ['sales'],
-    createdAt: new Date('2024-01-12')
+    createdAt: new Date('2024-01-12'),
   },
   {
     id: '5',
@@ -121,8 +139,8 @@ const defaultTeamMembers: TeamMember[] = [
     lastActive: new Date('2024-01-15'),
     permissions: ['view_analytics', 'manage_conversations', 'assign_conversations'],
     assignedInboxes: [],
-    createdAt: new Date('2024-01-15')
-  }
+    createdAt: new Date('2024-01-15'),
+  },
 ];
 
 export default function TeamManagement() {
@@ -133,7 +151,7 @@ export default function TeamManagement() {
   const [inviteForm, setInviteForm] = useState({
     email: '',
     role: 'agent',
-    message: ''
+    message: '',
   });
 
   const getRoleInfo = (roleId: string) => {
@@ -142,18 +160,25 @@ export default function TeamManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'inactive': return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-      case 'pending': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      case 'active':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'inactive':
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'owner': return <Crown size={16} className="text-yellow-400" />;
-      case 'admin': return <Shield size={16} className="text-red-400" />;
-      default: return <User size={16} className="text-blue-400" />;
+      case 'owner':
+        return <Crown size={16} className="text-yellow-400" />;
+      case 'admin':
+        return <Shield size={16} className="text-red-400" />;
+      default:
+        return <User size={16} className="text-blue-400" />;
     }
   };
 
@@ -182,7 +207,7 @@ export default function TeamManagement() {
       lastActive: new Date(),
       permissions: getRoleInfo(inviteForm.role).permissions,
       assignedInboxes: [],
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     setTeamMembers(prev => [...prev, newMember]);
@@ -197,19 +222,21 @@ export default function TeamManagement() {
   };
 
   const handleUpdateRole = (id: string, newRole: string) => {
-    setTeamMembers(prev => prev.map(m => 
-      m.id === id 
-        ? { ...m, role: newRole as any, permissions: getRoleInfo(newRole).permissions }
-        : m
-    ));
+    setTeamMembers(prev =>
+      prev.map(m =>
+        m.id === id
+          ? { ...m, role: newRole as any, permissions: getRoleInfo(newRole).permissions }
+          : m
+      )
+    );
   };
 
   const toggleMemberStatus = (id: string) => {
-    setTeamMembers(prev => prev.map(m => 
-      m.id === id 
-        ? { ...m, status: m.status === 'active' ? 'inactive' : 'active' }
-        : m
-    ));
+    setTeamMembers(prev =>
+      prev.map(m =>
+        m.id === id ? { ...m, status: m.status === 'active' ? 'inactive' : 'active' } : m
+      )
+    );
   };
 
   return (
@@ -304,9 +331,7 @@ export default function TeamManagement() {
               <Users size={20} />
               <span>Team Members</span>
             </CardTitle>
-            <CardDescription>
-              Manage your team members and their access levels
-            </CardDescription>
+            <CardDescription>Manage your team members and their access levels</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -317,12 +342,14 @@ export default function TeamManagement() {
                     <th className="text-left py-3 px-4 text-gray-400 font-medium">Role</th>
                     <th className="text-left py-3 px-4 text-gray-400 font-medium">Status</th>
                     <th className="text-left py-3 px-4 text-gray-400 font-medium">Last Active</th>
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium">Assigned Inboxes</th>
+                    <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                      Assigned Inboxes
+                    </th>
                     <th className="text-right py-3 px-4 text-gray-400 font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {teamMembers.map((member) => {
+                  {teamMembers.map(member => {
                     const roleInfo = getRoleInfo(member.role);
                     return (
                       <tr key={member.id} className="border-b border-gray-800 hover:bg-gray-800/30">
@@ -330,7 +357,10 @@ export default function TeamManagement() {
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                               <span className="text-white font-semibold text-sm">
-                                {member.name.split(' ').map(n => n[0]).join('')}
+                                {member.name
+                                  .split(' ')
+                                  .map(n => n[0])
+                                  .join('')}
                               </span>
                             </div>
                             <div>
@@ -345,22 +375,24 @@ export default function TeamManagement() {
                         <td className="py-4 px-4">
                           <div className="flex items-center space-x-2">
                             {getRoleIcon(member.role)}
-                            <Badge className={`${roleInfo.color}/20 text-white border-${roleInfo.color}/30`}>
+                            <Badge
+                              className={`${roleInfo.color}/20 text-white border-${roleInfo.color}/30`}
+                            >
                               {roleInfo.name}
                             </Badge>
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <Badge className={getStatusColor(member.status)}>
-                            {member.status}
-                          </Badge>
+                          <Badge className={getStatusColor(member.status)}>{member.status}</Badge>
                         </td>
                         <td className="py-4 px-4">
-                          <span className="text-gray-300">{formatLastActive(member.lastActive)}</span>
+                          <span className="text-gray-300">
+                            {formatLastActive(member.lastActive)}
+                          </span>
                         </td>
                         <td className="py-4 px-4">
                           <div className="flex flex-wrap gap-1">
-                            {member.assignedInboxes.slice(0, 2).map((inbox) => (
+                            {member.assignedInboxes.slice(0, 2).map(inbox => (
                               <Badge key={inbox} variant="secondary" className="text-xs">
                                 {inbox}
                               </Badge>
@@ -376,11 +408,11 @@ export default function TeamManagement() {
                           <div className="flex items-center justify-end space-x-2">
                             <select
                               value={member.role}
-                              onChange={(e) => handleUpdateRole(member.id, e.target.value)}
+                              onChange={e => handleUpdateRole(member.id, e.target.value)}
                               className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm text-white"
                               disabled={member.role === 'owner'}
                             >
-                              {roles.map((role) => (
+                              {roles.map(role => (
                                 <option key={role.id} value={role.id}>
                                   {role.name}
                                 </option>
@@ -420,7 +452,7 @@ export default function TeamManagement() {
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-white mb-6">Role Permissions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {roles.map((role) => (
+            {roles.map(role => (
               <Card key={role.id} className="bg-[#141517]/50 backdrop-blur-xl border-gray-800/50">
                 <CardHeader>
                   <div className="flex items-center space-x-3">
@@ -433,7 +465,7 @@ export default function TeamManagement() {
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-gray-300">Permissions:</h4>
                     <div className="flex flex-wrap gap-1">
-                      {role.permissions.map((permission) => (
+                      {role.permissions.map(permission => (
                         <Badge key={permission} variant="secondary" className="text-xs">
                           {permission === '*' ? 'All Permissions' : permission.replace('_', ' ')}
                         </Badge>
@@ -452,42 +484,46 @@ export default function TeamManagement() {
             <Card className="w-full max-w-md bg-[#141517] border-gray-800">
               <CardHeader>
                 <CardTitle className="text-white">Invite Team Member</CardTitle>
-                <CardDescription>
-                  Send an invitation to join your team
-                </CardDescription>
+                <CardDescription>Send an invitation to join your team</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Email Address
+                  </label>
                   <input
                     type="email"
                     value={inviteForm.email}
-                    onChange={(e) => setInviteForm(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={e => setInviteForm(prev => ({ ...prev, email: e.target.value }))}
                     className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter email address"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Role</label>
                   <select
                     value={inviteForm.role}
-                    onChange={(e) => setInviteForm(prev => ({ ...prev, role: e.target.value }))}
+                    onChange={e => setInviteForm(prev => ({ ...prev, role: e.target.value }))}
                     className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {roles.filter(r => r.id !== 'owner').map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name} - {role.description}
-                      </option>
-                    ))}
+                    {roles
+                      .filter(r => r.id !== 'owner')
+                      .map(role => (
+                        <option key={role.id} value={role.id}>
+                          {role.name} - {role.description}
+                        </option>
+                      ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Personal Message (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Personal Message (Optional)
+                  </label>
                   <textarea
                     value={inviteForm.message}
-                    onChange={(e) => setInviteForm(prev => ({ ...prev, message: e.target.value }))}
+                    onChange={e => setInviteForm(prev => ({ ...prev, message: e.target.value }))}
                     className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="Add a personal message to the invitation"

@@ -1,6 +1,7 @@
 # Environment Variables for Intaj Platform
 
 ## 🔧 Core Application
+
 ```bash
 # Next.js Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3000  # Production: https://intaj.nabih.tech
@@ -12,6 +13,7 @@ NODE_ENV=development  # Production: production
 ```
 
 ## 🗄️ Database (Supabase)
+
 ```bash
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -20,6 +22,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 ```
 
 ## 🤖 AI Services
+
 ```bash
 # OpenRouter API (for AI models)
 OPENROUTER_API_KEY=your-openrouter-api-key
@@ -30,6 +33,7 @@ ANTHROPIC_API_KEY=your-anthropic-api-key
 ```
 
 ## 💳 Payment Processing (Stripe)
+
 ```bash
 # Stripe Configuration
 STRIPE_PUBLISHABLE_KEY=pk_test_... # Production: pk_live_...
@@ -38,6 +42,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 ## 📱 WhatsApp Business API
+
 ```bash
 # WhatsApp Business Platform
 WHATSAPP_ACCESS_TOKEN=your-whatsapp-access-token
@@ -53,6 +58,7 @@ WHATSAPP_APP_SECRET=your-facebook-app-secret
 ```
 
 ## 📘 Facebook Messenger
+
 ```bash
 # Facebook App Configuration
 FACEBOOK_APP_ID=your-facebook-app-id
@@ -66,6 +72,7 @@ FACEBOOK_WEBHOOK_VERIFY_TOKEN=your-custom-verify-token
 ```
 
 ## 📸 Instagram Business
+
 ```bash
 # Instagram Business API (uses Facebook credentials)
 INSTAGRAM_BUSINESS_ACCOUNT_ID=your-instagram-business-id
@@ -77,6 +84,7 @@ INSTAGRAM_ACCESS_TOKEN=your-instagram-access-token
 ```
 
 ## 📧 Email Services
+
 ```bash
 # Email Provider (choose one)
 # Resend
@@ -93,6 +101,7 @@ SMTP_PASS=your-app-password
 ```
 
 ## 🔐 Authentication & Security
+
 ```bash
 # JWT Secret for custom auth
 JWT_SECRET=your-jwt-secret-key
@@ -105,6 +114,7 @@ CORS_ORIGINS=http://localhost:3000,https://intaj.nabih.tech
 ```
 
 ## 📊 Analytics & Monitoring
+
 ```bash
 # Google Analytics (optional)
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
@@ -119,6 +129,7 @@ NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
 ```
 
 ## 🔧 Development & Testing
+
 ```bash
 # Development flags
 DEBUG=true
@@ -130,6 +141,7 @@ TEST_STRIPE_KEY=sk_test_...
 ```
 
 ## 🌐 CDN & Storage
+
 ```bash
 # Supabase Storage (for file uploads)
 SUPABASE_STORAGE_BUCKET=intaj-uploads
@@ -141,6 +153,7 @@ CLOUDINARY_API_SECRET=your-api-secret
 ```
 
 ## 📱 Push Notifications (Optional)
+
 ```bash
 # Firebase Cloud Messaging
 FIREBASE_PROJECT_ID=your-firebase-project-id
@@ -149,6 +162,7 @@ FIREBASE_CLIENT_EMAIL=your-firebase-client-email
 ```
 
 ## 🔄 Rate Limiting & Caching
+
 ```bash
 # Redis (for caching and rate limiting)
 REDIS_URL=redis://localhost:6379
@@ -164,17 +178,20 @@ UPSTASH_REDIS_REST_TOKEN=your-upstash-token
 ## 🚀 Quick Setup Priority
 
 ### Essential (Must Have):
+
 1. `NEXT_PUBLIC_SUPABASE_URL` & `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 2. `OPENROUTER_API_KEY` or `OPENAI_API_KEY`
 3. `STRIPE_PUBLISHABLE_KEY` & `STRIPE_SECRET_KEY`
 4. `NEXTAUTH_SECRET`
 
 ### Social Media Integration:
+
 5. `WHATSAPP_ACCESS_TOKEN` & `WHATSAPP_PHONE_NUMBER_ID`
 6. `FACEBOOK_APP_ID` & `FACEBOOK_APP_SECRET`
 7. `INSTAGRAM_BUSINESS_ACCOUNT_ID` & `INSTAGRAM_ACCESS_TOKEN`
 
 ### Production Ready:
+
 8. Email service credentials
 9. Analytics keys
 10. Error monitoring (Sentry)
@@ -182,6 +199,7 @@ UPSTASH_REDIS_REST_TOKEN=your-upstash-token
 ---
 
 ## 📝 Notes:
+
 - Replace all `your-*` placeholders with actual values
 - Keep test/development keys separate from production
 - Never commit `.env.local` to version control

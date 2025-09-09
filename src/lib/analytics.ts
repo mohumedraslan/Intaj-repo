@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '@/types/supabase'
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/types/supabase';
 
 // Create DB tables for analytics
 export const analyticsSchema = `
@@ -41,7 +41,7 @@ CREATE TRIGGER update_usage_on_message
   AFTER INSERT ON messages
   FOR EACH ROW
   EXECUTE FUNCTION update_api_usage();
-`
+`;
 
 // Create analytics functions
 export async function updatePerformanceMetrics(
@@ -49,14 +49,12 @@ export async function updatePerformanceMetrics(
   metricType: string,
   value: number
 ) {
-  const { error } = await client
-    .from('performance_metrics')
-    .insert({
-      metric_type: metricType,
-      value
-    })
+  const { error } = await client.from('performance_metrics').insert({
+    metric_type: metricType,
+    value,
+  });
 
-  if (error) throw error
+  if (error) throw error;
 }
 
 export async function getPerformanceMetrics(
@@ -69,24 +67,20 @@ export async function getPerformanceMetrics(
     .select('*')
     .eq('metric_type', metricType)
     .gt('timestamp', timeRange)
-    .order('timestamp', { ascending: true })
+    .order('timestamp', { ascending: true });
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export async function getApiUsage(
   client: ReturnType<typeof createClient<Database>>,
   userId: string
 ) {
-  const { data, error } = await client
-    .from('api_usage')
-    .select('*')
-    .eq('user_id', userId)
-    .single()
+  const { data, error } = await client.from('api_usage').select('*').eq('user_id', userId).single();
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export async function getMessageCountsByChannel(
@@ -99,8 +93,8 @@ export async function getMessageCountsByChannel(
     .select('platform, count(*)')
     .eq('user_id', userId)
     .gt('created_at', timeRange)
-    .group('platform')
+    .group('platform');
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }

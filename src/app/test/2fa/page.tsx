@@ -10,7 +10,7 @@ export default function TwoFactorTestPage() {
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-md mx-auto">
         <h1 className="text-2xl font-bold mb-8">2FA Implementation Test</h1>
-        
+
         {!setupComplete ? (
           <TwoFactorSetup
             onComplete={() => {
@@ -25,8 +25,8 @@ export default function TwoFactorTestPage() {
           <div className="p-4 bg-green-600/20 border border-green-500 rounded-lg">
             <h2 className="text-lg font-semibold text-green-400 mb-2">2FA Setup Complete!</h2>
             <p className="text-sm text-gray-300">
-              Two-factor authentication has been successfully enabled for your account.
-              Try logging out and back in to test the 2FA flow.
+              Two-factor authentication has been successfully enabled for your account. Try logging
+              out and back in to test the 2FA flow.
             </p>
             <button
               onClick={() => setSetupComplete(false)}

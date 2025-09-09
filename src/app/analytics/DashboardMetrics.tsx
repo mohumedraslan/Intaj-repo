@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
 interface MetricCardProps {
-  title: string
-  value: string | number
-  description: string
+  title: string;
+  value: string | number;
+  description: string;
 }
 
 const MetricCard = ({ title, value, description }: MetricCardProps) => (
@@ -17,7 +17,7 @@ const MetricCard = ({ title, value, description }: MetricCardProps) => (
       <p className="text-xs text-muted-foreground">{description}</p>
     </CardContent>
   </Card>
-)
+);
 
 interface DashboardData {
   messagesByChannel: Array<{ count: number }>;
@@ -27,20 +27,19 @@ interface DashboardData {
 }
 
 export function DashboardMetrics({ data }: { data: DashboardData }) {
-  const { messagesByChannel, activeChatbots, apiUsage, costs } = data
+  const { messagesByChannel, activeChatbots, apiUsage, costs } = data;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <MetricCard
         title="Total Messages"
-        value={messagesByChannel.reduce((acc: number, curr: { count: number }) => acc + curr.count, 0)}
+        value={messagesByChannel.reduce(
+          (acc: number, curr: { count: number }) => acc + curr.count,
+          0
+        )}
         description="Across all channels"
       />
-      <MetricCard
-        title="Active Chatbots"
-        value={activeChatbots}
-        description="Currently online"
-      />
+      <MetricCard title="Active Chatbots" value={activeChatbots} description="Currently online" />
       <MetricCard
         title="API Usage"
         value={`${apiUsage.used}/${apiUsage.limit}`}
@@ -62,16 +61,12 @@ export function DashboardMetrics({ data }: { data: DashboardData }) {
               <BarChart data={messagesByChannel}>
                 <XAxis dataKey="channel" />
                 <YAxis />
-                <Bar
-                  dataKey="count"
-                  fill="#2563eb"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="count" fill="#2563eb" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

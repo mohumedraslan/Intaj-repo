@@ -1,7 +1,7 @@
 export interface ConnectionCardProps {
   name: string;
   type: string;
-  status: "Connected" | "Syncing" | "Error";
+  status: 'Connected' | 'Syncing' | 'Error';
   stats: Record<string, string>;
   color: string;
   icon: string;
