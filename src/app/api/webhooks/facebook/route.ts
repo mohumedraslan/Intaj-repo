@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
-    const signature = request.headers.get('x-hub-signature-256');
+    const signature = request.headers.get('x-hub-signature');
 
     // Verify webhook signature
     if (!signature || !FacebookMessengerIntegration.verifyWebhookSignature(
