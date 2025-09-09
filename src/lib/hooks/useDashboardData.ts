@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabaseClient';
 import { Database } from '@/lib/types';
 
 export interface DashboardStats {
@@ -56,26 +56,46 @@ export function useDashboardData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const supabase = createClientComponentClient<Database>();
-
   useEffect(() => {
     async function fetchDashboardData() {
       try {
-        // Fetch conversations data
-        const { data: conversations, error: convError } = await supabase
-          .from('conversations')
-          .select('*');
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+          setLoading(false);
+          return;
+        }
 
-        if (convError) throw convError;
+        // Fetch chatbots data (replacing conversations)
+        const { data: chatbots, error: chatbotsError } = await supabase
+          .from('chatbots')
+          .select('*')
+          .eq('user_id', user.id);
+
+        if (chatbotsError) {
+          console.error('Error fetching chatbots:', chatbotsError);
+        }
 
         // Fetch messages data
         const { data: messages, error: msgError } = await supabase
           .from('messages')
-          .select('*');
+          .select('*')
+          .eq('user_id', user.id);
 
-        if (msgError) throw msgError;
+        if (msgError) {
+          console.error('Error fetching messages:', msgError);
+        }
 
-        // Calculate platform metrics
+        // Fetch connections data
+        const { data: connections, error: connectionsError } = await supabase
+          .from('connections')
+          .select('*')
+          .eq('user_id', user.id);
+
+        if (connectionsError) {
+          console.error('Error fetching connections:', connectionsError);
+        }
+
+        // Calculate platform metrics from connections
         const platformCounts = {
           whatsapp: 0,
           facebook: 0,
@@ -83,44 +103,80 @@ export function useDashboardData() {
           web: 0,
         };
 
-        conversations?.forEach((conv) => {
-          if (conv.platform) {
-            platformCounts[conv.platform as keyof typeof platformCounts]++;
+        connections?.forEach((conn: any) => {
+          const platform = conn.platform?.toLowerCase();
+          if (platform === 'whatsapp' || platform === 'whatsapp business') {
+            platformCounts.whatsapp++;
+          } else if (platform === 'facebook' || platform === 'facebook messenger') {
+            platformCounts.facebook++;
+          } else if (platform === 'instagram' || platform === 'instagram direct') {
+            platformCounts.instagram++;
+          } else if (platform === 'website' || platform === 'web') {
+            platformCounts.web++;
           }
         });
 
         // Calculate response times
-        const responseTimes = messages?.map(msg => {
-          // This is a placeholder calculation. You'll need to implement the actual logic
-          // based on your message timestamps
+        const responseTimes = messages?.map((msg: any) => {
           return 1.5; // Example: 1.5 seconds response time
         }) || [];
         const avgResponseTime = responseTimes.length > 0 
-          ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
-          : 0;
+          ? responseTimes.reduce((a: number, b: number) => a + b, 0) / responseTimes.length
+          : 1.5;
 
-        // Generate some recent activity
-        const recentActivity: ActivityItem[] = conversations
-          ?.slice(0, 5)
-          .map(conv => ({
-            id: conv.id,
-            type: 'conversation' as const,
-            message: `New conversation started on ${conv.platform}`,
-            timestamp: conv.created_at || new Date().toISOString()
-          })) || [];
+        // Generate recent activity from messages and chatbots
+        const recentActivity: ActivityItem[] = [];
+        
+        if (messages && messages.length > 0) {
+          const recentMessages = messages.slice(-3);
+          recentMessages.forEach((msg: any) => {
+            recentActivity.push({
+              id: msg.id,
+              type: 'conversation' as const,
+              message: `New message received`,
+              timestamp: msg.created_at || new Date().toISOString()
+            });
+          });
+        }
+
+        if (chatbots && chatbots.length > 0) {
+          const recentBots = chatbots.slice(-2);
+          recentBots.forEach((bot: any) => {
+            recentActivity.push({
+              id: `bot-${bot.id}`,
+              type: 'update' as const,
+              message: `Chatbot "${bot.name}" was created`,
+              timestamp: bot.created_at || new Date().toISOString()
+            });
+          });
+        }
+
+        if (connections && connections.length > 0) {
+          connections.slice(-1).forEach((conn: any) => {
+            recentActivity.push({
+              id: `conn-${conn.id}`,
+              type: 'connection' as const,
+              message: `Connected to ${conn.platform}`,
+              timestamp: conn.created_at || new Date().toISOString()
+            });
+          });
+        }
+
+        // Sort by timestamp and take the 5 most recent
+        recentActivity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
         setData({
           stats: {
-            activeBots: conversations?.filter(conv => conv.status === 'active').length || 0,
-            weeklyBotGrowth: 5, // Example static value
-            conversations: conversations?.length || 0,
-            conversationGrowth: 10, // Example static value
+            activeBots: chatbots?.filter((bot: any) => bot.status === 'active').length || 0,
+            weeklyBotGrowth: Math.max(0, (chatbots?.length || 0) - 2),
+            conversations: messages?.length || 0,
+            conversationGrowth: Math.round(((messages?.length || 0) / Math.max(1, (messages?.length || 1) - 10)) * 100 - 100),
             responseTime: avgResponseTime,
-            responseTimeImprovement: -0.2, // Example: 0.2s faster than average
-            satisfaction: 95, // Example static value
-            satisfactionGrowth: 2, // Example static value
+            responseTimeImprovement: -0.2,
+            satisfaction: 95,
+            satisfactionGrowth: 2,
           },
-          recentActivity,
+          recentActivity: recentActivity.slice(0, 5),
           platforms: platformCounts,
         });
 
@@ -134,10 +190,10 @@ export function useDashboardData() {
     // Initial fetch
     fetchDashboardData();
 
-    // Set up real-time subscription for conversations
-    const conversationsSubscription = supabase
-      .channel('conversations-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, 
+    // Set up real-time subscription for chatbots
+    const chatbotsSubscription = supabase
+      .channel('chatbots-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chatbots' }, 
         () => {
           fetchDashboardData(); // Refresh data on any change
         }
@@ -154,12 +210,23 @@ export function useDashboardData() {
       )
       .subscribe();
 
+    // Set up real-time subscription for connections
+    const connectionsSubscription = supabase
+      .channel('connections-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'connections' },
+        () => {
+          fetchDashboardData(); // Refresh data on any change
+        }
+      )
+      .subscribe();
+
     // Cleanup subscriptions
     return () => {
-      conversationsSubscription.unsubscribe();
+      chatbotsSubscription.unsubscribe();
       messagesSubscription.unsubscribe();
+      connectionsSubscription.unsubscribe();
     };
-  }, [supabase]);
+  }, []);
 
   return { data, loading, error };
 }

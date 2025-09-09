@@ -48,20 +48,31 @@ export default function ProfilePage() {
 
   const fetchUserData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('Auth error:', authError);
+        setLoading(false);
+        return;
+      }
+      
       if (!user) {
+        console.log('No authenticated user found');
         setLoading(false);
         return;
       }
 
       setUser(user);
 
-      // Fetch profile data
-      const { data: profileData } = await supabase
+      // Fetch profile data with error handling
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
+      }
 
       if (profileData) {
         setProfile(profileData);
@@ -74,6 +85,17 @@ export default function ProfilePage() {
         setAiModel(profileData.ai_model || 'gpt4');
         setResponseStyle(profileData.response_style || 'professional');
       } else {
+        // Create default profile data when none exists
+        const defaultFormData = {
+          full_name: user.user_metadata?.full_name || '',
+          email: user.email || '',
+          company: '',
+          phone: ''
+        };
+        setFormData(defaultFormData);
+        setAiModel('gpt4');
+        setResponseStyle('professional');
+        
         // Create profile if it doesn't exist
         const newProfile = {
           id: user.id,
@@ -91,12 +113,16 @@ export default function ProfilePage() {
         });
       }
 
-      // Fetch user statistics
+      // Fetch user statistics with error handling
       const [chatbotsResult, connectionsResult, messagesResult] = await Promise.all([
         supabase.from('chatbots').select('id').eq('user_id', user.id),
         supabase.from('connections').select('id').eq('user_id', user.id),
         supabase.from('messages').select('id').eq('user_id', user.id)
       ]);
+
+      if (chatbotsResult.error) console.error('Error fetching chatbots count:', chatbotsResult.error);
+      if (connectionsResult.error) console.error('Error fetching connections count:', connectionsResult.error);
+      if (messagesResult.error) console.error('Error fetching messages count:', messagesResult.error);
 
       setStats({
         totalChatbots: chatbotsResult.data?.length || 0,

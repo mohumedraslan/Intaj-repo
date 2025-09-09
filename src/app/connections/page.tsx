@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Connection {
   id: string;
@@ -10,39 +11,116 @@ interface Connection {
   status: 'connected' | 'disconnected' | 'error';
   lastSync: string;
   messagesCount: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export default function ConnectionsPage() {
-  const [connections, setConnections] = useState<Connection[]>([
-    {
-      id: '1',
-      platform: 'WhatsApp Business',
-      status: 'connected',
-      lastSync: '2 minutes ago',
-      messagesCount: 1247
-    },
-    {
-      id: '2', 
-      platform: 'Facebook Messenger',
-      status: 'connected',
-      lastSync: '5 minutes ago',
-      messagesCount: 892
-    },
-    {
-      id: '3',
-      platform: 'Instagram Direct',
-      status: 'connected', 
-      lastSync: '1 hour ago',
-      messagesCount: 456
-    },
-    {
-      id: '4',
-      platform: 'Website Chat',
-      status: 'disconnected',
-      lastSync: '3 days ago',
-      messagesCount: 0
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    fetchConnectionsData();
+  }, []);
+
+  const fetchConnectionsData = async () => {
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('Auth error:', authError);
+        setLoading(false);
+        return;
+      }
+      
+      if (!user) {
+        console.log('No authenticated user found');
+        setLoading(false);
+        return;
+      }
+
+      setUser(user);
+
+      // Fetch real connections data
+      const { data: connectionsData, error: connectionsError } = await supabase
+        .from('connections')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (connectionsError) {
+        console.error('Error fetching connections:', connectionsError);
+      }
+
+      // Fetch messages count for each connection
+      const connectionsWithCounts: Connection[] = [];
+      
+      if (connectionsData && connectionsData.length > 0) {
+        for (const conn of connectionsData) {
+          const { data: messages } = await supabase
+            .from('messages')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('channel', conn.platform.toLowerCase());
+
+          const messageCount = messages?.length || 0;
+          
+          connectionsWithCounts.push({
+            id: conn.id,
+            platform: conn.platform || conn.type || 'Unknown Platform',
+            status: conn.status || 'disconnected',
+            lastSync: getRelativeTime(conn.updated_at || conn.created_at),
+            messagesCount: messageCount,
+            created_at: conn.created_at,
+            updated_at: conn.updated_at
+          });
+        }
+      } else {
+        // Show sample data when no connections exist
+        connectionsWithCounts.push(
+          {
+            id: 'sample-1',
+            platform: 'Website Chat',
+            status: 'disconnected',
+            lastSync: 'Never',
+            messagesCount: 0
+          },
+          {
+            id: 'sample-2',
+            platform: 'WhatsApp Business',
+            status: 'disconnected',
+            lastSync: 'Never',
+            messagesCount: 0
+          },
+          {
+            id: 'sample-3',
+            platform: 'Facebook Messenger',
+            status: 'disconnected',
+            lastSync: 'Never',
+            messagesCount: 0
+          }
+        );
+      }
+
+      setConnections(connectionsWithCounts);
+
+    } catch (error) {
+      console.error('Error fetching connections data:', error);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  const getRelativeTime = (timestamp: string) => {
+    if (!timestamp) return 'Never';
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+    return `${Math.floor(diffInMinutes / 1440)} days ago`;
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -97,6 +175,17 @@ export default function ConnectionsPage() {
         );
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0b] text-white p-8 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading connections...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white p-8">
@@ -212,10 +301,16 @@ export default function ConnectionsPage() {
                   </div>
                   
                   <div className="flex space-x-2">
-                    <button className="flex-1 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors text-sm">
+                    <button 
+                      onClick={() => alert('Configuration panel coming soon!')}
+                      className="flex-1 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors text-sm"
+                    >
                       Configure
                     </button>
-                    <button className="flex-1 px-4 py-2 bg-gray-600/20 text-gray-400 rounded-lg hover:bg-gray-600/30 transition-colors text-sm">
+                    <button 
+                      onClick={() => alert('Logs viewer coming soon!')}
+                      className="flex-1 px-4 py-2 bg-gray-600/20 text-gray-400 rounded-lg hover:bg-gray-600/30 transition-colors text-sm"
+                    >
                       View Logs
                     </button>
                   </div>
@@ -235,7 +330,10 @@ export default function ConnectionsPage() {
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Add New Connection</h3>
             <p className="text-gray-400 mb-4">Connect a new platform to expand your automation reach</p>
-            <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity">
+            <button 
+              onClick={() => alert('Connection wizard coming soon!')}
+              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+            >
               Add Connection
             </button>
           </CardContent>

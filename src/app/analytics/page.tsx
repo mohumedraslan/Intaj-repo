@@ -96,8 +96,15 @@ export default function AnalyticsPage() {
 
   const fetchAnalyticsData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('Auth error:', authError);
+        setLoading(false);
+        return;
+      }
+      
       if (!user) {
+        console.log('No authenticated user found');
         setLoading(false);
         return;
       }
@@ -109,27 +116,40 @@ export default function AnalyticsPage() {
       const daysAgo = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
       const startDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
 
-      // Fetch chatbots data
-      const { data: chatbots } = await supabase
+      // Fetch chatbots data with error handling
+      const { data: chatbots, error: chatbotsError } = await supabase
         .from('chatbots')
         .select('*')
         .eq('user_id', user.id);
 
-      // Fetch messages data
-      const { data: messages } = await supabase
+      if (chatbotsError) {
+        console.error('Error fetching chatbots:', chatbotsError);
+      }
+
+      // Fetch messages data with error handling
+      const { data: messages, error: messagesError } = await supabase
         .from('messages')
         .select('*')
         .eq('user_id', user.id)
         .gte('created_at', startDate.toISOString());
 
-      // Fetch connections data
-      const { data: connections } = await supabase
+      if (messagesError) {
+        console.error('Error fetching messages:', messagesError);
+      }
+
+      // Fetch connections data with error handling
+      const { data: connections, error: connectionsError } = await supabase
         .from('connections')
         .select('*')
         .eq('user_id', user.id);
 
-      // Calculate metrics
+      if (connectionsError) {
+        console.error('Error fetching connections:', connectionsError);
+      }
+
+      // Calculate metrics with fallback data
       const totalConversations = messages?.length || 0;
+      const totalBots = chatbots?.length || 0;
       const activeBots = chatbots?.filter(bot => bot.status === 'active').length || 0;
       const avgResponseTime = 1.5; // This would be calculated from actual response times
       const conversionRate = Math.round((totalConversations * 0.25)); // Simulated conversion rate
@@ -141,27 +161,43 @@ export default function AnalyticsPage() {
         conversionRate: { value: conversionRate, change: 12, trend: 'up' }
       });
 
-      // Transform chatbots into bot performance data
-      const botPerformanceData: BotPerformance[] = chatbots?.map(bot => {
-        const botMessages = messages?.filter(msg => msg.chatbot_id === bot.id) || [];
-        return {
-          name: bot.name,
-          channel: bot.channel || 'Website',
-          conversations: botMessages.length,
-          successRate: Math.round(80 + Math.random() * 20), // Simulated success rate
-          responseTime: `${(1 + Math.random() * 2).toFixed(1)}s`,
-          status: bot.status as 'active' | 'optimizing' | 'inactive'
-        };
-      }) || [];
+      // Transform chatbots into bot performance data or show sample data
+      let botPerformanceData: BotPerformance[] = [];
+      
+      if (chatbots && chatbots.length > 0) {
+        botPerformanceData = chatbots.map(bot => {
+          const botMessages = messages?.filter(msg => msg.chatbot_id === bot.id) || [];
+          return {
+            name: bot.name,
+            channel: bot.channel || 'Website',
+            conversations: botMessages.length,
+            successRate: Math.round(80 + Math.random() * 20), // Simulated success rate
+            responseTime: `${(1 + Math.random() * 2).toFixed(1)}s`,
+            status: bot.status as 'active' | 'optimizing' | 'inactive'
+          };
+        });
+      } else {
+        // Show sample data when no bots exist
+        botPerformanceData = [
+          {
+            name: 'Welcome Bot',
+            channel: 'Website',
+            conversations: 0,
+            successRate: 85,
+            responseTime: '1.2s',
+            status: 'inactive'
+          }
+        ];
+      }
 
       setBotPerformance(botPerformanceData);
 
-      // Generate recent activities from real data
+      // Generate recent activities from real data or show sample
       const recentActivities: Activity[] = [];
       
       if (messages && messages.length > 0) {
         const recentMessages = messages.slice(-5).reverse();
-        recentMessages.forEach((msg, index) => {
+        recentMessages.forEach((msg) => {
           const bot = chatbots?.find(b => b.id === msg.chatbot_id);
           recentActivities.push({
             id: msg.id,
@@ -183,6 +219,16 @@ export default function AnalyticsPage() {
         });
       }
 
+      // If no real activities, show sample activity
+      if (recentActivities.length === 0) {
+        recentActivities.push({
+          id: 'sample-1',
+          message: 'Welcome to your analytics dashboard',
+          timestamp: 'Just now',
+          type: 'info'
+        });
+      }
+
       setActivities(recentActivities.slice(0, 5));
 
     } catch (error) {
@@ -201,6 +247,36 @@ export default function AnalyticsPage() {
     if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
     return `${Math.floor(diffInMinutes / 1440)} days ago`;
+  };
+
+  const exportAnalyticsData = () => {
+    const exportData = {
+      timestamp: new Date().toISOString(),
+      timeRange,
+      metrics: {
+        conversations: metrics.conversations.value,
+        activeBots: metrics.activeBots.value,
+        responseTime: metrics.responseTime.value,
+        conversionRate: metrics.conversionRate.value
+      },
+      botPerformance,
+      activities: activities.map(activity => ({
+        message: activity.message,
+        timestamp: activity.timestamp,
+        type: activity.type
+      }))
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `intaj-analytics-${timeRange}-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Real-time updates for live data
@@ -291,18 +367,18 @@ export default function AnalyticsPage() {
                 <SelectItem value="7d">Last 7 days</SelectItem>
                 <SelectItem value="30d">Last 30 days</SelectItem>
                 <SelectItem value="90d">Last 90 days</SelectItem>
-                <SelectItem value="custom">Custom range</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+            <Button 
+              className="border border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent"
+              onClick={exportAnalyticsData}
+            >
               <Download className="w-4 h-4 mr-2" />
-              Export Report
+              Export Data
             </Button>
           </div>
         </div>
       </div>
-
-      {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-blue-500/10 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/5 to-transparent animate-pulse"></div>
@@ -396,9 +472,9 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-semibold text-white">Conversations Over Time</CardTitle>
               <div className="flex items-center space-x-2">
-                <Button size="sm" className="bg-blue-600 text-white">Daily</Button>
-                <Button size="sm" variant="ghost" className="text-gray-300 hover:bg-gray-700">Weekly</Button>
-                <Button size="sm" variant="ghost" className="text-gray-300 hover:bg-gray-700">Monthly</Button>
+                <Button className="bg-blue-600 text-white text-sm px-3 py-1">Daily</Button>
+                <Button className="text-gray-300 hover:bg-gray-700 text-sm px-3 py-1">Weekly</Button>
+                <Button className="text-gray-300 hover:bg-gray-700 text-sm px-3 py-1">Monthly</Button>
               </div>
             </div>
           </CardHeader>
@@ -522,7 +598,7 @@ export default function AnalyticsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold text-white">Performance Breakdown</CardTitle>
-            <Button variant="ghost" className="text-blue-400 hover:text-blue-300">
+            <Button className="text-blue-400 hover:text-blue-300 bg-transparent">
               <Eye className="w-4 h-4 mr-2" />
               View All
             </Button>

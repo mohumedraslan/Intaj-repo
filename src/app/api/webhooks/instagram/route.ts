@@ -19,12 +19,124 @@ export async function GET(request: NextRequest) {
   const challenge = searchParams.get('hub.challenge');
 
   // Verify webhook subscription
-  if (mode === 'subscribe' && token === process.env.INSTAGRAM_WEBHOOK_VERIFY_TOKEN) {
+  if (mode === 'subscribe' && token === process.env.ENC_MASTER_KEY) {
     console.log('Instagram webhook verified');
     return new NextResponse(challenge);
   }
 
-  return new NextResponse('Forbidden', { status: 403 });
+  // Return helpful error page for forbidden access
+  const errorHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Instagram Webhook - Intaj</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: linear-gradient(135deg, #0a0a0b 0%, #141517 100%);
+          color: #ffffff;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .container {
+          max-width: 600px;
+          padding: 2rem;
+          text-align: center;
+          background: rgba(31, 32, 36, 0.8);
+          backdrop-filter: blur(10px);
+          border-radius: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .logo {
+          font-size: 2rem;
+          font-weight: bold;
+          background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin-bottom: 1rem;
+        }
+        h1 { font-size: 1.5rem; margin-bottom: 1rem; color: #f1f5f9; }
+        p { color: #94a3b8; margin-bottom: 1rem; line-height: 1.6; }
+        .code { 
+          background: rgba(0, 0, 0, 0.3); 
+          padding: 0.5rem 1rem; 
+          border-radius: 8px; 
+          font-family: monospace; 
+          color: #06b6d4;
+          margin: 1rem 0;
+        }
+        .steps {
+          text-align: left;
+          background: rgba(0, 0, 0, 0.2);
+          padding: 1.5rem;
+          border-radius: 12px;
+          margin: 1.5rem 0;
+        }
+        .step {
+          margin-bottom: 1rem;
+          padding-left: 1.5rem;
+          position: relative;
+        }
+        .step::before {
+          content: counter(step-counter);
+          counter-increment: step-counter;
+          position: absolute;
+          left: 0;
+          top: 0;
+          background: linear-gradient(135deg, #e1306c, #f56040);
+          color: white;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.8rem;
+          font-weight: bold;
+        }
+        .steps { counter-reset: step-counter; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="logo">INTAJ</div>
+        <h1>Instagram Business Webhook</h1>
+        <p>This endpoint handles Instagram Business API webhook verification and message processing.</p>
+        
+        <div class="steps">
+          <div class="step">
+            <strong>Webhook URL:</strong><br>
+            <div class="code">${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/webhooks/instagram</div>
+          </div>
+          <div class="step">
+            <strong>Verify Token:</strong><br>
+            <div class="code">Use your ENC_MASTER_KEY from environment variables</div>
+          </div>
+          <div class="step">
+            <strong>Setup Instructions:</strong><br>
+            • Go to Facebook Developer Console<br>
+            • Navigate to Instagram > Configuration<br>
+            • Add the webhook URL above<br>
+            • Use ENC_MASTER_KEY as verify token<br>
+            • Subscribe to messages, story_insights, and mentions
+          </div>
+        </div>
+        
+        <p><strong>Status:</strong> ${mode ? `Mode: ${mode}, Token: ${token ? 'provided' : 'missing'}` : 'No verification parameters'}</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return new NextResponse(errorHtml, { 
+    status: 403,
+    headers: { 'Content-Type': 'text/html' }
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -263,9 +375,9 @@ async function processMessageWithAI(message: string, chatbotId: string): Promise
       headers: {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL,
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://intaj.nabih.tech',
         'X-Title': 'Intaj AI Platform'
-      },
+      } as HeadersInit,
       body: JSON.stringify({
         model: chatbot.model || 'openai/gpt-3.5-turbo',
         messages: [
