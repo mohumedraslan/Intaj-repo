@@ -6,7 +6,7 @@ interface ErrorLogEntry {
   error_type: string
   message: string
   stack_trace?: string
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
   resolved: boolean
   created_at: string
 }
@@ -32,7 +32,7 @@ export class ErrorHandler {
   }
 
   // Log error to database and external service
-  async logError(error: Error, metadata: Record<string, any> = {}) {
+  async logError(error: Error, metadata: Record<string, unknown> = {}) {
     try {
       const errorEntry = {
         error_type: error.name,
@@ -77,11 +77,11 @@ export class ErrorHandler {
     for (let attempt = 1; attempt <= retryConfig.maxAttempts; attempt++) {
       try {
         return await operation()
-      } catch (error: any) {
-        lastError = error
+      } catch (error: unknown) {
+        lastError = error instanceof Error ? error : new Error(String(error))
         
         // Log each retry attempt
-        await this.logError(error, {
+        await this.logError(lastError, {
           attempt,
           maxAttempts: retryConfig.maxAttempts,
           operation: operation.name
@@ -102,24 +102,27 @@ export class ErrorHandler {
   }
 
   // Check if error is retryable
-  private isRetryableError(error: any): boolean {
+  private isRetryableError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
+    
+    const errorWithCode = error as Error & { code?: string; status?: number };
     // Network errors
     if (error.name === 'NetworkError' || error.name === 'TimeoutError') {
       return true
     }
 
     // Database connection errors
-    if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
+    if (errorWithCode.code === 'ECONNRESET' || errorWithCode.code === 'ETIMEDOUT') {
       return true
     }
 
     // Rate limiting errors (retry after backoff)
-    if (error.status === 429) {
+    if (errorWithCode.status === 429) {
       return true
     }
 
     // Supabase specific errors
-    if (error.code === 'PGRST116' || error.code === 'PGRST012') {
+    if (errorWithCode.code === 'PGRST116' || errorWithCode.code === 'PGRST012') {
       return true
     }
 
@@ -133,14 +136,15 @@ export class ErrorHandler {
   ): Promise<T> {
     try {
       return await this.retry(primaryOperation)
-    } catch (error: any) {
-      await this.logError(error, { usedFallback: true })
+    } catch (error: unknown) {
+      const errorInstance = error instanceof Error ? error : new Error(String(error))
+      await this.logError(errorInstance, { usedFallback: true })
       return fallbackOperation()
     }
   }
 
   // Notify users of errors
-  async notifyUser(userId: string, error: Error, metadata: Record<string, any> = {}) {
+  async notifyUser(userId: string, error: Error, metadata: Record<string, unknown> = {}) {
     try {
       const notification = {
         user_id: userId,
@@ -157,7 +161,8 @@ export class ErrorHandler {
         .from('user_notifications')
         .insert(notification)
     } catch (notificationError) {
-      await this.logError(notificationError, {
+      const notificationErrorInstance = notificationError instanceof Error ? notificationError : new Error(String(notificationError))
+      await this.logError(notificationErrorInstance, {
         context: 'User notification failed',
         originalError: error
       })
