@@ -706,3 +706,344 @@ I have successfully implemented a comprehensive Time-based One-Time Password (TO
 - ⚠️ **Proper error handling** and user feedback
 
 The 2FA system is now fully functional and ready for use. Users can enable 2FA in their profile settings, and the system will automatically require 2FA verification during login for protected accounts.
+
+### Prompt 17: Implement a Multi-Step Connection Wizard
+```
+The current "Add Connection" button on the `/connections` page is a placeholder. We need to implement a full-featured, multi-step wizard to guide users through connecting new platforms. This is a critical step to making our advertised integrations a reality.
+
+**Part 1: Frontend - The Wizard Component**
+
+1.  **Create a new component** `ConnectionWizard` in `src/components/connections/`. This component should be a modal dialog that overlays the `ConnectionsPage`.
+2.  **Trigger the Wizard:** The "Add Connection" button on `/connections` should open this modal.
+3.  **State Management:** Use React's `useState` and `useReducer` hooks to manage the wizard's state, including the current step, selected platform, and form data.
+4.  **Step 1: Select Platform:**
+    *   Display a grid of all supported and planned integrations (e.g., WhatsApp, Facebook, Instagram, Telegram, Slack, Discord, etc.).
+    *   Each platform should have its logo and name.
+    *   **Crucially, platforms that are not yet implemented should be visually disabled or have a "Coming Soon" badge**, but still be visible to build anticipation.
+    *   Include a search bar to filter the platforms.
+5.  **Step 2: Authentication:**
+    *   This step's content must change based on the platform selected in Step 1.
+    *   **For API Key platforms (e.g., Telegram):** Display a form with an input for the API token. Include a link to a help document (we can create this later) explaining where to find the key.
+    *   **For OAuth 2.0 platforms (e.g., Slack, Facebook):** Display a "Connect with [Platform]" button. Clicking this should initiate the OAuth flow.
+6.  **Step 3: Configuration (Optional):**
+    *   For some platforms, an additional configuration step may be needed.
+    *   For example, after connecting Slack, this step would fetch and display a list of the user's Slack channels in a dropdown, allowing them to choose which one the bot should join.
+7.  **Step 4: Confirmation & Finish:**
+    *   Show a success message confirming the connection is active.
+    *   The "Finish" button should close the wizard and refresh the list of connections on the main page to show the newly added one.
+8.  **UI/UX:**
+    *   Build the wizard using existing `shadcn/ui` components (`Dialog`, `Card`, `Button`, `Input`, etc.) for a consistent look.
+    *   Include "Next," "Back," and "Cancel" buttons for navigation.
+
+**Part 2: Backend - API and Database**
+
+1.  **Database Schema Update:**
+    *   Modify the `connections` table in your database.
+    *   Add a new column, `credentials` (type `text`, encrypted), to store sensitive information like API keys or OAuth access/refresh tokens.
+    *   Ensure you have a robust encryption/decryption mechanism in place for this column (like the one used for 2FA secrets).
+2.  **API Endpoint for API Key Connections (`/api/connections/connect/api-key`):**
+    *   A `POST` endpoint that accepts a `platform` and an `apiKey`.
+    *   It should validate the key (if possible, by making a test call to the platform's API).
+    *   If valid, it should encrypt and save the key in the `connections` table for the user.
+3.  **API Endpoints for OAuth 2.0 Connections:**
+    *   **`GET /api/connections/oauth/connect?platform=[platformName]`:** This endpoint initiates the OAuth flow. It should construct the correct authorization URL for the specified platform and redirect the user to it.
+    *   **`GET /api/connections/oauth/callback?code=[authCode]&state=[state]`:** This is the callback URL the user is sent back to after authorizing the app. This endpoint must:
+        *   Verify the `state` parameter to prevent CSRF attacks.
+        *   Exchange the `authorization_code` for an `access_token` and `refresh_token`.
+        *   Encrypt and save these tokens in the `connections` table for the user.
+        *   Redirect the user back to the `/connections` page with a success message.
+
+By the end of this task, a user should be able to click "Add Connection," select a platform (like Telegram), enter their API key, and see the new connection appear on their dashboard.
+```
+
+### Prompt 18: Implement Backend for Telegram and Slack Integrations
+```
+With the Connection Wizard frontend specified in Prompt 17, we now need to build the backend logic to handle the connection and communication for our first new platforms: Telegram and Slack.
+
+**Prerequisites:**
+*   Familiarity with the database schema (`connections` table with encrypted `credentials`) and API endpoints (`/api/connections/...`) defined in Prompt 17.
+*   You will need to install the official SDKs: `npm install node-telegram-bot-api @slack/bolt`.
+
+**Part 1: Telegram Integration (API Key-based)**
+
+1.  **Create Integration Logic File:** Create a new file at `src/lib/integrations/telegram.ts`.
+2.  **Implement `verifyTelegramToken`:**
+    *   Create an exported async function `verifyTelegramToken(token: string): Promise<boolean>`.
+    *   Inside, instantiate the Telegram Bot API client with the provided token.
+    *   Call the `getMe()` method. If it succeeds and returns a bot object, the token is valid. Return `true`.
+    *   If it fails, log the error and return `false`.
+    *   This function will be called from the `/api/connections/connect/api-key` endpoint when the platform is "Telegram".
+3.  **Implement `sendTelegramMessage`:**
+    *   Create an exported async function `sendTelegramMessage(token: string, chatId: number, text: string)`.
+    *   This function will be used by the core chatbot logic to send responses back to the user.
+4.  **Create Telegram Webhook Handler:**
+    *   Create a new API route at `/api/webhooks/telegram/route.ts`.
+    *   This `POST` endpoint will receive incoming messages from Telegram.
+    *   **Security:** For simplicity in this step, we won't implement webhook secret verification, but add a `// TODO:` comment to add it later.
+    *   **Logic:**
+        *   Parse the incoming message body.
+        *   Extract the `chat.id`, `text`, and user information.
+        *   Find the corresponding `connection` in your database by looking for the bot associated with the webhook.
+        *   Save the incoming message to your `messages` table.
+        *   Trigger your core AI response logic (which will eventually call `sendTelegramMessage`).
+5.  **Set the Webhook:** After a user successfully adds a Telegram connection, you need to programmatically set their bot's webhook to point to your new API endpoint. This should be done by calling the `setWebHook` method from the Telegram Bot API.
+
+**Part 2: Slack Integration (OAuth 2.0-based)**
+
+1.  **Environment Variables:** Add `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`, and `SLACK_SIGNING_SECRET` to your `.env.local` file.
+2.  **Create Integration Logic File:** Create a new file at `src/lib/integrations/slack.ts`.
+3.  **Update OAuth Endpoints (from Prompt 17):**
+    *   **Connect (`/api/connections/oauth/connect`):** When the platform is "Slack", this endpoint must generate and redirect to the Slack authorization URL. Ensure you request the correct scopes: `app_mentions:read`, `chat:write`, and `channels:read`.
+    *   **Callback (`/api/connections/oauth/callback`):** When handling the callback from Slack, use the `code` to call Slack's `oauth.v2.access` method to get an `access_token`. Encrypt this token and save it to the `credentials` column for that user's Slack connection.
+4.  **Implement `getSlackChannels`:**
+    *   Create an exported async function `getSlackChannels(accessToken: string): Promise<{id: string, name: string}[]>`.
+    *   Use the `conversations.list` method from the Slack API to fetch a list of public channels in the connected workspace.
+    *   This will be called by the Connection Wizard (Step 3) to allow the user to select a channel.
+5.  **Create Slack Events Webhook Handler:**
+    *   Create a new API route at `/api/webhooks/slack/route.ts`.
+    *   Slack's Event API requires a "challenge" request during setup. Your endpoint must respond to this by echoing back the `challenge` value.
+    *   Use Slack's `signingSecret` to verify that all incoming requests are genuinely from Slack. This is not optional.
+    *   **Event Handling:**
+        *   Listen for the `app_mention` event.
+        *   When an event is received, extract the `text`, `user`, and `channel` from the event payload.
+        *   Save the incoming message to your `messages` table.
+        *   Trigger your AI response logic.
+
+By the end of this task, the backend should be able to securely handle the connection lifecycle and two-way messaging for both Telegram and Slack.
+```
+
+### Prompt 19: Implement Core Chatbot Management UI
+```
+Now that users can connect various platforms (in theory), they need a way to create, manage, and configure the chatbots that will be linked to those connections. This task involves building the core CRUD (Create, Read, Update, Delete) interface for chatbots in the user dashboard.
+
+**Part 1: Chatbot List View (`/dashboard/chatbots/page.tsx`)**
+
+1.  **Fetch and Display Data:**
+    *   On page load, fetch all chatbots belonging to the currently authenticated user from the `chatbots` table in Supabase.
+    *   Use the `shadcn/ui` `Table` component to display the list of chatbots.
+2.  **Table Design:** The table should include the following columns:
+    *   **Chatbot Name:** Display the bot's name and its profile picture/avatar.
+    *   **Status:** Use a `Badge` component to show the bot's status (e.g., 'Active', 'Inactive', 'Training').
+    *   **Connected Channels:** Fetch the connections associated with each chatbot and display the icons of the connected platforms (e.g., a small WhatsApp and Slack icon).
+    *   **Last Updated:** A human-readable relative timestamp (e.g., "2 days ago").
+    *   **Actions:** A `DropdownMenu` (`...` icon) for each row containing three options: "Edit", "View Analytics", and "Delete".
+3.  **Create New Chatbot Button:**
+    *   Add a prominent "Create New Chatbot" button at the top of the page.
+    *   This button should navigate the user to `/dashboard/chatbots/new`.
+4.  **Empty State:**
+    *   If a user has no chatbots, the table should not be shown. Instead, display a well-designed empty state component that encourages them to create their first chatbot.
+
+**Part 2: Create & Edit Form (`/dashboard/chatbots/new/page.tsx` and `/dashboard/chatbots/[chatbotId]/page.tsx`)**
+
+1.  **Dynamic Route for Create/Edit:**
+    *   Create a dynamic route page at `/dashboard/chatbots/[chatbotId]/page.tsx`. This single page will handle both creating and editing.
+    *   You can have a separate `/dashboard/chatbots/new/page.tsx` that just renders the `[chatbotId]` component with a special prop, or handle the `chatbotId === 'new'` case within the dynamic page itself.
+2.  **Create a Reusable `ChatbotForm` Component:**
+    *   This form will be the heart of the create/edit page.
+    *   **In Edit Mode (`/dashboard/chatbots/[some-uuid]`):** The page component should first fetch the data for the specified chatbot and pass it as props to the `ChatbotForm`.
+    *   **In Create Mode (`/dashboard/chatbots/new`):** The form should be displayed with empty/default values.
+3.  **Form Fields:** The form should include, at a minimum:
+    *   **Chatbot Name:** A required text input.
+    *   **Chatbot Avatar:** An image upload component. Use Supabase Storage to handle the file uploads. The uploaded image URL should be saved in the `chatbots` table.
+    *   **Status:** A `Select` dropdown to toggle the bot's status between "Active" and "Inactive".
+4.  **Save/Update Logic:**
+    *   The form's "Save" button should trigger either an `insert` (for new bots) or `update` (for existing bots) operation on the `chatbots` table using the Supabase client.
+    *   After a successful operation, redirect the user back to the main list view at `/dashboard/chatbots`.
+5.  **Delete Logic:**
+    *   The "Delete" option in the actions menu on the list view should trigger a confirmation `AlertDialog`.
+    *   Upon confirmation, it should perform a `delete` operation on the `chatbots` table and refresh the list. This is a critical safety feature to prevent accidental deletion.
+
+**Part 3: Database & Security**
+
+1.  **Row Level Security (RLS):** Ensure that RLS policies on the `chatbots` table are correctly configured so that users can only perform CRUD operations on their own chatbots (`auth.uid() = user_id`).
+2.  **Storage Security:** Configure Storage policies to ensure users can only upload/delete avatars for their own chatbots.
+
+By completing this task, you will have built the foundational UI for chatbot management, which is a cornerstone of the entire application.
+```
+
+### Prompt 20: Implement Chatbot Configuration, Personality, and Data Sources
+```
+This prompt focuses on building the interface that allows users to define *how* their chatbot behaves and what it knows. This is where the product's core value proposition starts to come to life. This task will transform the chatbot management page into a multi-tabbed configuration center.
+
+**Prerequisites:**
+*   The chatbot management UI from Prompt 19 must be complete.
+*   You will need to install libraries for text extraction: `npm install pdf-parse cheerio`.
+
+**Part 1: Database Schema Updates**
+
+1.  **Modify `chatbots` Table:**
+    *   Add a `base_prompt` column (type `text`) to store the chatbot's core personality and instructions.
+    *   Add a `model` column (type `text`, default `'gpt-4o'`) to specify which AI model to use.
+2.  **Create `data_sources` Table:**
+    *   Create a new table named `data_sources`. This table will track the knowledge sources for each bot.
+    *   **Columns:**
+        *   `id` (uuid, primary key)
+        *   `chatbot_id` (uuid, foreign key to `chatbots.id`)
+        *   `user_id` (uuid, foreign key to `auth.users.id`)
+        *   `type` (text: 'website', 'file', 'text')
+        *   `content` (text: stores the URL, the path to the stored file, or the raw text)
+        *   `status` (text: 'pending', 'training', 'ready', 'error')
+        *   `created_at` (timestamp with time zone)
+
+**Part 2: Frontend - Tabbed Configuration Interface**
+
+1.  **Refactor Chatbot Edit Page:**
+    *   Modify the page at `/dashboard/chatbots/[chatbotId]/page.tsx` to use the `shadcn/ui` `Tabs` component.
+    *   **Tab 1: "General":** This tab will contain the existing chatbot form from Prompt 19 (Name, Avatar, Status).
+    *   **Tab 2: "Personality & Model":** This will be a new tab.
+    *   **Tab 3: "Data Sources":** This will also be a new tab.
+2.  **Implement "Personality & Model" Tab:**
+    *   **Base Prompt:**
+        *   Add a large `Textarea` for the `base_prompt`.
+        *   Provide a helpful placeholder, e.g., "You are a friendly and professional customer support assistant for 'Intaj AI'. Your main goal is to answer user questions about our products and services."
+    *   **Model Selection:**
+        *   Add a `Select` dropdown for the `model`.
+        *   Hardcode the initial options: "GPT-4o", "Claude 3 Sonnet", "Llama 3 70B".
+    *   The "Save" button on this tab should update the corresponding columns in the `chatbots` table.
+3.  **Implement "Data Sources" Tab:**
+    *   This tab will display a list of all `data_sources` associated with the current chatbot.
+    *   Show the `type`, `content` (e.g., the URL), and `status` (using a `Badge`) for each source. Include a "Delete" button for each.
+    *   Add an "Add Data Source" button that opens a dialog.
+4.  **"Add Data Source" Dialog:**
+    *   This dialog should present three options to the user:
+        *   **Website URL:** An input field for a URL.
+        *   **File Upload:** A file dropzone that accepts `.pdf`, `.txt`, and `.md` files.
+        *   **Raw Text:** A textarea for pasting text directly.
+    *   Submitting this dialog should create a new entry in the `data_sources` table with a status of `'pending'`.
+
+**Part 3: Backend - The Data Processing Pipeline (Background Job)**
+
+This is the most critical and complex part of the task. When a new data source is created, a background process must be triggered to ingest it.
+
+1.  **Create a Supabase Edge Function:**
+    *   Create a new Edge Function, e.g., `process-data-source`.
+    *   This function should be triggered whenever a new row is inserted into the `data_sources` table (you can use Supabase Database Webhooks for this).
+2.  **Function Logic:** The function should receive the `data_source` record and perform the following steps:
+    *   **Update Status:** Immediately update the data source's status to `'training'`.
+    *   **1. Fetch Content:**
+        *   If `type` is 'website', use `cheerio` to fetch and extract the text content from the body of the URL.
+        *   If `type` is 'file', download the file from Supabase Storage and use `pdf-parse` (for PDFs) or simple file reading to extract the text.
+        *   If `type` is 'text', the content is already there.
+    *   **2. Clean and Chunk Text:**
+        *   Sanitize the extracted text (remove excessive newlines, etc.).
+        *   Split the long text into smaller, overlapping chunks (e.g., 1000 characters per chunk with a 200-character overlap). This is crucial for effective embedding.
+    *   **3. Generate Embeddings:**
+        *   For each text chunk, call an embedding API (e.g., OpenAI's `text-embedding-3-small`) to convert it into a vector.
+    *   **4. Store in Vector Database:**
+        *   Store these vectors in a Supabase `pgvector` table. Your vector table should link back to the `data_source_id` and `chatbot_id`.
+    *   **5. Final Status Update:** Once all chunks are processed and stored, update the data source's status to `'ready'`. If any step fails, update it to `'error'` and log the issue.
+
+By the end of this task, a user can give their chatbot a unique personality and train it on specific knowledge, with the entire data ingestion process happening automatically in the background.
+```
+
+### Prompt 21: Implement a User Onboarding Checklist
+```
+To improve user activation and retention, we need to guide new users through the critical first steps of setting up their AI chatbot. A simple checklist on the main dashboard is an effective, non-intrusive way to achieve this.
+
+**Part 1: Database and User Profile**
+
+1.  **Extend the `profiles` Table:**
+    *   Add a new column named `onboarding_steps` to the `profiles` table (or whichever table stores user profile data).
+    *   The type should be `jsonb`. This gives us the flexibility to track completion of individual steps.
+    *   The default value should be a JSON object representing the initial state, for example:
+        ```json
+        {
+          "created_first_chatbot": false,
+          "added_data_source": false,
+          "connected_channel": false,
+          "has_dismissed": false
+        }
+        ```
+
+**Part 2: The Onboarding Checklist UI Component**
+
+1.  **Create `OnboardingChecklist.tsx`:**
+    *   Create a new component in `src/components/onboarding/`.
+    *   This component will be displayed on the main dashboard page (`/dashboard/page.tsx`).
+2.  **Display Logic:**
+    *   On the dashboard page, fetch the current user's `onboarding_steps` from their profile.
+    *   Render the `OnboardingChecklist` component only if the user has not completed all steps and has not dismissed the checklist (`has_dismissed` is false).
+3.  **Checklist UI:**
+    *   The component should be a `Card` that sits at the top of the dashboard content.
+    *   It should have a title like "Getting Started with Intaj AI".
+    *   It should have a "Dismiss" or "x" button that updates the `has_dismissed` flag in the database to `true` for that user.
+    *   Display a list of onboarding steps. Each step should have:
+        *   An icon (a circle that turns into a checkmark upon completion).
+        *   A description of the step.
+        *   A call-to-action button.
+    *   **The Steps:**
+        1.  **"Create your first chatbot":** The button should link to `/dashboard/chatbots/new`. This step is marked complete when `onboarding_steps.created_first_chatbot` is `true`.
+        2.  **"Train your chatbot with data":** This button should be disabled until the first step is complete. Once active, it should link to the "Data Sources" tab of the newly created chatbot.
+        3.  **"Connect a communication channel":** This button should also be disabled until the first step is complete. Once active, it should link to the `/connections` page.
+
+**Part 3: Logic for Updating Onboarding Progress**
+
+The most important part is to automatically track the user's progress.
+
+1.  **Track Chatbot Creation:**
+    *   Modify the logic in the `ChatbotForm` component (from Prompt 19).
+    *   After a user successfully *creates* their very first chatbot, make an additional Supabase call to update their `profiles` record, setting `onboarding_steps.created_first_chatbot` to `true`. You'll need to check if it's their first bot before making this call.
+2.  **Track Data Source Addition:**
+    *   Modify the logic in the "Add Data Source" dialog (from Prompt 20).
+    *   After a user successfully adds their first data source to any bot, update `onboarding_steps.added_data_source` to `true`.
+3.  **Track Channel Connection:**
+    *   Modify the logic in the `ConnectionWizard` (from Prompt 17).
+    *   After a user successfully connects their first channel, update `onboarding_steps.connected_channel` to `true`.
+
+By the end of this task, new users will be greeted with a helpful checklist that guides them through the core product loop, significantly improving their chances of a successful first experience.
+```
+
+### Prompt 22: Dynamic Content for FAQ and Blog Pages
+```
+Many of the project's public-facing pages contain static, hardcoded content, making them difficult for a non-technical person to update. This task focuses on converting two key pages, the FAQ and the Blog, into fully dynamic, database-driven pages.
+
+**Prerequisites:**
+*   You will need to install a Markdown rendering library: `npm install react-markdown remark-gfm`.
+
+**Part 1: Dynamic FAQ Page**
+
+1.  **Create `faqs` Table:**
+    *   In your Supabase database, create a new table named `faqs`.
+    *   **Columns:**
+        *   `id` (serial, primary key)
+        *   `question` (text, not null)
+        *   `answer` (text, not null)
+        *   `category` (text, default 'General')
+        *   `is_published` (boolean, default `true`)
+2.  **Enable Public Read Access:**
+    *   Set up Row Level Security (RLS) on the `faqs` table.
+    *   Create a policy that allows public, anonymous `SELECT` access for rows where `is_published` is `true`.
+3.  **Refactor FAQ Page (`/faq/page.tsx`):**
+    *   Remove all the hardcoded question and answer data.
+    *   On the server side (`async function FaqPage()`), fetch all published FAQs from the new `faqs` table.
+    *   Group the fetched FAQs by their `category`.
+    *   Render the page dynamically. For each category, create a heading. Under each heading, use the `shadcn/ui` `Accordion` component to list the questions, with the answers hidden inside each accordion item.
+
+**Part 2: Dynamic Blog**
+
+1.  **Create `blog_posts` Table:**
+    *   Create a new table named `blog_posts`.
+    *   **Columns:**
+        *   `id` (uuid, primary key, default `uuid_generate_v4()`)
+        *   `slug` (text, unique, not null)
+        *   `title` (text, not null)
+        *   `excerpt` (text)
+        *   `content` (text, for Markdown content)
+        *   `author_id` (uuid, can be a foreign key to `users.id` if you want to link to authors)
+        *   `published_at` (timestamp with time zone)
+        *   `is_published` (boolean, default `false`)
+2.  **Enable Public Read Access:**
+    *   Similar to the `faqs` table, enable RLS and create a policy that allows public `SELECT` access on published blog posts.
+3.  **Refactor Blog List Page (`/blog/page.tsx`):**
+    *   Remove any hardcoded blog post entries.
+    *   Fetch all published posts from the `blog_posts` table, ordered by `published_at` descending.
+    *   Render the posts as a list or grid of cards. Each card should show the post's `title`, `excerpt`, author, and publication date, and link to the individual post page (`/blog/[slug]`).
+4.  **Create Individual Blog Post Page (`/blog/[slug]/page.tsx`):**
+    *   This is a new dynamic route.
+    *   The page should fetch the single blog post from the database that matches the `slug` in the URL.
+    *   If no post is found, it should return a 404 page.
+    *   **Render Markdown:** Use the `react-markdown` library to render the `content` of the blog post. This is the key step to convert the stored Markdown into formatted HTML.
+    *   **Dynamic Metadata:** Ensure the page's `<title>` tag and meta description are dynamically set based on the blog post's title and excerpt for better SEO.
+
+By the end of this task, the content for the FAQ and Blog will be entirely managed through the database. The business owner can now add, edit, or delete FAQs and blog posts using the Supabase table editor, and the live website will update automatically without requiring a new deployment.
+```
