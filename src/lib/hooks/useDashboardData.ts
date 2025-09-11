@@ -1,40 +1,8 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { Database } from '@/lib/types';
-
-export interface DashboardStats {
-  activeBots: number;
-  weeklyBotGrowth: number;
-  conversations: number;
-  conversationGrowth: number;
-  responseTime: number;
-  responseTimeImprovement: number;
-  satisfaction: number;
-  satisfactionGrowth: number;
-}
-
-export interface ActivityItem {
-  id: string;
-  type: 'conversation' | 'connection' | 'update' | 'signup';
-  message: string;
-  timestamp: string;
-}
-
-export interface DashboardData {
-  stats: DashboardStats;
-  recentActivity: ActivityItem[];
-  platforms: {
-    whatsapp: number;
-    facebook: number;
-    instagram: number;
-    web: number;
-  };
-}
 
 export function useDashboardData() {
-  const [data, setData] = useState<DashboardData>({
+  const [data, setData] = useState({
     stats: {
       activeBots: 0,
       weeklyBotGrowth: 0,
@@ -43,188 +11,133 @@ export function useDashboardData() {
       responseTime: 0,
       responseTimeImprovement: 0,
       satisfaction: 0,
-      satisfactionGrowth: 0
+      satisfactionGrowth: 0,
     },
-    recentActivity: [],
     platforms: {
       whatsapp: 0,
       facebook: 0,
       instagram: 0,
       web: 0,
     },
+    recentActivity: [],
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<any>(null);
+
+  async function fetchDashboardData() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch chatbots data
+      const { data: chatbots, error: botError } = await supabase
+        .from('chatbots')
+        .select('*');
+
+      if (botError) {
+        // Set error state but don't log to console
+        setError(botError);
+        return;
+      }
+
+      // Fetch messages data
+      const { data: messages, error: msgError } = await supabase
+        .from('messages')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (msgError) {
+        // Set error state but don't log to console
+        setError(msgError);
+        return;
+      }
+
+      // Fetch connections data
+      const { data: connections, error: connError } = await supabase
+        .from('connections')
+        .select('*');
+
+      if (connError) {
+        // Set error state but don't log to console
+        setError(connError);
+        return;
+      }
+
+      // Calculate platform connection counts
+      const platforms = {
+        whatsapp: connections?.filter(c => c.platform === 'whatsapp').length || 0,
+        facebook: connections?.filter(c => c.platform === 'facebook').length || 0,
+        instagram: connections?.filter(c => c.platform === 'instagram').length || 0,
+        web: connections?.filter(c => c.platform === 'web').length || 0,
+      };
+
+      // Calculate response times
+      const responseTimes = messages
+        ?.filter(m => m.response_time)
+        ?.map(m => m.response_time) || [];
+      const avgResponseTime = responseTimes.length
+        ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
+        : 0;
+
+      // Generate recent activity from messages, chatbots, and connections
+      const recentActivity = [
+        ...messages?.slice(0, 5).map(m => ({
+          id: `msg-${m.id}`,
+          type: 'conversation',
+          message: `New message in ${m.chatbot_name || 'a chatbot'}`,
+          timestamp: m.created_at,
+        })) || [],
+        ...connections?.slice(0, 3).map(c => ({
+          id: `conn-${c.id}`,
+          type: 'connection',
+          message: `New ${c.platform} connection added`,
+          timestamp: c.created_at,
+        })) || [],
+        ...chatbots?.slice(0, 3).map(b => ({
+          id: `bot-${b.id}`,
+          type: 'update',
+          message: `Chatbot "${b.name}" was updated`,
+          timestamp: b.updated_at,
+        })) || [],
+      ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+      // Set data state with stats and activity
+      setData({
+        stats: {
+          activeBots: chatbots?.filter(b => b.status === 'active').length || 0,
+          weeklyBotGrowth: 12, // Placeholder - would calculate from historical data
+          conversations: messages?.length || 0,
+          conversationGrowth: 8, // Placeholder - would calculate from historical data
+          responseTime: parseFloat(avgResponseTime.toFixed(2)),
+          responseTimeImprovement: -0.15, // Placeholder - would calculate from historical data
+          satisfaction: 92, // Placeholder - would calculate from feedback
+          satisfactionGrowth: 3, // Placeholder - would calculate from historical data
+        },
+        platforms,
+        recentActivity,
+      });
+    } catch (err) {
+      // Set error state but don't log to console
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        if (authError || !user) {
-          setLoading(false);
-          return;
-        }
-
-        // Fetch chatbots data (replacing conversations)
-        const { data: chatbots, error: chatbotsError } = await supabase
-          .from('chatbots')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (chatbotsError) {
-          console.error('Error fetching chatbots:', chatbotsError);
-        }
-
-        // Fetch messages data
-        const { data: messages, error: msgError } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (msgError) {
-          console.error('Error fetching messages:', msgError);
-        }
-
-        // Fetch connections data
-        const { data: connections, error: connectionsError } = await supabase
-          .from('connections')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (connectionsError) {
-          console.error('Error fetching connections:', connectionsError);
-        }
-
-        // Calculate platform metrics from connections
-        const platformCounts = {
-          whatsapp: 0,
-          facebook: 0,
-          instagram: 0,
-          web: 0,
-        };
-
-        connections?.forEach((conn: any) => {
-          const platform = conn.platform?.toLowerCase();
-          if (platform === 'whatsapp' || platform === 'whatsapp business') {
-            platformCounts.whatsapp++;
-          } else if (platform === 'facebook' || platform === 'facebook messenger') {
-            platformCounts.facebook++;
-          } else if (platform === 'instagram' || platform === 'instagram direct') {
-            platformCounts.instagram++;
-          } else if (platform === 'website' || platform === 'web') {
-            platformCounts.web++;
-          }
-        });
-
-        // Calculate response times
-        const responseTimes = messages?.map((msg: any) => {
-          return 1.5; // Example: 1.5 seconds response time
-        }) || [];
-        const avgResponseTime = responseTimes.length > 0 
-          ? responseTimes.reduce((a: number, b: number) => a + b, 0) / responseTimes.length
-          : 1.5;
-
-        // Generate recent activity from messages and chatbots
-        const recentActivity: ActivityItem[] = [];
-        
-        if (messages && messages.length > 0) {
-          const recentMessages = messages.slice(-3);
-          recentMessages.forEach((msg: any) => {
-            recentActivity.push({
-              id: msg.id,
-              type: 'conversation' as const,
-              message: `New message received`,
-              timestamp: msg.created_at || new Date().toISOString()
-            });
-          });
-        }
-
-        if (chatbots && chatbots.length > 0) {
-          const recentBots = chatbots.slice(-2);
-          recentBots.forEach((bot: any) => {
-            recentActivity.push({
-              id: `bot-${bot.id}`,
-              type: 'update' as const,
-              message: `Chatbot "${bot.name}" was created`,
-              timestamp: bot.created_at || new Date().toISOString()
-            });
-          });
-        }
-
-        if (connections && connections.length > 0) {
-          connections.slice(-1).forEach((conn: any) => {
-            recentActivity.push({
-              id: `conn-${conn.id}`,
-              type: 'connection' as const,
-              message: `Connected to ${conn.platform}`,
-              timestamp: conn.created_at || new Date().toISOString()
-            });
-          });
-        }
-
-        // Sort by timestamp and take the 5 most recent
-        recentActivity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-        setData({
-          stats: {
-            activeBots: chatbots?.filter((bot: any) => bot.status === 'active').length || 0,
-            weeklyBotGrowth: Math.max(0, (chatbots?.length || 0) - 2),
-            conversations: messages?.length || 0,
-            conversationGrowth: Math.round(((messages?.length || 0) / Math.max(1, (messages?.length || 1) - 10)) * 100 - 100),
-            responseTime: avgResponseTime,
-            responseTimeImprovement: -0.2,
-            satisfaction: 95,
-            satisfactionGrowth: 2,
-          },
-          recentActivity: recentActivity.slice(0, 5),
-          platforms: platformCounts,
-        });
-
-        setLoading(false);
-      } catch (err) {
-        setError(err as Error);
-        setLoading(false);
-      }
-    }
-
-    // Initial fetch
     fetchDashboardData();
 
-    // Set up real-time subscription for chatbots
-    const chatbotsSubscription = supabase
-      .channel('chatbots-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chatbots' }, 
-        () => {
-          fetchDashboardData(); // Refresh data on any change
-        }
-      )
+    // Set up real-time subscription for chatbot changes
+    const subscription = supabase
+      .channel('public:chatbots')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chatbots' }, () => {
+        fetchDashboardData();
+      })
       .subscribe();
 
-    // Set up real-time subscription for messages
-    const messagesSubscription = supabase
-      .channel('messages-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' },
-        () => {
-          fetchDashboardData(); // Refresh data on any change
-        }
-      )
-      .subscribe();
-
-    // Set up real-time subscription for connections
-    const connectionsSubscription = supabase
-      .channel('connections-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'connections' },
-        () => {
-          fetchDashboardData(); // Refresh data on any change
-        }
-      )
-      .subscribe();
-
-    // Cleanup subscriptions
     return () => {
-      chatbotsSubscription.unsubscribe();
-      messagesSubscription.unsubscribe();
-      connectionsSubscription.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 
