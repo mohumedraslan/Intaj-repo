@@ -14,10 +14,10 @@ DECLARE
   result JSON;
   days_back INTEGER;
   total_conversations INTEGER;
-  active_bots INTEGER;
+  active_agents INTEGER;
   avg_response_time NUMERIC;
   conversion_rate NUMERIC;
-  bot_performance JSON;
+  agent_performance JSON;
 BEGIN
   -- Parse time range parameter
   CASE time_range_param
@@ -36,9 +36,9 @@ BEGIN
     AND m.role = 'user'
     AND m.created_at >= NOW() - INTERVAL '1 day' * days_back;
 
-  -- Get active bots count
+  -- Get active agents count
   SELECT COUNT(*)
-  INTO active_bots
+  INTO active_agents
   FROM chatbots c
   WHERE c.user_id = user_id_param;
 
@@ -52,18 +52,18 @@ BEGIN
     ELSE 0
   END;
 
-  -- Get bot performance data
+  -- Get agent performance data
   SELECT JSON_AGG(
     JSON_BUILD_OBJECT(
-      'name', bot_data.name,
-      'channel', COALESCE(bot_data.platform, 'Website'),
-      'conversations', bot_data.conversations,
+      'name', agent_data.name,
+      'channel', COALESCE(agent_data.platform, 'Website'),
+      'conversations', agent_data.conversations,
       'success_rate', (80 + (RANDOM() * 15))::INTEGER,
       'response_time', ROUND((1 + RANDOM() * 2)::NUMERIC, 1) || 's',
-      'status', CASE WHEN bot_data.conversations > 0 THEN 'active' ELSE 'inactive' END
+      'status', CASE WHEN agent_data.conversations > 0 THEN 'active' ELSE 'inactive' END
     )
   )
-  INTO bot_performance
+  INTO agent_performance
   FROM (
     SELECT 
       c.name,
@@ -76,20 +76,20 @@ BEGIN
       AND m.created_at >= NOW() - INTERVAL '1 day' * days_back
     WHERE c.user_id = user_id_param
     GROUP BY c.id, c.name, conn.platform
-  ) bot_data;
+  ) agent_data;
 
-  -- Handle case where no bots exist
-  IF bot_performance IS NULL THEN
-    bot_performance := '[]'::JSON;
+  -- Handle case where no agents exist
+  IF agent_performance IS NULL THEN
+    agent_performance := '[]'::JSON;
   END IF;
 
   -- Build final result
   result := JSON_BUILD_OBJECT(
     'total_conversations', total_conversations,
-    'active_bots', active_bots,
+    'active_agents', active_agents,
     'avg_response_time', avg_response_time,
     'conversion_rate', conversion_rate,
-    'bot_performance', bot_performance,
+    'agent_performance', agent_performance,
     'time_range', time_range_param,
     'generated_at', NOW()
   );
@@ -149,8 +149,8 @@ BEGIN
 END;
 $$;
 
--- Function to get top performing chatbots
-CREATE OR REPLACE FUNCTION get_top_chatbots(
+-- Function to get top performing agents
+CREATE OR REPLACE FUNCTION get_top_agents(
   user_id_param UUID,
   limit_param INTEGER DEFAULT 5
 )
@@ -163,12 +163,12 @@ DECLARE
 BEGIN
   SELECT JSON_AGG(
     JSON_BUILD_OBJECT(
-      'id', bot_stats.id,
-      'name', bot_stats.name,
-      'conversations', bot_stats.conversations,
-      'last_active', bot_stats.last_active,
-      'platform', COALESCE(bot_stats.platform, 'Website')
-    ) ORDER BY bot_stats.conversations DESC
+      'id', agent_stats.id,
+      'name', agent_stats.name,
+      'conversations', agent_stats.conversations,
+      'last_active', agent_stats.last_active,
+      'platform', COALESCE(agent_stats.platform, 'Website')
+    ) ORDER BY agent_stats.conversations DESC
   )
   INTO result
   FROM (
@@ -185,9 +185,9 @@ BEGIN
     GROUP BY c.id, c.name, conn.platform
     ORDER BY conversations DESC
     LIMIT limit_param
-  ) bot_stats;
+  ) agent_stats;
 
-  -- Handle case where no bots exist
+  -- Handle case where no agents exist
   IF result IS NULL THEN
     result := '[]'::JSON;
   END IF;
@@ -279,5 +279,5 @@ $$;
 -- Grant execute permissions to authenticated users
 GRANT EXECUTE ON FUNCTION get_analytics_metrics(UUID, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_conversation_trends(UUID, TEXT) TO authenticated;
-GRANT EXECUTE ON FUNCTION get_top_chatbots(UUID, INTEGER) TO authenticated;
+GRANT EXECUTE ON FUNCTION get_top_agents(UUID, INTEGER) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_conversations_over_time(UUID, TEXT) TO authenticated;

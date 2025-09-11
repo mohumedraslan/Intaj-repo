@@ -35,7 +35,7 @@ interface MetricData {
   trend: 'up' | 'down';
 }
 
-interface BotPerformance {
+interface AgentPerformance {
   name: string;
   channel: string;
   conversations: number;
@@ -56,17 +56,17 @@ export default function AnalyticsPage() {
   const [user, setUser] = useState<any>(null);
   const [metrics, setMetrics] = useState<{
     conversations: MetricData;
-    activeBots: MetricData;
+    activeAgents: MetricData;
     responseTime: MetricData;
     conversionRate: MetricData;
   }>({
     conversations: { value: 0, change: 0, trend: 'up' },
-    activeBots: { value: 0, change: 0, trend: 'up' },
+    activeAgents: { value: 0, change: 0, trend: 'up' },
     responseTime: { value: 0, change: 0, trend: 'down' },
     conversionRate: { value: 0, change: 0, trend: 'up' }
   });
 
-  const [botPerformance, setBotPerformance] = useState<BotPerformance[]>([]);
+  const [agentPerformance, setAgentPerformance] = useState<AgentPerformance[]>([]);
 
   const [activities, setActivities] = useState<Activity[]>([]);
 
@@ -76,7 +76,7 @@ export default function AnalyticsPage() {
     {
       type: 'optimization',
       title: 'Optimization Tip',
-      message: "Your Support Bot's response time improved by 15% this week. Consider scaling this configuration to other bots.",
+      message: "Your Support Agent's response time improved by 15% this week. Consider scaling this configuration to other agents.",
       color: 'from-blue-900/30 to-purple-900/30',
       borderColor: 'border-blue-500/20',
       iconColor: 'bg-blue-500'
@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
     {
       type: 'growth',
       title: 'Growth Opportunity',
-      message: 'Instagram engagement up 34%. Consider expanding your social media bot presence.',
+      message: 'Instagram engagement up 34%. Consider expanding your social media agent presence.',
       color: 'from-cyan-900/30 to-green-900/30',
       borderColor: 'border-cyan-500/20',
       iconColor: 'bg-cyan-500'
@@ -139,11 +139,11 @@ export default function AnalyticsPage() {
         // Fallback to default values if RPC fails
         setMetrics({
           conversations: { value: 0, change: 0, trend: 'up' },
-          activeBots: { value: 0, change: 0, trend: 'up' },
+          activeAgents: { value: 0, change: 0, trend: 'up' },
           responseTime: { value: 1.5, change: -10, trend: 'down' },
           conversionRate: { value: 0, change: 0, trend: 'up' }
         });
-        setBotPerformance([]);
+        setAgentPerformance([]);
         setActivities([{
           id: 'error-1',
           message: 'Unable to load analytics data',
@@ -175,7 +175,7 @@ export default function AnalyticsPage() {
           change: 15, // Keep hardcoded for now as requested
           trend: 'up' 
         },
-        activeBots: { 
+        activeAgents: {
           value: analyticsData.active_bots || 0, 
           change: 8, // Keep hardcoded for now as requested
           trend: 'up' 
@@ -192,8 +192,8 @@ export default function AnalyticsPage() {
         }
       });
 
-      // Transform bot performance data from RPC response
-      const botPerformanceData: BotPerformance[] = analyticsData.bot_performance?.map((bot: any) => ({
+      // Transform agent performance data from RPC response
+      const agentPerformanceData: AgentPerformance[] = analyticsData.bot_performance?.map((bot: any) => ({
         name: bot.name,
         channel: bot.channel === 'website' ? 'Website' : 
                 bot.channel === 'whatsapp' ? 'WhatsApp' :
@@ -205,10 +205,10 @@ export default function AnalyticsPage() {
         status: bot.status as 'active' | 'optimizing' | 'inactive'
       })) || [];
 
-      // Show sample data if no bots exist
-      if (botPerformanceData.length === 0) {
-        botPerformanceData.push({
-          name: 'Welcome Bot',
+      // Show sample data if no agents exist
+      if (agentPerformanceData.length === 0) {
+        agentPerformanceData.push({
+          name: 'Welcome Agent',
           channel: 'Website',
           conversations: 0,
           successRate: 85,
@@ -217,28 +217,28 @@ export default function AnalyticsPage() {
         });
       }
 
-      setBotPerformance(botPerformanceData);
+      setAgentPerformance(agentPerformanceData);
 
-      // Generate activities based on bot performance data
+      // Generate activities based on agent performance data
       const recentActivities: Activity[] = [];
       
-      // Add activities for bots with conversations
-      botPerformanceData.forEach(bot => {
-        if (bot.conversations > 0) {
+      // Add activities for agents with conversations
+      agentPerformanceData.forEach(agent => {
+        if (agent.conversations > 0) {
           recentActivities.push({
-            id: `bot-activity-${bot.name}`,
-            message: `${bot.name} handled ${bot.conversations} conversation${bot.conversations > 1 ? 's' : ''}`,
+            id: `agent-activity-${agent.name}`,
+            message: `${agent.name} handled ${agent.conversations} conversation${agent.conversations > 1 ? 's' : ''}`,
             timestamp: 'Recently',
             type: 'success'
           });
         }
       });
 
-      // Add bot creation activities
+      // Add agent creation activities
       if (analyticsData.active_bots > 0) {
         recentActivities.push({
-          id: 'bots-active',
-          message: `${analyticsData.active_bots} chatbot${analyticsData.active_bots > 1 ? 's' : ''} currently active`,
+          id: 'agents-active',
+          message: `${analyticsData.active_bots} agent${analyticsData.active_bots > 1 ? 's' : ''} currently active`,
           timestamp: 'Now',
           type: 'info'
         });
@@ -261,11 +261,11 @@ export default function AnalyticsPage() {
       // Set fallback data on error
       setMetrics({
         conversations: { value: 0, change: 0, trend: 'up' },
-        activeBots: { value: 0, change: 0, trend: 'up' },
+        activeAgents: { value: 0, change: 0, trend: 'up' },
         responseTime: { value: 1.5, change: -10, trend: 'down' },
         conversionRate: { value: 0, change: 0, trend: 'up' }
       });
-      setBotPerformance([]);
+      setAgentPerformance([]);
       setActivities([{
         id: 'error-1',
         message: 'Error loading analytics data',
@@ -289,18 +289,18 @@ export default function AnalyticsPage() {
     return `${Math.floor(diffInMinutes / 1440)} days ago`;
   };
 
-  // Helper function to convert bot performance data to CSV
-  const convertToCSV = (data: BotPerformance[]) => {
-    const headers = ['Bot Name', 'Channel', 'Conversations', 'Success Rate (%)', 'Response Time', 'Status'];
+  // Helper function to convert agent performance data to CSV
+  const convertToCSV = (data: AgentPerformance[]) => {
+    const headers = ['Agent Name', 'Channel', 'Conversations', 'Success Rate (%)', 'Response Time', 'Status'];
     const csvContent = [
       headers.join(','),
-      ...data.map(bot => [
-        `"${bot.name}"`,
-        `"${bot.channel}"`,
-        bot.conversations,
-        bot.successRate,
-        `"${bot.responseTime}"`,
-        `"${bot.status}"`
+      ...data.map(agent => [
+        `"${agent.name}"`,
+        `"${agent.channel}"`,
+        agent.conversations,
+        agent.successRate,
+        `"${agent.responseTime}"`,
+        `"${agent.status}"`
       ].join(','))
     ].join('\n');
     
@@ -308,8 +308,8 @@ export default function AnalyticsPage() {
   };
 
   const exportAnalyticsData = () => {
-    // Convert bot performance data to CSV
-    const csvData = convertToCSV(botPerformance);
+    // Convert agent performance data to CSV
+    const csvData = convertToCSV(agentPerformance);
     
     // Create blob and download
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
@@ -454,14 +454,14 @@ export default function AnalyticsPage() {
               </div>
               <div className="flex items-center space-x-1 text-blue-400 text-sm">
                 <TrendingUp className="w-4 h-4" />
-                <span>+{metrics.activeBots.change}%</span>
+                <span>+{metrics.activeAgents.change}%</span>
               </div>
             </div>
             <div>
               <div className="text-3xl font-bold text-white mb-1">
-                {metrics.activeBots.value}
+                {metrics.activeAgents.value}
               </div>
-              <div className="text-gray-400 text-sm">Active AI Bots</div>
+              <div className="text-gray-400 text-sm">Active AI Agents</div>
             </div>
           </CardContent>
         </Card>
@@ -589,14 +589,14 @@ export default function AnalyticsPage() {
 
       {/* Detailed Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        {/* Bot Performance */}
+        {/* Agent Performance */}
         <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-blue-500/10">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold text-white">Top Performing Bots</CardTitle>
+            <CardTitle className="text-xl font-semibold text-white">Top Performing Agents</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {botPerformance.slice(0, 3).map((bot, index) => (
+              {agentPerformance.slice(0, 3).map((agent, index) => (
                 <div key={index} className="flex items-center justify-between p-4 bg-[#1f2024] rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -606,16 +606,16 @@ export default function AnalyticsPage() {
                       <Bot className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <div className="font-semibold text-white">{bot.name}</div>
-                      <div className="text-sm text-gray-400">{bot.channel}</div>
+                      <div className="font-semibold text-white">{agent.name}</div>
+                      <div className="text-sm text-gray-400">{agent.channel}</div>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className={`font-bold ${
-                      bot.successRate >= 90 ? 'text-green-400' :
-                      bot.successRate >= 80 ? 'text-blue-400' : 'text-yellow-400'
+                      agent.successRate >= 90 ? 'text-green-400' :
+                      agent.successRate >= 80 ? 'text-blue-400' : 'text-yellow-400'
                     }`}>
-                      {bot.successRate}%
+                      {agent.successRate}%
                     </div>
                     <div className="text-sm text-gray-400">Success Rate</div>
                   </div>
@@ -687,7 +687,7 @@ export default function AnalyticsPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="text-left py-3 text-gray-400 font-medium">Bot Name</th>
+                  <th className="text-left py-3 text-gray-400 font-medium">Agent Name</th>
                   <th className="text-left py-3 text-gray-400 font-medium">Channel</th>
                   <th className="text-left py-3 text-gray-400 font-medium">Conversations</th>
                   <th className="text-left py-3 text-gray-400 font-medium">Success Rate</th>
@@ -696,29 +696,29 @@ export default function AnalyticsPage() {
                 </tr>
               </thead>
               <tbody>
-                {botPerformance.map((bot, index) => (
+                {agentPerformance.map((agent, index) => (
                   <tr key={index} className="border-b border-gray-800">
-                    <td className="py-4 text-white font-medium">{bot.name}</td>
-                    <td className="py-4 text-gray-300">{bot.channel}</td>
-                    <td className="py-4 text-gray-300">{bot.conversations.toLocaleString()}</td>
+                    <td className="py-4 text-white font-medium">{agent.name}</td>
+                    <td className="py-4 text-gray-300">{agent.channel}</td>
+                    <td className="py-4 text-gray-300">{agent.conversations.toLocaleString()}</td>
                     <td className="py-4">
                       <div className="flex items-center space-x-2">
                         <div className={`font-medium ${
-                          bot.successRate >= 90 ? 'text-green-400' :
-                          bot.successRate >= 80 ? 'text-blue-400' : 'text-yellow-400'
+                          agent.successRate >= 90 ? 'text-green-400' :
+                          agent.successRate >= 80 ? 'text-blue-400' : 'text-yellow-400'
                         }`}>
-                          {bot.successRate}%
+                          {agent.successRate}%
                         </div>
                         <Progress 
-                          value={bot.successRate} 
+                          value={agent.successRate}
                           className="w-16 h-2"
                         />
                       </div>
                     </td>
-                    <td className="py-4 text-gray-300">{bot.responseTime}</td>
+                    <td className="py-4 text-gray-300">{agent.responseTime}</td>
                     <td className="py-4">
-                      <Badge className={`${getStatusColor(bot.status)} text-xs`}>
-                        {bot.status.charAt(0).toUpperCase() + bot.status.slice(1)}
+                      <Badge className={`${getStatusColor(agent.status)} text-xs`}>
+                        {agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
                       </Badge>
                     </td>
                   </tr>

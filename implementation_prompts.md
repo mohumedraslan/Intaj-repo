@@ -1047,3 +1047,126 @@ Many of the project's public-facing pages contain static, hardcoded content, mak
 
 By the end of this task, the content for the FAQ and Blog will be entirely managed through the database. The business owner can now add, edit, or delete FAQs and blog posts using the Supabase table editor, and the live website will update automatically without requiring a new deployment.
 ```
+
+### Prompt 23: Implement a Multi-Platform Connection Wizard
+```
+The application currently lacks a centralized way for users to connect their Agents to external platforms. This task is to build a user-friendly, multi-step wizard that will become the primary interface for adding new integrations. This will replace any placeholder "Add Connection" buttons.
+
+**Location:** The wizard should be implemented as a modal dialog, likely triggered from a new "Connections" tab within the Agent settings page (`/dashboard/agents/[id]`).
+
+**Part 1: Frontend - The Wizard Component**
+
+1.  **Create `ConnectionWizard.tsx`:** Build a new component in `src/components/connections/`. This component will manage the state of the wizard (current step, selected platform, form data).
+2.  **Step 1: Select Platform:**
+    *   Display a grid of the newly prioritized integrations: **Email**, **Telegram**, and **Slack**.
+    *   Each platform should be represented by its logo and name.
+    *   Include other potential future integrations (like Discord, WhatsApp, etc.) but make them visually disabled with a "Coming Soon" badge.
+3.  **Step 2: Authentication & Configuration:**
+    *   The content of this step must be dynamic based on the platform selected.
+    *   **For Telegram:** Display a form asking for the **Telegram Bot Token**. Include a brief explanation and a link to Telegram's documentation on how to get a token from BotFather.
+    *   **For Slack:** Display a "Connect with Slack" button. This will initiate an OAuth 2.0 flow.
+    *   **For Email:** Display a uniquely generated email address (e.g., `agent-abcde@intaj.ai`). The user will be instructed to set up automatic forwarding from their support/contact email to this address.
+4.  **Step 3: Link to Agent & Finish:**
+    *   After successful authentication, the user should see a confirmation.
+    *   The final step will create a new entry in the `connections` table, linking the newly authenticated platform to the current Agent (`agent.id`).
+    *   On "Finish", the modal should close, and the list of active connections for that agent should be refreshed.
+
+**Part 2: Backend - Connection API**
+
+1.  **Database Schema:** The `connections` table should be able to store an encrypted `credentials` object. For Telegram, this will be the API token. For Slack, it will be the OAuth access token. For Email, it may not be needed.
+2.  **API Endpoint for Connections:** Create a new API route, e.g., `/api/connections`, to handle the connection logic.
+    *   A `POST` request to this endpoint should accept `agentId`, `platform`, and `credentials`.
+    *   It should perform validation (e.g., make a test call to the Telegram API with the token) before encrypting and saving the credentials.
+    *   It should also handle the server-side logic for the Slack OAuth callback.
+```
+
+### Prompt 24: Implement Telegram and Slack Integration Backend
+```
+With the Connection Wizard UI specified, we now need the backend logic to handle communication for **Telegram** and **Slack**.
+
+**Prerequisites:**
+*   Install the necessary SDKs: `npm install node-telegram-bot-api @slack/bolt`.
+*   Add necessary environment variables: `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`, `SLACK_SIGNING_SECRET`.
+
+**Part 1: Telegram Integration (API Key-based)**
+
+1.  **Create `src/lib/integrations/telegram.ts`:**
+    *   **`verifyTelegramToken(token)`:** A function that uses `getMe()` from the SDK to validate a token.
+    *   **`sendTelegramMessage(token, chatId, text)`:** A function to send a message.
+    *   **`setTelegramWebhook(token, url)`:** A function to set the bot's webhook to our new API endpoint.
+2.  **Create Telegram Webhook Handler:**
+    *   Create an API route at `/api/webhooks/telegram/[agentId]/route.ts`.
+    *   This `POST` endpoint will receive messages from Telegram. It must look up the corresponding agent using the `agentId` in the URL to access its configuration and context for generating a response.
+    *   The response logic should use the `sendTelegramMessage` function.
+
+**Part 2: Slack Integration (OAuth 2.0-based)**
+
+1.  **Create `src/lib/integrations/slack.ts`:**
+    *   This file will contain the logic for handling Slack API calls.
+2.  **Implement Slack OAuth Flow:**
+    *   The "Connect with Slack" button should redirect to the Slack authorization URL with the correct scopes (`app_mentions:read`, `chat:write`).
+    *   The callback handler (`/api/connections/callback/slack`) must exchange the code for an access token, encrypt it, and save it to the `connections` table.
+3.  **Create Slack Webhook Handler:**
+    *   Create an API route at `/api/webhooks/slack/route.ts`.
+    *   This endpoint must handle Slack's `url_verification` challenge.
+    *   It must verify the signing secret for all incoming requests.
+    *   It should listen for `app_mention` events, find the corresponding Agent based on the event payload, and trigger the AI response logic.
+```
+
+### Prompt 25: Implement Email Integration (Forwarding)
+```
+This prompt outlines the implementation of the Email integration, which is a key strategic priority. The method will be based on email forwarding.
+
+**Part 1: Generating Unique Inbound Addresses**
+
+1.  **Create a new table `email_integrations`:**
+    *   Columns: `id`, `agent_id`, `user_id`, `inbound_address` (e.g., 'agent-pqrst@intaj.ai'), `forwarding_address` (the user's actual support email).
+2.  **Logic for Generation:** When a user adds an "Email" connection for an Agent, generate a unique, random email address with the app's domain. Display this to the user.
+
+**Part 2: Receiving and Processing Emails**
+
+1.  **Set up an Inbound Parse Webhook:**
+    *   Use a service like SendGrid, Mailgun, or Postmark to receive emails sent to your domain (`@intaj.ai`).
+    *   Configure the service to parse incoming emails and forward them as a `POST` request to a new webhook endpoint in our application: `/api/webhooks/email/inbound/route.ts`.
+2.  **Implement the Inbound Webhook:**
+    *   The webhook will receive a JSON payload containing the sender, subject, and body of the email.
+    *   It should look up which Agent corresponds to the `to` address (`agent-pqrst@intaj.ai`).
+    *   Save the incoming email content as a "user" message in the `messages` table.
+    *   Trigger the AI response generation logic for that Agent.
+
+**Part 3: Sending Email Replies**
+
+1.  **Integrate an Email Sending Service:**
+    *   Set up an email sending service (like SendGrid, Mailgun, etc.) to send emails from your application.
+2.  **Implement Sending Logic:**
+    *   After the AI generates a response, use the email service's API to send a new email.
+    *   The "from" address should be the unique inbound address for the agent.
+    *   The "to" address should be the original sender of the email.
+    *   The email body will be the AI-generated response.
+```
+
+### Prompt 26: Deprecate Old Integration Code
+```
+To align the codebase with the new strategic focus and reduce technical debt, this task involves removing the old, now-deprioritized integration code for WhatsApp, Facebook, and Instagram.
+
+**Part 1: Remove Library Files**
+
+1.  **Delete the following files** from the `src/lib/integrations/` directory:
+    *   `whatsapp.ts`
+    *   `facebook.ts`
+    *   `instagram.ts`
+
+**Part 2: Remove API Webhook Handlers**
+
+1.  **Delete the following directories** from `src/app/api/webhooks/`:
+    *   `whatsapp/`
+    *   `facebook/`
+    *   `instagram/`
+
+**Part 3: Clean Up UI Components**
+
+1.  **Review the `ConnectionWizard` component** (from Prompt 23) and ensure that the disabled "Coming Soon" placeholders for WhatsApp, Facebook, and Instagram do not contain any lingering logic or imports related to the old code.
+2.  **Search the codebase** for any other stray imports or references to the deleted files and remove them. This is a good opportunity to ensure the project is clean.
+
+This task is crucial for maintaining a focused and maintainable codebase that reflects the current product strategy.
+```

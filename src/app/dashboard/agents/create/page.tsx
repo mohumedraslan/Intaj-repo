@@ -33,8 +33,7 @@ interface StepProps {
 const ProgressSteps = ({ currentStep, totalSteps }: StepProps) => {
   const steps = [
     { id: 1, title: 'Basic Info', icon: Bot },
-    { id: 2, title: 'Configuration', icon: Settings },
-    { id: 3, title: 'Deploy', icon: Rocket }
+    { id: 2, title: 'Configuration', icon: Settings }
   ];
 
   return (
@@ -79,7 +78,7 @@ const ProgressSteps = ({ currentStep, totalSteps }: StepProps) => {
   );
 };
 
-export default function CreateChatbotPage() {
+export default function CreateAgentPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -93,12 +92,6 @@ export default function CreateChatbotPage() {
     customInstructions: '',
     temperature: 70,
     maxTokens: 500,
-    channels: {
-      website: true,
-      facebook: false,
-      instagram: false,
-      whatsapp: false
-    }
   });
 
   useEffect(() => {
@@ -116,18 +109,8 @@ export default function CreateChatbotPage() {
     }));
   };
 
-  const handleChannelToggle = (channel: string) => {
-    setFormData(prev => ({
-      ...prev,
-      channels: {
-        ...prev.channels,
-        [channel]: !prev.channels[channel as keyof typeof prev.channels]
-      }
-    }));
-  };
-
   const nextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -138,12 +121,12 @@ export default function CreateChatbotPage() {
     }
   };
 
-  const createChatbot = async () => {
+  const createAgent = async () => {
     if (!user) return;
     
     setLoading(true);
     try {
-      const chatbotData = {
+      const agentData = {
         name: formData.name,
         description: formData.description,
         model: 'gpt-4',
@@ -151,41 +134,35 @@ export default function CreateChatbotPage() {
           purpose: formData.purpose,
           customInstructions: formData.customInstructions,
           temperature: formData.temperature / 100,
-          maxTokens: formData.maxTokens,
-          channels: formData.channels
+          maxTokens: formData.maxTokens
         }
       };
 
-      console.log('Creating chatbot with data:', chatbotData);
+      console.log('Creating agent with data:', agentData);
 
       const response = await fetch('/api/chatbots/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(chatbotData)
+        body: JSON.stringify(agentData)
       });
 
       const responseData = await response.json();
       console.log('API Response:', responseData);
 
-      if (response.ok) {
-        console.log('Chatbot created successfully:', responseData.chatbot);
-        // Force refresh of chatbots data by redirecting with a timestamp
-        router.push('/dashboard/chatbots?refresh=' + Date.now());
+      if (response.ok && responseData.chatbot) {
+        console.log('Agent created successfully:', responseData.chatbot);
+        // Redirect to the new agent's settings page
+        router.push(`/dashboard/agents/${responseData.chatbot.id}`);
       } else {
         console.error('API Error:', responseData.error);
-        alert(`Failed to create chatbot: ${responseData.error || 'Unknown error'}`);
+        alert(`Failed to create agent: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Error creating chatbot:', error);
+      console.error('Error creating agent:', error);
       alert(`Error: ${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
-  };
-
-  const copyEmbedCode = () => {
-    const code = `<script src="https://intaj.ai/widget.js" data-bot-id="your-bot-id"></script>`;
-    navigator.clipboard.writeText(code);
   };
 
   return (
@@ -211,7 +188,7 @@ export default function CreateChatbotPage() {
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-4">
-              <div className="text-sm text-gray-400">Creating new chatbot...</div>
+              <div className="text-sm text-gray-400">Creating new agent...</div>
             </div>
           </div>
         </div>
@@ -219,7 +196,7 @@ export default function CreateChatbotPage() {
 
       <div className="min-h-screen bg-[#0a0a0b] p-6">
         <div className="max-w-6xl mx-auto py-8">
-          <ProgressSteps currentStep={currentStep} totalSteps={3} />
+          <ProgressSteps currentStep={currentStep} totalSteps={2} />
 
           {/* Step Content Container */}
           <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-blue-500/10 rounded-2xl p-8 max-w-4xl mx-auto">
@@ -229,13 +206,13 @@ export default function CreateChatbotPage() {
               <div className="space-y-8">
                 <div className="text-center mb-8">
                   <h1 className="text-4xl font-bold mb-4">
-                    Create Your <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">AI Chatbot</span>
+                    Create Your <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">AI Agent</span>
                   </h1>
-                  <p className="text-gray-300 text-lg">Let's start with the basics. What would you like your chatbot to be called?</p>
+                  <p className="text-gray-300 text-lg">Let's start with the basics. What would you like to call your new agent?</p>
                 </div>
 
                 <div className="space-y-8">
-                  {/* Bot Name */}
+                  {/* Agent Name */}
                   <div className="relative">
                     <input
                       type="text"
@@ -245,11 +222,11 @@ export default function CreateChatbotPage() {
                       className="w-full px-4 py-3 bg-[#1f2024] border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors peer"
                     />
                     <label className="absolute left-4 top-3 text-gray-400 transition-all duration-200 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-blue-400 peer-[:not(:placeholder-shown)]:-translate-y-6 peer-[:not(:placeholder-shown)]:scale-75 bg-[#1f2024] px-2">
-                      Chatbot Name
+                      Agent Name
                     </label>
                   </div>
 
-                  {/* Bot Description */}
+                  {/* Agent Description */}
                   <div className="relative">
                     <textarea
                       value={formData.description}
@@ -263,9 +240,9 @@ export default function CreateChatbotPage() {
                     </label>
                   </div>
 
-                  {/* Bot Purpose */}
+                  {/* Agent Purpose */}
                   <div>
-                    <label className="block text-sm font-medium mb-3">What's the primary purpose of your chatbot?</label>
+                    <label className="block text-sm font-medium mb-3">What's the primary purpose of this agent?</label>
                     <div className="grid md:grid-cols-3 gap-4">
                       {[
                         { id: 'support', title: 'Customer Support', desc: 'Help customers with questions, issues, and general inquiries', icon: Target, color: 'from-blue-500 to-purple-600' },
@@ -298,7 +275,7 @@ export default function CreateChatbotPage() {
                     <textarea
                       value={formData.customInstructions}
                       onChange={(e) => handleInputChange('customInstructions', e.target.value)}
-                      placeholder="Add specific instructions for how your chatbot should behave, respond to certain topics, or handle specific scenarios..."
+                      placeholder="Add specific instructions for how your agent should behave, respond to certain topics, or handle specific scenarios..."
                       rows={4}
                       className="w-full px-4 py-3 bg-[#1f2024] border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none"
                     />
@@ -329,7 +306,7 @@ export default function CreateChatbotPage() {
                   <h2 className="text-3xl font-bold mb-4">
                     Configure Your <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">AI Settings</span>
                   </h2>
-                  <p className="text-gray-300 text-lg">Fine-tune how your chatbot responds and behaves.</p>
+                  <p className="text-gray-300 text-lg">Fine-tune how your agent responds and behaves.</p>
                 </div>
 
                 <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600 p-6 rounded-xl">
@@ -382,195 +359,7 @@ export default function CreateChatbotPage() {
                     Back
                   </Button>
                   <Button 
-                    onClick={nextStep}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300"
-                  >
-                    Continue to Deploy
-                    <Rocket className="w-4 h-4 ml-2" />
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Deploy */}
-            {currentStep === 3 && (
-              <div className="space-y-8">
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold mb-4">
-                    Deploy Your <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">Chatbot</span>
-                  </h2>
-                  <p className="text-gray-300 text-lg">Choose where you want your chatbot to be available for your customers.</p>
-                </div>
-
-                <div className="space-y-6">
-                  {/* Website Widget */}
-                  <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600 p-6 rounded-xl">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Globe className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-semibold">Website Widget</h3>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={formData.channels.website}
-                              onChange={() => handleChannelToggle('website')}
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                          </label>
-                        </div>
-                        <p className="text-sm text-gray-400 mb-4">Add a chat widget to your website that visitors can use to interact with your chatbot.</p>
-                        {formData.channels.website && (
-                          <div className="bg-[#1f2024] rounded-lg p-4">
-                            <p className="text-xs text-gray-400 mb-2">Embed Code:</p>
-                            <code className="text-xs bg-black/50 p-2 rounded block overflow-x-auto text-gray-300">
-                              &lt;script src="https://intaj.ai/widget.js" data-bot-id="your-bot-id"&gt;&lt;/script&gt;
-                            </code>
-                            <Button 
-                              onClick={copyEmbedCode}
-                              className="mt-2 text-xs text-blue-400 hover:text-blue-300 bg-transparent p-0"
-                            >
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy Code
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
-
-                  {/* Social Media Channels */}
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {/* Facebook */}
-                    <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600 p-6 rounded-xl">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <Facebook className="w-5 h-5 text-white" />
-                          </div>
-                          <h3 className="font-semibold">Facebook</h3>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.channels.facebook}
-                            onChange={() => handleChannelToggle('facebook')}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-                      <p className="text-sm text-gray-400 mb-4">Connect to Facebook Messenger</p>
-                      <Button className="w-full py-2 px-4 border border-gray-600 rounded-lg text-gray-300 hover:border-blue-500 hover:text-blue-400 transition-colors text-sm bg-transparent">
-                        Connect Facebook
-                      </Button>
-                    </Card>
-
-                    {/* Instagram */}
-                    <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600 p-6 rounded-xl">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                            <Instagram className="w-5 h-5 text-white" />
-                          </div>
-                          <h3 className="font-semibold">Instagram</h3>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.channels.instagram}
-                            onChange={() => handleChannelToggle('instagram')}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                        </label>
-                      </div>
-                      <p className="text-sm text-gray-400 mb-4">Connect to Instagram DMs</p>
-                      <Button className="w-full py-2 px-4 border border-gray-600 rounded-lg text-gray-300 hover:border-purple-500 hover:text-purple-400 transition-colors text-sm bg-transparent">
-                        Connect Instagram
-                      </Button>
-                    </Card>
-
-                    {/* WhatsApp */}
-                    <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600 p-6 rounded-xl">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                            <Phone className="w-5 h-5 text-white" />
-                          </div>
-                          <h3 className="font-semibold">WhatsApp</h3>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.channels.whatsapp}
-                            onChange={() => handleChannelToggle('whatsapp')}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                        </label>
-                      </div>
-                      <p className="text-sm text-gray-400 mb-4">Connect WhatsApp Business</p>
-                      <Button className="w-full py-2 px-4 border border-gray-600 rounded-lg text-gray-300 hover:border-green-500 hover:text-green-400 transition-colors text-sm bg-transparent">
-                        Connect WhatsApp
-                      </Button>
-                    </Card>
-                  </div>
-
-                  {/* Preview Section */}
-                  <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600 p-6 rounded-xl">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <Eye className="w-5 h-5 text-blue-400" />
-                      <h3 className="font-semibold">Live Preview</h3>
-                    </div>
-                    <div className="bg-[#1f2024] rounded-xl p-6 max-w-sm mx-auto">
-                      <div className="bg-white rounded-t-lg p-4 text-black">
-                        <div className="flex items-center space-x-2 mb-3">
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                            <MessageSquare className="w-4 h-4 text-white" />
-                          </div>
-                          <div>
-                            <div className="font-semibold text-sm">{formData.name || 'Your Chatbot'}</div>
-                            <div className="text-xs text-gray-500 flex items-center">
-                              <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
-                              Online
-                            </div>
-                          </div>
-                        </div>
-                        <div className="bg-gray-100 rounded-lg p-3">
-                          <p className="text-sm">Hi! I'm your AI assistant. How can I help you today?</p>
-                        </div>
-                      </div>
-                      <div className="bg-gray-200 rounded-b-lg p-4 flex items-center space-x-2">
-                        <input 
-                          type="text" 
-                          placeholder="Type a message..." 
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-full text-sm text-black"
-                          readOnly
-                        />
-                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-
-                <div className="flex justify-between mt-8">
-                  <Button 
-                    onClick={prevStep}
-                    className="px-6 py-3 border border-gray-600 rounded-lg text-gray-300 hover:border-gray-500 transition-colors bg-transparent"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
-                  </Button>
-                  <Button 
-                    onClick={createChatbot}
+                    onClick={createAgent}
                     disabled={loading}
                     className="bg-gradient-to-r from-blue-500 to-purple-600 px-12 py-4 rounded-lg text-white font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:-translate-y-0.5"
                   >
@@ -582,7 +371,7 @@ export default function CreateChatbotPage() {
                     ) : (
                       <>
                         <Rocket className="w-5 h-5 mr-2" />
-                        Create Chatbot
+                        Create Agent
                       </>
                     )}
                   </Button>

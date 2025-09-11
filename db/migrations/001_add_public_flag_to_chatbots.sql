@@ -1,0 +1,2 @@
+ALTER TABLE public.chatbots
+ADD COLUMN is_public BOOLEAN NOT NULL DEFAULT FALSE;
