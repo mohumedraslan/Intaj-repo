@@ -38,26 +38,26 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
   const steps: OnboardingStep[] = [
     {
       id: 'created_first_chatbot',
-      title: 'Create your first chatbot',
-      description: 'Set up an AI chatbot with your preferred model and personality.',
-      action: 'Create Chatbot',
+      title: 'Create your first Agent',
+      description: 'Set up an AI agent with your preferred model and personality.',
+      action: 'Create Agent',
       link: '/dashboard/chatbots/new',
       completed: onboardingSteps.created_first_chatbot,
       disabled: false
     },
     {
       id: 'added_data_source',
-      title: 'Train your chatbot with data',
-      description: 'Add documents, websites, or text to make your chatbot smarter.',
+      title: 'Train your Agent with data',
+      description: 'Add documents, websites, or text to make your agent smarter.',
       action: 'Add Data',
-      link: '/dashboard/chatbots', // This will be updated dynamically if they have a chatbot
+      link: '/dashboard/chatbots', // This will be updated dynamically if they have an agent
       completed: onboardingSteps.added_data_source,
       disabled: !onboardingSteps.created_first_chatbot
     },
     {
       id: 'connected_channel',
       title: 'Connect a communication channel',
-      description: 'Deploy your chatbot to your website, WhatsApp, or other platforms.',
+      description: 'Deploy your agent to your website, WhatsApp, or other platforms.',
       action: 'Connect',
       link: '/connections',
       completed: onboardingSteps.connected_channel,

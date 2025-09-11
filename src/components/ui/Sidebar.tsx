@@ -33,11 +33,11 @@ const sidebarItems: SidebarItem[] = [
     icon: LayoutDashboard,
   },
   {
-    label: 'Chatbots',
+    label: 'Agents',
     href: '/dashboard/chatbots',
     icon: MessageSquare,
     children: [
-      { label: 'Active Bots', href: '/dashboard/chatbots/active', icon: MessageSquare },
+      { label: 'Active Agents', href: '/dashboard/chatbots/active', icon: MessageSquare },
       { label: 'Templates', href: '/dashboard/chatbots/templates', icon: FileText },
       { label: 'Settings', href: '/dashboard/chatbots/settings', icon: Settings },
     ],

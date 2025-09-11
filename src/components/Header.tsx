@@ -197,7 +197,7 @@ export default function Header() {
               ) : !isAuthenticated ? (
                 <>
                   <Link 
-                    href="/login" 
+                    href="/auth"
                     className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm font-medium"
                   >
                     Log In
@@ -351,7 +351,7 @@ export default function Header() {
               ) : !isAuthenticated ? (
                 <>
                   <Link
-                    href="/login"
+                    href="/auth"
                     className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >

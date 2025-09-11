@@ -4,9 +4,9 @@ import { useState, useId, useEffect } from 'react';
 import '@/styles/auth.css';
 import { useAuth } from '@/lib/hooks/useAuth';
 
-export default function AuthPage() {
+export default function AuthPage({ initialIsSignIn = true }: { initialIsSignIn?: boolean }) {
   const formId = useId();
-  const [isSignIn, setIsSignIn] = useState(true);
+  const [isSignIn, setIsSignIn] = useState(initialIsSignIn);
   const [saveMessage, setSaveMessage] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 

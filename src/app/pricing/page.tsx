@@ -103,7 +103,7 @@ export default function PricingPage() {
                 <PricingFeature text="API access" included />
               </ul>
 
-              <a href="/pricing/checkout?plan=professional" className="block w-full">
+              <a href="/signup" className="block w-full">
                 <button className="w-full gradient-neural text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl animate-glow">
                   Start Free Trial
                 </button>
@@ -135,7 +135,7 @@ export default function PricingPage() {
                 <PricingFeature text="SLA & uptime guarantee" included />
               </ul>
 
-              <a href="/pricing/checkout?plan=enterprise" className="block w-full">
+              <a href="/contact-us" className="block w-full">
                 <button className="w-full gradient-automation text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
                   Contact Sales
                 </button>
@@ -190,12 +190,12 @@ export default function PricingPage() {
             Join thousands of companies already automating their customer engagement with AI.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <button className="gradient-neural px-12 py-4 rounded-lg text-white font-bold text-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">
+            <a href="/signup" className="gradient-neural px-12 py-4 rounded-lg text-white font-bold text-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">
               Start Your Free Trial
-            </button>
-            <button className="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors">
+            </a>
+            <a href="/contact-us" className="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors">
               <span>Talk to Sales</span>
-            </button>
+            </a>
           </div>
           <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8 text-gray-400 text-sm">
             <div className="flex items-center space-x-2">

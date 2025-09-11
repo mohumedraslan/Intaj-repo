@@ -1,224 +1,3 @@
-<<<<<<< Updated upstream
-// src/app/dashboard/chatbots/[id]/page.tsx
-'use client';
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabaseClient';
-import { updateChatbot, deleteChatbot } from '../actions';
-
-export default function EditChatbotPage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params?.id as string;
-  interface Chatbot {
-    id: string;
-    name: string;
-    model: string;
-    settings: Record<string, unknown>;
-    created_at: string;
-  }
-  const [chatbot, setChatbot] = useState<Chatbot | null>(null);
-  const [name, setName] = useState('');
-  const [model, setModel] = useState('gpt-3.5-turbo');
-  const [settings, setSettings] = useState('{}');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchChatbot = async () => {
-      // supabase is already imported and ready to use
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-      const { data, error } = await supabase
-        .from('chatbots')
-        .select('*')
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single();
-      if (error) setError(error.message);
-      else {
-        setChatbot(data);
-        setName(data.name);
-        setModel(data.model);
-        setSettings(JSON.stringify(data.settings || {}, null, 2));
-      }
-      setLoading(false);
-    };
-    if (id) fetchChatbot();
-  }, [id]);
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    try {
-      await updateChatbot({ id, name, model, settings: JSON.parse(settings) });
-      router.refresh();
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!confirm('Delete this chatbot?')) return;
-    try {
-      await deleteChatbot(id);
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  };
-
-  if (loading) return <div className="p-8">Loading...</div>;
-  if (error) return <div className="p-8 text-red-500">{error}</div>;
-  if (!chatbot) return <div className="p-8">Chatbot not found.</div>;
-
-  return (
-    <div className="max-w-xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Edit Chatbot</h1>
-      <form onSubmit={handleUpdate} className="space-y-4">
-        <div>
-          <label className="block text-sm">Name</label>
-          <input value={name} onChange={e => setName(e.target.value)} required className="input input-bordered w-full" placeholder="Chatbot name" title="Chatbot name" />
-        </div>
-        <div>
-          <label className="block text-sm">Model</label>
-          <select value={model} onChange={e => setModel(e.target.value)} className="input input-bordered" title="Model">
-            <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-            <option value="gpt-4">gpt-4</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm">Settings (JSON)</label>
-          <textarea value={settings} onChange={e => setSettings(e.target.value)} rows={4} className="input input-bordered w-full font-mono" placeholder="{}" title="Settings JSON" />
-        </div>
-        <Button type="submit">Save</Button>
-        <Button type="button" variant="destructive" onClick={handleDelete}>Delete</Button>
-      </form>
-    </div>
-  );
-}
-=======
-<<<<<<< Updated upstream
-// src/app/dashboard/chatbots/[id]/page.tsx
-'use client';
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabaseClient';
-import { updateChatbot, deleteChatbot } from '../actions';
-
-export default function EditChatbotPage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params?.id as string;
-  interface Chatbot {
-    id: string;
-    name: string;
-    model: string;
-    settings: Record<string, unknown>;
-    created_at: string;
-  }
-  const [chatbot, setChatbot] = useState<Chatbot | null>(null);
-  const [name, setName] = useState('');
-  const [model, setModel] = useState('gpt-3.5-turbo');
-  const [settings, setSettings] = useState('{}');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchChatbot = async () => {
-      // supabase is already imported and ready to use
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-      const { data, error } = await supabase
-        .from('chatbots')
-        .select('*')
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single();
-      if (error) setError(error.message);
-      else {
-        setChatbot(data);
-        setName(data.name);
-        setModel(data.model);
-        setSettings(JSON.stringify(data.settings || {}, null, 2));
-      }
-      setLoading(false);
-    };
-    if (id) fetchChatbot();
-  }, [id]);
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    try {
-      await updateChatbot({ id, name, model, settings: JSON.parse(settings) });
-      router.refresh();
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!confirm('Delete this chatbot?')) return;
-    try {
-      await deleteChatbot(id);
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  };
-
-  if (loading) return <div className="p-8">Loading...</div>;
-  if (error) return <div className="p-8 text-red-500">{error}</div>;
-  if (!chatbot) return <div className="p-8">Chatbot not found.</div>;
-
-  return (
-    <div className="max-w-xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Edit Chatbot</h1>
-      <form onSubmit={handleUpdate} className="space-y-4">
-        <div>
-          <label className="block text-sm">Name</label>
-          <input
-            value={name}
-            onChange={e => setName(e.target.value)}
-            required
-            className="input input-bordered w-full"
-            placeholder="Chatbot name"
-            title="Chatbot name"
-          />
-        </div>
-        <div>
-          <label className="block text-sm">Model</label>
-          <select
-            value={model}
-            onChange={e => setModel(e.target.value)}
-            className="input input-bordered"
-            title="Model"
-          >
-            <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-            <option value="gpt-4">gpt-4</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm">Settings (JSON)</label>
-          <textarea
-            value={settings}
-            onChange={e => setSettings(e.target.value)}
-            rows={4}
-            className="input input-bordered w-full font-mono"
-            placeholder="{}"
-            title="Settings JSON"
-          />
-        </div>
-        <Button type="submit">Save</Button>
-        <Button type="button" variant="destructive" onClick={handleDelete}>
-          Delete
-        </Button>
-      </form>
-    </div>
-  );
-}
-=======
 // src/app/dashboard/chatbots/[id]/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
@@ -233,12 +12,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/lib/supabaseClient';
-import { updateChatbot, deleteChatbot, createChatbot } from '../actions';
+import { updateAgent, deleteAgent, createAgent } from '../actions';
 import { Bot, Trash2, Upload } from 'lucide-react';
 import { AddDataSourceDialog } from '@/components/add-data-source-dialog';
 import { DataSourceList } from '@/components/data-source-list';
+import WidgetEmbedCode from '@/components/chat/WidgetEmbedCode';
 
-interface Chatbot {
+interface Agent {
   id: string;
   name: string;
   description?: string;
@@ -249,13 +29,13 @@ interface Chatbot {
   avatar_url?: string;
 }
 
-export default function EditChatbotPage() {
+export default function EditAgentPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
   const isNew = id === 'new';
   
-  const [chatbot, setChatbot] = useState<Chatbot | null>(null);
+  const [agent, setAgent] = useState<Agent | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [model, setModel] = useState('gpt-4o');
@@ -276,7 +56,7 @@ export default function EditChatbotPage() {
       return;
     }
     
-    const fetchChatbot = async () => {
+    const fetchAgent = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -294,7 +74,7 @@ export default function EditChatbotPage() {
         if (error) {
           setError(error.message);
         } else if (data) {
-          setChatbot(data);
+          setAgent(data);
           setName(data.name);
           setDescription(data.description || '');
           setModel(data.model || 'gpt-4o');
@@ -302,10 +82,10 @@ export default function EditChatbotPage() {
           setStatus(data.settings?.status || 'active');
           setAvatarUrl(data.avatar_url || null);
           
-          // Fetch data sources for this chatbot
+          // Fetch data sources for this agent
           fetchDataSources(data.id);
         } else {
-          setError('Chatbot not found');
+          setError('Agent not found');
         }
       } catch (err) {
         setError((err as Error).message);
@@ -314,7 +94,7 @@ export default function EditChatbotPage() {
       }
     };
     
-    fetchChatbot();
+    fetchAgent();
   }, [id, isNew, router]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -337,8 +117,8 @@ export default function EditChatbotPage() {
     if (!avatarFile) return avatarUrl;
     
     try {
-      // Generate a UUID if we don't have one (for new chatbots)
-      const chatbotId = id !== 'new' ? id : crypto.randomUUID();
+      // Generate a UUID if we don't have one (for new agents)
+      const agentId = id !== 'new' ? id : crypto.randomUUID();
       const fileExt = avatarFile.name.split('.').pop();
       const fileName = `${chatbotId}.${fileExt}`;
       const filePath = `${userId}/${fileName}`;
@@ -399,11 +179,11 @@ export default function EditChatbotPage() {
         return;
       }
       
-      // Generate a UUID for new chatbots
-      const chatbotId = isNew ? crypto.randomUUID() : id;
+      // Generate a UUID for new agents
+      const agentId = isNew ? crypto.randomUUID() : id;
       
-      // Prepare chatbot data
-      const chatbotData = {
+      // Prepare agent data
+      const agentData = {
         name,
         description, // Allow empty string to be saved as null
         model,
@@ -418,7 +198,7 @@ export default function EditChatbotPage() {
         if (avatarFile) {
           const newAvatarUrl = await uploadAvatar(user.id);
           if (newAvatarUrl) {
-            chatbotData.avatar_url = newAvatarUrl;
+            agentData.avatar_url = newAvatarUrl;
           }
         }
       } catch (avatarError) {
@@ -427,21 +207,21 @@ export default function EditChatbotPage() {
       }
       
       if (isNew) {
-        // Create new chatbot using the createChatbot function
-        await createChatbot({
-          ...chatbotData,
-          id: chatbotId
+        // Create new agent using the createAgent function
+        await createAgent({
+          ...agentData,
+          id: agentId
         });
 
         
-        // Check if this is the user's first chatbot and update onboarding steps
+        // Check if this is the user's first agent and update onboarding steps
         const { data: chatbots, error: chatbotsError } = await supabase
           .from('chatbots')
           .select('id')
           .eq('user_id', user.id);
           
         if (!chatbotsError && chatbots && chatbots.length === 1) {
-          // This is the user's first chatbot, update onboarding steps
+          // This is the user's first agent, update onboarding steps
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('onboarding_steps')
@@ -470,15 +250,15 @@ export default function EditChatbotPage() {
           }
         }
         
-        // Redirect to the newly created chatbot
+        // Redirect to the newly created agent
         router.push('/dashboard/chatbots');
       } else {
-        // Update existing chatbot
-        await updateChatbot(id, chatbotData);
+        // Update existing agent
+        await updateAgent(id, agentData);
         router.push('/dashboard/chatbots');
       }
     } catch (err) {
-      console.error('Error saving chatbot:', err);
+      console.error('Error saving agent:', err);
       setError((err as Error).message);
       setSaving(false);
     }
@@ -486,7 +266,7 @@ export default function EditChatbotPage() {
   
   const handleDelete = async () => {
     try {
-      await deleteChatbot(id);
+      await deleteAgent(id);
       router.push('/dashboard/chatbots');
     } catch (err) {
       setError((err as Error).message);
@@ -520,14 +300,14 @@ export default function EditChatbotPage() {
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">
           <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
-            {isNew ? 'Create New Chatbot' : 'Edit Chatbot'}
+            {isNew ? 'Create New Agent' : 'Edit Agent'}
           </span>
         </h1>
         
         <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600/50 rounded-xl">
           <CardHeader>
             <CardTitle className="text-xl font-semibold">
-              {isNew ? 'Chatbot Configuration' : 'Edit Chatbot Configuration'}
+              {isNew ? 'Agent Configuration' : 'Edit Agent Configuration'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -538,10 +318,11 @@ export default function EditChatbotPage() {
             )}
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 w-full mb-6">
+              <TabsList className="grid grid-cols-4 w-full mb-6">
                 <TabsTrigger value="general">General</TabsTrigger>
                 <TabsTrigger value="personality">Personality & Model</TabsTrigger>
                 <TabsTrigger value="data">Data Sources</TabsTrigger>
+                <TabsTrigger value="widget">Website Widget</TabsTrigger>
               </TabsList>
               
               <TabsContent value="general" className="space-y-6">
@@ -550,7 +331,7 @@ export default function EditChatbotPage() {
                   <div className="flex flex-col items-center space-y-4">
                     <Avatar className="h-24 w-24 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600">
                       {avatarUrl ? (
-                        <AvatarImage src={avatarUrl} alt="Chatbot avatar" className="rounded-xl" />
+                        <AvatarImage src={avatarUrl} alt="Agent avatar" className="rounded-xl" />
                       ) : (
                         <AvatarFallback className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600">
                           <Bot className="h-12 w-12 text-white" />
@@ -575,12 +356,12 @@ export default function EditChatbotPage() {
                   
                   {/* Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-gray-300">Chatbot Name</Label>
+                    <Label htmlFor="name" className="text-gray-300">Agent Name</Label>
                     <Input 
                       id="name" 
                       value={name} 
                       onChange={(e) => setName(e.target.value)} 
-                      placeholder="My Awesome Chatbot" 
+                      placeholder="My Awesome Agent"
                       required 
                       className="bg-gray-800 border-gray-700 text-white" 
                     />
@@ -593,7 +374,7 @@ export default function EditChatbotPage() {
                       id="description" 
                       value={description} 
                       onChange={(e) => setDescription(e.target.value)} 
-                      placeholder="A brief description of your chatbot" 
+                      placeholder="A brief description of your agent"
                       className="bg-gray-800 border-gray-700 text-white" 
                     />
                   </div>
@@ -623,7 +404,7 @@ export default function EditChatbotPage() {
                           onClick={() => setDeleteDialogOpen(true)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Chatbot
+                          Delete Agent
                         </Button>
                       )}
                     </div>
@@ -705,6 +486,9 @@ export default function EditChatbotPage() {
                   />
                 </div>
               </TabsContent>
+              <TabsContent value="widget">
+                <WidgetEmbedCode chatbotId={id} />
+              </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
@@ -715,7 +499,7 @@ export default function EditChatbotPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-400">
-                This action cannot be undone. This will permanently delete the chatbot
+                This action cannot be undone. This will permanently delete the agent
                 and all associated data including messages and connections.
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -736,5 +520,3 @@ export default function EditChatbotPage() {
     </div>
   );
 }
->>>>>>> Stashed changes
->>>>>>> Stashed changes
