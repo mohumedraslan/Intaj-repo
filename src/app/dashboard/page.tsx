@@ -1,12 +1,75 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useDashboardData } from '@/lib/hooks/useDashboardData';
+import { supabase } from '@/lib/supabaseClient';
+import OnboardingChecklist from '@/components/onboarding/OnboardingChecklist';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
 
 export default function DashboardPage() {
-  const pathname = usePathname() || '';
-  const { data: { stats, recentActivity }, loading, error } = useDashboardData();
+  const pathname = usePathname();
+  const { data, loading, error } = useDashboardData();
+  const [profile, setProfile] = useState<any>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [profileError, setProfileError] = useState<any>(null);
+  const [onboardingSteps, setOnboardingSteps] = useState({
+    created_first_chatbot: false,
+    added_data_source: false,
+    connected_channel: false,
+    has_dismissed: false
+  });
+
+  useEffect(() => {
+    async function fetchUserProfile() {
+      try {
+        setLoadingProfile(true);
+        
+        // Get the current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) {
+          setProfileError(userError);
+          return;
+        }
+        
+        if (!user) {
+          setProfileError(new Error('No user found'));
+          return;
+        }
+
+        // Fetch the user's profile
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+          
+        if (error) {
+          // Handle the error silently - we can still show the dashboard
+          setProfileError(error);
+        } else if (profile) {
+          setProfile(profile);
+          setOnboardingSteps(profile.onboarding_steps || {
+            created_first_chatbot: false,
+            added_data_source: false,
+            connected_channel: false,
+            has_dismissed: false
+          });
+        }
+      } catch (error) {
+        // Set the error state but don't log to console
+        setProfileError(error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    }
+    
+    fetchUserProfile();
+  }, []);
+
   return (
     <div className="flex h-[100dvh] bg-[#0a0a0b] text-[#f8fafc] font-sans antialiased">
       {/* Sidebar */}
@@ -106,227 +169,264 @@ export default function DashboardPage() {
           </div>
         </nav>
         <div className="p-4 border-t border-gray-700/50">
-          <div className="flex items-center space-x-3 p-3 rounded-lg bg-[#1f2024]">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">JD</span>
+          <div className="flex items-center space-x-3 p-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold">
+              {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : '?'}
             </div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-gray-200">John Doe</div>
-              <div className="text-xs text-gray-400">Pro Plan</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-200 truncate">
+                {profile?.full_name || 'User'}
+              </p>
+              <p className="text-xs text-gray-400 truncate">
+                {profile?.email || 'Loading...'}
+              </p>
             </div>
-            <button 
-              className="text-gray-400 hover:text-gray-200 transition-colors"
-              title="Sign out"
-              aria-label="Sign out"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-            </button>
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar */}
-        <header className="bg-[#141517] border-b border-gray-700/50 px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-              <p className="text-gray-400">Welcome back! Here&apos;s what&apos;s happening with your AI automation.</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              {/* Search */}
-              <div className="relative">
-                <input type="text" placeholder="Search..." className="bg-[#1f2024] border border-gray-600 rounded-lg px-4 py-2 pl-10 text-gray-200 focus:border-blue-500 focus:outline-none w-64" />
-                <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      {/* Main content */}
+      <main className="flex-1 overflow-auto">
+        {/* Top bar */}
+        <div className="border-b border-gray-700/50 bg-[#141517] p-4 flex justify-between items-center">
+          <div className="relative w-96">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full bg-[#1e1f23] border border-gray-700/50 rounded-lg py-2 px-4 pl-10 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+            />
+            <svg className="w-5 h-5 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="p-2 rounded-lg bg-[#1e1f23] text-gray-400 hover:text-gray-200">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </button>
+            <button className="p-2 rounded-lg bg-[#1e1f23] text-gray-400 hover:text-gray-200">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Dashboard content */}
+        <div className="p-6">
+          {/* Onboarding checklist */}
+          {!loading && !loadingProfile && (
+            <OnboardingChecklist 
+              steps={onboardingSteps} 
+              onUpdateStep={(step, value) => {
+                setOnboardingSteps(prev => ({
+                  ...prev,
+                  [step]: value
+                }));
+              }}
+              onDismiss={() => {
+                setOnboardingSteps(prev => ({
+                  ...prev,
+                  has_dismissed: true
+                }));
+              }}
+            />
+          )}
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+            <div className="bg-[#141517] border border-gray-700/50 rounded-xl p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm">Active Chatbots</p>
+                  <h3 className="text-2xl font-bold text-white mt-1">{data.stats.activeBots}</h3>
+                </div>
+                <div className="p-3 bg-blue-500/10 rounded-lg">
+                  <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                </div>
               </div>
-              {/* Notifications */}
-              <button 
-                className="relative p-2 text-gray-400 hover:text-gray-200 transition-colors"
-                title="View notifications"
-                aria-label="View notifications"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-5.405-5.405a2.032 2.032 0 01-.595-1.43V11a6.5 6.5 0 11-13 0v-0.834c0-.532-.217-1.04-.595-1.43L0 17h5m10 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              </button>
-              {/* Quick Actions */}
-              <Link
-                href="/dashboard/chatbots/new"
-                className="bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-2 rounded-lg text-white font-medium hover:opacity-90 transition-opacity flex items-center space-x-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                <span>Create Bot</span>
-              </Link>
+              <div className="mt-4 flex items-center">
+                <span className="text-green-500 flex items-center text-sm">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  {data.stats.weeklyBotGrowth}%
+                </span>
+                <span className="text-gray-500 text-sm ml-2">vs last week</span>
+              </div>
+            </div>
+
+            <div className="bg-[#141517] border border-gray-700/50 rounded-xl p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm">Conversations</p>
+                  <h3 className="text-2xl font-bold text-white mt-1">{data.stats.conversations}</h3>
+                </div>
+                <div className="p-3 bg-purple-500/10 rounded-lg">
+                  <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center">
+                <span className="text-green-500 flex items-center text-sm">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  {data.stats.conversationGrowth}%
+                </span>
+                <span className="text-gray-500 text-sm ml-2">vs last week</span>
+              </div>
+            </div>
+
+            <div className="bg-[#141517] border border-gray-700/50 rounded-xl p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm">Avg. Response Time</p>
+                  <h3 className="text-2xl font-bold text-white mt-1">{data.stats.responseTime}s</h3>
+                </div>
+                <div className="p-3 bg-cyan-500/10 rounded-lg">
+                  <svg className="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center">
+                <span className="text-green-500 flex items-center text-sm">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                  {Math.abs(data.stats.responseTimeImprovement * 100)}%
+                </span>
+                <span className="text-gray-500 text-sm ml-2">faster than last week</span>
+              </div>
+            </div>
+
+            <div className="bg-[#141517] border border-gray-700/50 rounded-xl p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm">User Satisfaction</p>
+                  <h3 className="text-2xl font-bold text-white mt-1">{data.stats.satisfaction}%</h3>
+                </div>
+                <div className="p-3 bg-green-500/10 rounded-lg">
+                  <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center">
+                <span className="text-green-500 flex items-center text-sm">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  {data.stats.satisfactionGrowth}%
+                </span>
+                <span className="text-gray-500 text-sm ml-2">vs last week</span>
+              </div>
             </div>
           </div>
-        </header>
 
-        {/* Dashboard Content */}
-        <main className="flex-1 overflow-y-auto bg-[#0a0a0b] p-8">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-red-500">Error loading dashboard data: {error.message || 'An unknown error occurred'}</div>
-            </div>
-          ) : (
-            <div data-tour="dashboard-overview">
-              {/* Stats Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-tour="analytics-cards">
-                {/* Active Bots */}
-            <div className="bg-[#1f2024] glass-card p-6 rounded-2xl hover:border-blue-500/30 transition-colors">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+          {/* Platform distribution and recent activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <div className="lg:col-span-1 bg-[#141517] border border-gray-700/50 rounded-xl p-6">
+              <h3 className="text-lg font-medium text-white">Platform Distribution</h3>
+              <div className="mt-6 space-y-4">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm text-gray-400">WhatsApp</span>
+                    <span className="text-sm text-gray-400">{data.platforms.whatsapp}</span>
+                  </div>
+                  <div className="w-full bg-gray-700/30 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: `${(data.platforms.whatsapp / Math.max(1, Object.values(data.platforms).reduce((a, b) => a + b, 0))) * 100}%` }}></div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-green-500">Live</span>
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm text-gray-400">Facebook</span>
+                    <span className="text-sm text-gray-400">{data.platforms.facebook}</span>
+                  </div>
+                  <div className="w-full bg-gray-700/30 rounded-full h-2">
+                    <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(data.platforms.facebook / Math.max(1, Object.values(data.platforms).reduce((a, b) => a + b, 0))) * 100}%` }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm text-gray-400">Instagram</span>
+                    <span className="text-sm text-gray-400">{data.platforms.instagram}</span>
+                  </div>
+                  <div className="w-full bg-gray-700/30 rounded-full h-2">
+                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: `${(data.platforms.instagram / Math.max(1, Object.values(data.platforms).reduce((a, b) => a + b, 0))) * 100}%` }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm text-gray-400">Website</span>
+                    <span className="text-sm text-gray-400">{data.platforms.web}</span>
+                  </div>
+                  <div className="w-full bg-gray-700/30 rounded-full h-2">
+                    <div className="bg-cyan-500 h-2 rounded-full" style={{ width: `${(data.platforms.web / Math.max(1, Object.values(data.platforms).reduce((a, b) => a + b, 0))) * 100}%` }}></div>
+                  </div>
                 </div>
               </div>
-              <div className="text-3xl font-bold text-white mb-1">{stats.activeBots}</div>
-              <div className="text-gray-400 text-sm">Active Bots</div>
-              {stats.weeklyBotGrowth > 0 && (
-                <div className="text-xs text-green-500 mt-2">+{stats.weeklyBotGrowth} this week</div>
-              )}
-            </div>
-            {/* Today's Conversations */}
-            <div className="bg-[#1f2024] glass-card p-6 rounded-2xl hover:border-purple-500/30 transition-colors">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-purple-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8z" /></svg>
-                </div>
-                <div className="text-xs text-purple-500">Today</div>
+              <div className="mt-6">
+                <Button className="w-full bg-primary-500 hover:bg-primary-600 text-white">
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                  Add Connection
+                </Button>
               </div>
-              <div className="text-3xl font-bold text-white mb-1">{stats.conversations}</div>
-              <div className="text-gray-400 text-sm">Conversations</div>
-              {stats.conversationGrowth !== 0 && (
-                <div className={`text-xs ${stats.conversationGrowth > 0 ? 'text-green-500' : 'text-red-500'} mt-2`}>
-                  {stats.conversationGrowth > 0 ? '+' : ''}{stats.conversationGrowth}% vs yesterday
-                </div>
-              )}
             </div>
-            {/* Response Time */}
-            <div className="bg-[#1f2024] glass-card p-6 rounded-2xl hover:border-cyan-500/30 transition-colors">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-cyan-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <div className="text-xs text-cyan-500">Avg</div>
-              </div>
-              <div className="text-3xl font-bold text-white mb-1">
-                {stats.responseTime.toFixed(1)}s
-              </div>
-              <div className="text-gray-400 text-sm">Response Time</div>
-              {stats.responseTimeImprovement !== 0 && (
-                <div className={`text-xs ${stats.responseTimeImprovement < 0 ? 'text-green-500' : 'text-red-500'} mt-2`}>
-                  {stats.responseTimeImprovement < 0 ? '' : '+'}
-                  {stats.responseTimeImprovement.toFixed(1)}s vs avg
-                </div>
-              )}
-            </div>
-            {/* Satisfaction Rate */}
-            <div className="bg-[#1f2024] glass-card p-6 rounded-2xl hover:border-green-500/30 transition-colors">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                </div>
-                <div className="text-xs text-green-500">Rating</div>
-              </div>
-              <div className="text-3xl font-bold text-white mb-1">{stats.satisfaction.toFixed(1)}%</div>
-              <div className="text-gray-400 text-sm">Satisfaction</div>
-              {stats.satisfactionGrowth !== 0 && (
-                <div className={`text-xs ${stats.satisfactionGrowth > 0 ? 'text-green-500' : 'text-red-500'} mt-2`}>
-                  {stats.satisfactionGrowth > 0 ? '+' : ''}
-                  {stats.satisfactionGrowth.toFixed(1)}% this month
-                </div>
-              )}
-            </div>
-          </div>
 
-          {/* Quick Actions & Recent Activity */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Quick Actions */}
-            <div className="bg-[#1f2024] glass-card p-6 rounded-2xl" data-tour="quick-actions">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-2">
-                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                <span>Quick Actions</span>
-              </h3>
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <Link href="/dashboard/chatbots/create">
-                  <button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 p-4 rounded-lg text-white font-medium hover:opacity-90 transition-opacity flex flex-col items-center space-y-2" data-tour="create-chatbot-btn">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                    <span>Create Chatbot</span>
-                  </button>
-                </Link>
-                <Link href="/connections">
-                  <button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 p-4 rounded-lg text-white font-medium hover:opacity-90 transition-opacity flex flex-col items-center space-y-2">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                    <span>Connect Channel</span>
-                  </button>
-                </Link>
-                <Link href="/profile">
-                  <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-lg text-white font-medium hover:opacity-90 transition-opacity flex flex-col items-center space-y-2">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                    <span>Invite Team</span>
-                  </button>
-                </Link>
-                <Link href="/analytics">
-                  <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 p-4 rounded-lg text-white font-medium hover:opacity-90 transition-opacity flex flex-col items-center space-y-2">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2 2z" /></svg>
-                    <span>View Analytics</span>
-                  </button>
-                </Link>
-              </div>
-            </div>
-            
-            {/* Recent Activity */}
-            <div className="bg-[#1f2024] glass-card p-6 rounded-2xl" data-tour="chatbots-section">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span>Recent Activity</span>
-              </h3>
-              <div className="space-y-4">
-                {recentActivity?.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-4 p-3 bg-[#23242a] rounded-lg">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      activity.type === 'conversation' ? 'bg-blue-500' :
-                      activity.type === 'connection' ? 'bg-green-500' :
-                      activity.type === 'update' ? 'bg-purple-500' :
-                      'bg-cyan-500'
-                    }`}>
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {activity.type === 'conversation' && (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        )}
-                        {activity.type === 'connection' && (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        )}
-                        {activity.type === 'update' && (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        )}
-                        {activity.type === 'signup' && (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        )}
-                      </svg>
+            <div className="lg:col-span-2 bg-[#141517] border border-gray-700/50 rounded-xl p-6">
+              <h3 className="text-lg font-medium text-white">Recent Activity</h3>
+              <div className="mt-6 space-y-6">
+                {data.recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex">
+                    <div className="mr-4">
+                      {activity.type === 'conversation' && (
+                        <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                        </div>
+                      )}
+                      {activity.type === 'connection' && (
+                        <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
+                        </div>
+                      )}
+                      {activity.type === 'update' && (
+                        <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </div>
+                      )}
+                      {activity.type === 'signup' && (
+                        <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-medium text-gray-200">{activity.message}</div>
-                      <div className="text-xs text-gray-400">
+                    <div>
+                      <p className="text-gray-200">{activity.message}</p>
+                      <p className="text-xs text-gray-500 mt-1">
                         {new Date(activity.timestamp).toLocaleString()}
-                      </div>
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-            </div>
-          )}
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
