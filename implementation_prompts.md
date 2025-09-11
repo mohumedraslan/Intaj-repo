@@ -2684,7 +2684,96 @@ Many of the project's public-facing pages contain static, hardcoded content, mak
     *   **Render Markdown:** Use the `react-markdown` library to render the `content` of the blog post. This is the key step to convert the stored Markdown into formatted HTML.
     *   **Dynamic Metadata:** Ensure the page's `<title>` tag and meta description are dynamically set based on the blog post's title and excerpt for better SEO.
 
-By the end of this task, the content for the FAQ and Blog will be entirely managed through the database. The business owner can now add, edit, or delete FAQs and blog posts using the Supabase table editor, and the live website will update automatically without requiring a new deployment.
+By the end of this task, a user can give their chatbot a unique personality and train it on specific knowledge, with the entire data ingestion process happening automatically in the background.
+```
+
+### Prompt 23: Adopt "Agent" Personas
+```
+To align with our new product strategy, we need to shift our terminology from "Chatbot" to "Agent" across the entire application. This change will make the product more intuitive and align with our branding.
+
+**Task:**
+
+1.  **Global Search & Replace:**
+    *   Perform a comprehensive search across the entire codebase for all user-facing instances of "Chatbot", "chatbot", "Bot", and "bot".
+    *   Replace these terms with "Agent" or "agent" as appropriate.
+    *   **Be careful:** Do not change variable names, function names, or file names if it would break the code (e.g., `chatbotId` can remain, but "Create New Chatbot" on a button must change).
+
+2.  **Key Files to Update:**
+    *   Pay special attention to the following files, as they are highly visible to the user:
+        *   `src/app/dashboard/page.tsx` (Main dashboard titles, quick actions)
+        *   `src/app/dashboard/chatbots/page.tsx` (The main list of agents)
+        *   `src/app/dashboard/chatbots/[id]/page.tsx` (The agent configuration page)
+        *   `src/components/onboarding/OnboardingChecklist.tsx`
+        *   `src/components/ui/Sidebar.tsx`
+        *   All public-facing pages like `/services`, `/pricing`, `/faq`, etc.
+
+3.  **Review and Verify:**
+    *   After making the changes, manually review the application to ensure the new terminology is applied consistently and that no part of the UI has been broken.
+```
+
+### Prompt 24: Implement Agent Selection in Connection Wizard
+```
+The `ConnectionWizard` currently allows a user to connect a new platform, but it's missing a critical step: linking that connection to a specific Agent. This prompt addresses that gap.
+
+**Task:**
+
+1.  **Add `chatbot_id` to `connections` table:**
+    *   Create a new database migration to add a `chatbot_id` column (type `uuid`, foreign key to `chatbots.id`) to the `connections` table. This is essential for the relationship.
+
+2.  **Modify the `ConnectionWizard` Component (`src/components/connections/ConnectionWizard.tsx`):**
+    *   **Add a New Step:** Introduce a new step in the wizard called `"select-agent"` that appears immediately after the user selects a platform.
+    *   **Fetch and Display Agents:** In this new step, fetch all the agents belonging to the current user and display them in a list. Each item in the list should show the agent's name and avatar.
+    *   **State Management:** Add state to the component to manage the list of agents and the ID of the agent the user selects.
+    *   **Require Selection:** The "Next" button should be disabled until the user has selected an agent.
+    *   **Update `handleNext` and `handleBack`:** Adjust the wizard's navigation logic to correctly handle the new step.
+
+3.  **Update `submitConnection` Logic:**
+    *   When the user completes the wizard, ensure that the `chatbot_id` of the selected agent is included in the data that is saved to the `connections` table.
+```
+
+### Prompt 25: Refine Platform Availability
+```
+To align with our new strategy of focusing on core integrations first, we need to visually distinguish between live integrations and those that are planned for the future.
+
+**Task:**
+
+1.  **Update Platform Data (`src/data/platforms.ts`):**
+    *   Modify the `Platform` interface to replace the `available: boolean` property with a more descriptive `status: 'live' | 'coming_soon'` property.
+    *   Update the `platforms` array:
+        *   Set the `status` of **Email**, **Telegram**, and **Slack** to `'live'`.
+        *   Set the `status` of all other integrations (Facebook, Instagram, WhatsApp, etc.) to `'coming_soon'`.
+
+2.  **Update the `PlatformCard` Component (`src/components/connections/PlatformCard.tsx`):**
+    *   Modify the component to use the new `status` property instead of `available`.
+    *   If `status` is `'coming_soon'`, the card should be visually de-emphasized (e.g., with reduced opacity) and should not be clickable.
+    *   Ensure the "Coming Soon" badge is displayed correctly for these platforms.
+```
+
+### Prompt 26: Fix Public Site UI and Routing
+```
+Our public-facing marketing site has several broken links and non-functional UI elements. This creates a poor first impression and needs to be fixed to ensure a professional and trustworthy user experience.
+
+**Task:**
+
+1.  **Fix Header and Footer Links:**
+    *   In `src/components/Header.tsx`, ensure the "Log In" link correctly points to `/auth`.
+    *   In `src/components/Footer.tsx`, ensure the company logo is a clickable link that goes to the homepage (`/`).
+    *   Review all other header and footer links to ensure they point to valid pages.
+
+2.  **Repair the Pricing Page (`src/app/pricing/page.tsx`):**
+    *   The "Contact Sales" button for the Enterprise plan should link to `/contact-us`.
+    *   The "Start Free Trial" button for the Professional plan should link to `/signup`.
+    *   The buttons in the "Ready to Transform Your Business?" section at the bottom of the page must be made functional, linking to `/signup` and `/contact-us` respectively.
+
+3.  **Repair the Services Page (`src/app/services/page.tsx`):**
+    *   Fix the "Schedule Consultation" and "Contact Sales" buttons to correctly link to `/contact-us`.
+
+4.  **Create Missing Pages:**
+    *   The site is missing a checkout page, causing a 404 error. Create a placeholder page at `src/app/pricing/checkout/page.tsx`. This page should acknowledge the selected plan (passed as a query parameter) and can have a simple "Coming Soon" message for the payment integration.
+    *   Verify that the `/contact-us` page exists and is functional. If not, create a simple contact page.
+
+5.  **Site-wide Audit:**
+    *   Perform a quick audit of the other main public pages (`/`, `/about-us`, `/faq`) to find and fix any other obvious broken links or non-functional buttons.
 ```
 >>>>>>> Stashed changes
 >>>>>>> Stashed changes

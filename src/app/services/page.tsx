@@ -63,7 +63,7 @@ export default function ServicesPage() {
               That Transform Your <span className="text-gradient">Business</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
-              From intelligent chatbots to automated workflows, discover our comprehensive suite of AI services designed to streamline operations and boost growth.
+              From intelligent agents to automated workflows, discover our comprehensive suite of AI services designed to streamline operations and boost growth.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link 
@@ -73,7 +73,7 @@ export default function ServicesPage() {
                 Explore All Services
               </Link>
               <Link
-                href="/contact"
+                href="/contact-us"
                 className="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors"
               >
                 <span>Schedule Consultation</span>
@@ -96,7 +96,7 @@ export default function ServicesPage() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Chatbots & Messaging */}
+            {/* Agents & Messaging */}
             <div className="animate-on-scroll">
               <div className="glass-card p-8 rounded-3xl feature-card group">
                 <div className="flex items-center mb-6">
@@ -105,10 +105,10 @@ export default function ServicesPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold">AI Chatbots</h3>
+                  <h3 className="text-2xl font-bold">AI Agents</h3>
                 </div>
                 <p className="text-gray-300 text-lg mb-6">
-                  Intelligent conversational AI that understands your customers and provides instant, accurate responses 24/7.
+                  Intelligent conversational agents that understand your customers and provides instant, accurate responses 24/7.
                 </p>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center space-x-3">
@@ -239,7 +239,7 @@ export default function ServicesPage() {
                 Start Free Trial
               </Link>
               <Link
-                href="/contact"
+                href="/contact-us"
                 className="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors"
               >
                 Contact Sales

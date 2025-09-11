@@ -5,6 +5,7 @@ import type { NextRequest } from 'next/server';
 const PUBLIC_ROUTES = [
   '/',
   '/auth',
+  '/signup',
   '/about-us',
   '/features',
   '/pricing',

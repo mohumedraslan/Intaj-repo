@@ -13,12 +13,18 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-type WizardStep = 'select-platform' | 'authentication' | 'configuration' | 'confirmation';
+type WizardStep = 'select-platform' | 'select-agent' | 'authentication' | 'configuration' | 'confirmation';
 
 interface ConnectionWizardProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: (connectionData: any) => void;
+}
+
+interface Agent {
+  id: string;
+  name: string;
+  avatar_url?: string;
 }
 
 interface ApiResponse {
@@ -33,6 +39,8 @@ interface ApiResponse {
 export default function ConnectionWizard({ isOpen, onClose, onComplete }: ConnectionWizardProps) {
   const [currentStep, setCurrentStep] = useState<WizardStep>('select-platform');
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,10 +49,32 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
   const { data: session } = useSession();
   const router = useRouter();
   
+  useEffect(() => {
+    const fetchAgents = async () => {
+      if (isOpen) {
+        const supabase = createClientComponentClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data, error } = await supabase
+            .from('chatbots')
+            .select('id, name, avatar_url')
+            .eq('user_id', user.id);
+          if (error) {
+            console.error('Error fetching agents:', error);
+          } else {
+            setAgents(data);
+          }
+        }
+      }
+    };
+    fetchAgents();
+  }, [isOpen]);
+
   // Reset state when modal is closed
   const handleClose = () => {
     setCurrentStep('select-platform');
     setSelectedPlatform(null);
+    setSelectedAgent(null);
     setFormData({});
     setError(null);
     setIsLoading(false);
@@ -99,6 +129,7 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
       if (selectedPlatform.authType === 'api-key') {
         const payload = {
           platform: selectedPlatform.id,
+          chatbot_id: selectedAgent,
           apiKey: formData.apiKey,
           ...(selectedPlatform.id === 'telegram' && formData.botUsername ? { botUsername: formData.botUsername } : {}),
           ...(formData.channel ? { channel: formData.channel } : {}),
@@ -269,6 +300,13 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
     
     switch (currentStep) {
       case 'select-platform':
+        setCurrentStep('select-agent');
+        break;
+      case 'select-agent':
+        if (!selectedAgent) {
+          setError('Please select an agent to connect.');
+          return;
+        }
         setCurrentStep('authentication');
         break;
       case 'authentication':
@@ -311,8 +349,11 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
   // Handle back navigation
   const handleBack = () => {
     switch (currentStep) {
-      case 'authentication':
+      case 'select-agent':
         setCurrentStep('select-platform');
+        break;
+      case 'authentication':
+        setCurrentStep('select-agent');
         break;
       case 'configuration':
         setCurrentStep('authentication');
@@ -353,6 +394,24 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
             <p className="text-gray-400 mb-6">Choose a platform to connect with your account</p>
             
             {/* Search bar */}
+      case 'select-agent':
+        return (
+          <div className="p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Select Agent</h2>
+            <p className="text-gray-400 mb-6">Choose which agent to connect to {selectedPlatform?.name}.</p>
+            <div className="space-y-2">
+              {agents.map(agent => (
+                <div
+                  key={agent.id}
+                  className={`p-4 border rounded-lg cursor-pointer ${selectedAgent === agent.id ? 'border-blue-500 bg-blue-500/10' : 'border-gray-700'}`}
+                  onClick={() => setSelectedAgent(agent.id)}
+                >
+                  {agent.name}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
             <div className="relative mb-6">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />

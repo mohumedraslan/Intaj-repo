@@ -1,151 +1,98 @@
-# Intaj API Reference
+# Intaj AI Public API Reference
+
+Welcome to the Intaj AI Public API! This guide will help you get started with programmatically interacting with your AI Agents.
 
 ## Authentication
 
-### Getting Started
-1. Sign up at [dashboard.intaj.io](https://dashboard.intaj.io)
-2. Get your API key from the dashboard
-3. Include the API key in all requests:
-```http
-Authorization: Bearer your_api_key_here
+All API requests must be authenticated with an API key. You can generate and manage your API keys in your **Profile Settings > API Keys**.
+
+Your API key must be included in the `Authorization` header as a Bearer token.
+
+**Example Header:**
+```
+Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### Authentication Endpoints
+---
 
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
+## Endpoints
 
-{
-  "email": "user@example.com",
-  "password": "your_password"
-}
-```
+### Chat with an Agent
 
-#### Sign Up
-```http
-POST /api/auth/signup
-Content-Type: application/json
+This endpoint allows you to send a message to one of your agents and receive a response.
 
-{
-  "email": "user@example.com",
-  "password": "your_password",
-  "name": "User Name"
-}
-```
+- **URL:** `/api/v1/chat`
+- **Method:** `POST`
+- **Headers:**
+  - `Content-Type: application/json`
+  - `Authorization: Bearer YOUR_API_KEY`
 
-## Chat API Endpoints
+**Request Body:**
 
-### Send Message
-```http
-POST /api/chat
-Content-Type: application/json
-
-{
-  "message": "Hello, how can I help?",
-  "chatbotId": "bot_123",
-  "platform": "website" // website, whatsapp, facebook, instagram
-}
-```
-
-### Get Chat History
-```http
-GET /api/chat/history?chatbotId=bot_123&limit=50
-```
-
-## Chatbot Management
-
-### Create Chatbot
-```http
-POST /api/chatbots
-Content-Type: application/json
-
-{
-  "name": "Support Bot",
-  "model": "gpt-4",
-  "settings": {
-    "temperature": 0.7,
-    "maxTokens": 2000
-  }
-}
-```
-
-### Update Chatbot
-```http
-PUT /api/chatbots/{botId}
-Content-Type: application/json
-
-{
-  "name": "New Name",
-  "settings": {
-    "temperature": 0.5
-  }
-}
-```
-
-## File Management
-
-### Upload File
-```http
-POST /api/files/upload
-Content-Type: multipart/form-data
-
-file: [binary]
-```
-
-### List Files
-```http
-GET /api/files?limit=20&offset=0
-```
-
-## Analytics
-
-### Get Usage Stats
-```http
-GET /api/analytics/usage
-```
-
-### Get Performance Metrics
-```http
-GET /api/analytics/performance
-```
-
-## Rate Limits
-
-| Plan     | API Calls/min | Messages/day | Storage |
-|----------|---------------|--------------|---------|
-| Free     | 60           | 100          | 100 MB  |
-| Pro      | 300          | 1,000        | 1 GB    |
-| Business | 1,000        | 5,000        | 5 GB    |
-
-### Rate Limit Headers
-```http
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 45
-X-RateLimit-Reset: 1631924400
-```
-
-## Error Handling
-
-### Error Response Format
 ```json
 {
-  "error": {
-    "code": "rate_limit_exceeded",
-    "message": "Rate limit exceeded",
-    "details": {
-      "limit": 60,
-      "reset": 1631924400
-    }
-  }
+  "agentId": "YOUR_AGENT_ID",
+  "message": "Hello, what services do you offer?"
 }
 ```
 
-### Common Error Codes
-- `400`: Bad Request
-- `401`: Unauthorized
-- `403`: Forbidden
-- `404`: Not Found
-- `429`: Rate Limit Exceeded
-- `500`: Internal Server Error
+- `agentId` (string, required): The unique ID of the agent you want to chat with. You can find this ID in the URL when you are editing your agent in the dashboard.
+- `message` (string, required): The message from the user.
+
+**Success Response (200 OK):**
+
+```json
+{
+  "reply": "We offer a wide range of AI automation services, including intelligent chatbots, sales automation, and seamless integrations with platforms like Slack and Telegram."
+}
+```
+
+**Error Responses:**
+
+- `400 Bad Request`: Missing `agentId` or `message` in the request body.
+- `401 Unauthorized`: Missing or invalid API key.
+- `404 Not Found`: The specified `agentId` does not exist or you do not have permission to access it.
+- `500 Internal Server Error`: An unexpected error occurred on our end.
+
+---
+
+## Code Examples
+
+### cURL
+
+```bash
+curl -X POST https://intaj.nabih.tech/api/v1/chat \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d '{
+        "agentId": "YOUR_AGENT_ID",
+        "message": "Tell me about your pricing."
+      }'
+```
+
+### JavaScript (fetch)
+
+```javascript
+const agentId = 'YOUR_AGENT_ID';
+const apiKey = 'YOUR_API_KEY';
+const userMessage = 'What is your refund policy?';
+
+fetch('https://intaj.nabih.tech/api/v1/chat', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`
+  },
+  body: JSON.stringify({
+    agentId: agentId,
+    message: userMessage
+  })
+})
+.then(response => response.json())
+.then(data => {
+  console.log('AI Reply:', data.reply);
+})
+.catch(error => {
+  console.error('Error:', error);
+});
+```

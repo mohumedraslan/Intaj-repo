@@ -1,128 +1,10 @@
-<<<<<<< Updated upstream
 // src/app/dashboard/chatbots/actions.ts
 // Server actions for chatbot CRUD (create, update, delete)
 import { supabase } from '@/lib/supabaseClient';
 
 // NOTE: Do not import this file into client components. Use API routes instead for client-server communication.
 
-export async function createChatbot({ name, model, settings }: { name: string; model: string; settings: Record<string, unknown> }) {
-  // supabase is already imported and ready to use
-  const user = (await supabase.auth.getUser()).data.user;
-  if (!user) throw new Error('Not authenticated');
-  const { data, error } = await supabase
-    .from('chatbots')
-    .insert({
-      user_id: user.id,
-      name,
-      model,
-      settings,
-    })
-    .select()
-    .single();
-  if (error) throw error;
-  // Optionally trigger revalidation here if called from a server component
-  return data;
-}
-
-export async function updateChatbot({ id, name, model, settings }: { id: string; name: string; model: string; settings: Record<string, unknown> }) {
-  // supabase is already imported and ready to use
-  const user = (await supabase.auth.getUser()).data.user;
-  if (!user) throw new Error('Not authenticated');
-  const { error } = await supabase
-    .from('chatbots')
-    .update({ name, model, settings })
-    .eq('id', id)
-    .eq('user_id', user.id);
-  if (error) throw error;
-  // Optionally trigger revalidation here if called from a server component
-}
-
-export async function deleteChatbot(id: string) {
-  // supabase is already imported and ready to use
-  const user = (await supabase.auth.getUser()).data.user;
-  if (!user) throw new Error('Not authenticated');
-  const { error } = await supabase
-    .from('chatbots')
-    .delete()
-    .eq('id', id)
-    .eq('user_id', user.id);
-  if (error) throw error;
-  // Optionally trigger revalidation here if called from a server component
-}
-=======
-<<<<<<< Updated upstream
-// src/app/dashboard/chatbots/actions.ts
-// Server actions for chatbot CRUD (create, update, delete)
-import { supabase } from '@/lib/supabaseClient';
-
-// NOTE: Do not import this file into client components. Use API routes instead for client-server communication.
-
-export async function createChatbot({
-  name,
-  model,
-  settings,
-}: {
-  name: string;
-  model: string;
-  settings: Record<string, unknown>;
-}) {
-  // supabase is already imported and ready to use
-  const user = (await supabase.auth.getUser()).data.user;
-  if (!user) throw new Error('Not authenticated');
-  const { data, error } = await supabase
-    .from('chatbots')
-    .insert({
-      user_id: user.id,
-      name,
-      model,
-      settings,
-    })
-    .select()
-    .single();
-  if (error) throw error;
-  // Optionally trigger revalidation here if called from a server component
-  return data;
-}
-
-export async function updateChatbot({
-  id,
-  name,
-  model,
-  settings,
-}: {
-  id: string;
-  name: string;
-  model: string;
-  settings: Record<string, unknown>;
-}) {
-  // supabase is already imported and ready to use
-  const user = (await supabase.auth.getUser()).data.user;
-  if (!user) throw new Error('Not authenticated');
-  const { error } = await supabase
-    .from('chatbots')
-    .update({ name, model, settings })
-    .eq('id', id)
-    .eq('user_id', user.id);
-  if (error) throw error;
-  // Optionally trigger revalidation here if called from a server component
-}
-
-export async function deleteChatbot(id: string) {
-  // supabase is already imported and ready to use
-  const user = (await supabase.auth.getUser()).data.user;
-  if (!user) throw new Error('Not authenticated');
-  const { error } = await supabase.from('chatbots').delete().eq('id', id).eq('user_id', user.id);
-  if (error) throw error;
-  // Optionally trigger revalidation here if called from a server component
-}
-=======
-// src/app/dashboard/chatbots/actions.ts
-// Server actions for chatbot CRUD (create, update, delete)
-import { supabase } from '@/lib/supabaseClient';
-
-// NOTE: Do not import this file into client components. Use API routes instead for client-server communication.
-
-export async function createChatbot({ 
+export async function createAgent({
   name, 
   description, 
   model, 
@@ -165,19 +47,19 @@ export async function createChatbot({
       .single();
       
     if (error) {
-      console.error('Error creating chatbot:', error);
+      console.error('Error creating agent:', error);
       throw error;
     }
     
     // Optionally trigger revalidation here if called from a server component
     return data;
   } catch (err) {
-    console.error('Error in createChatbot:', err);
+    console.error('Error in createAgent:', err);
     throw err;
   }
 }
 
-export async function updateChatbot(
+export async function updateAgent(
   id: string, 
   { 
     name, 
@@ -199,7 +81,7 @@ export async function updateChatbot(
   
   // Validate UUID before updating
   if (!id || id === 'undefined' || id === 'null' || id === 'new') {
-    throw new Error('Invalid chatbot ID');
+    throw new Error('Invalid agent ID');
   }
   
   // Prepare update data with proper handling of null/undefined values
@@ -220,13 +102,13 @@ export async function updateChatbot(
     .eq('user_id', user.id);
     
   if (error) {
-    console.error('Error updating chatbot:', error);
+    console.error('Error updating agent:', error);
     throw error;
   }
   // Optionally trigger revalidation here if called from a server component
 }
 
-export async function deleteChatbot(id: string) {
+export async function deleteAgent(id: string) {
   // supabase is already imported and ready to use
   const user = (await supabase.auth.getUser()).data.user;
   if (!user) throw new Error('Not authenticated');
@@ -238,5 +120,3 @@ export async function deleteChatbot(id: string) {
   if (error) throw error;
   // Optionally trigger revalidation here if called from a server component
 }
->>>>>>> Stashed changes
->>>>>>> Stashed changes

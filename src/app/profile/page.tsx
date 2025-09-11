@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import '@/styles/profile.css';
 import { TwoFactorSetup } from '@/components/security/TwoFactorSetup';
+import ApiKeyManager from '@/components/security/ApiKeyManager';
 import { supabase } from '@/lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
@@ -518,6 +519,10 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
+
+            {/* API Key Manager */}
+            <ApiKeyManager />
+
           </div>
         </div>
       </div>

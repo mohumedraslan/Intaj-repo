@@ -3,7 +3,7 @@ export interface Platform {
   name: string;
   description: string;
   logo: string;
-  available: boolean;
+  status: 'live' | 'coming_soon';
   authType: 'api-key' | 'oauth';
   configOptions?: {
     requiresChannel?: boolean;
@@ -13,22 +13,19 @@ export interface Platform {
 
 const platforms: Platform[] = [
   {
-    id: 'whatsapp',
-    name: 'WhatsApp',
-    description: 'Connect your WhatsApp Business account',
-    logo: '/logos/whatsapp.svg',
-    available: true,
-    authType: 'api-key',
-    configOptions: {
-      requiresWebhook: true
-    }
+    id: 'email',
+    name: 'Email',
+    description: 'Connect your email account',
+    logo: '/logos/email.svg',
+    status: 'live',
+    authType: 'oauth'
   },
   {
     id: 'telegram',
     name: 'Telegram',
     description: 'Connect your Telegram bot',
     logo: '/logos/telegram.svg',
-    available: true,
+    status: 'live',
     authType: 'api-key'
   },
   {
@@ -36,10 +33,21 @@ const platforms: Platform[] = [
     name: 'Slack',
     description: 'Connect your Slack workspace',
     logo: '/logos/slack.svg',
-    available: true,
+    status: 'live',
     authType: 'oauth',
     configOptions: {
       requiresChannel: true
+    }
+  },
+  {
+    id: 'whatsapp',
+    name: 'WhatsApp',
+    description: 'Connect your WhatsApp Business account',
+    logo: '/logos/whatsapp.svg',
+    status: 'coming_soon',
+    authType: 'api-key',
+    configOptions: {
+      requiresWebhook: true
     }
   },
   {
@@ -47,7 +55,7 @@ const platforms: Platform[] = [
     name: 'Discord',
     description: 'Connect your Discord server',
     logo: '/logos/discord.svg',
-    available: true,
+    status: 'coming_soon',
     authType: 'oauth',
     configOptions: {
       requiresChannel: true
@@ -58,7 +66,7 @@ const platforms: Platform[] = [
     name: 'Facebook',
     description: 'Connect your Facebook page',
     logo: '/logos/facebook.svg',
-    available: false,
+    status: 'coming_soon',
     authType: 'oauth'
   },
   {
@@ -66,7 +74,7 @@ const platforms: Platform[] = [
     name: 'Instagram',
     description: 'Connect your Instagram business account',
     logo: '/logos/instagram.svg',
-    available: false,
+    status: 'coming_soon',
     authType: 'oauth'
   },
   {
@@ -74,7 +82,7 @@ const platforms: Platform[] = [
     name: 'Twitter',
     description: 'Connect your Twitter account',
     logo: '/logos/twitter.svg',
-    available: false,
+    status: 'coming_soon',
     authType: 'oauth'
   },
   {
@@ -82,7 +90,7 @@ const platforms: Platform[] = [
     name: 'LINE',
     description: 'Connect your LINE official account',
     logo: '/logos/line.svg',
-    available: false,
+    status: 'coming_soon',
     authType: 'api-key'
   },
   {
@@ -90,7 +98,7 @@ const platforms: Platform[] = [
     name: 'WeChat',
     description: 'Connect your WeChat official account',
     logo: '/logos/wechat.svg',
-    available: false,
+    status: 'coming_soon',
     authType: 'api-key'
   },
   {
@@ -98,23 +106,15 @@ const platforms: Platform[] = [
     name: 'Viber',
     description: 'Connect your Viber business account',
     logo: '/logos/viber.svg',
-    available: false,
+    status: 'coming_soon',
     authType: 'api-key'
-  },
-  {
-    id: 'email',
-    name: 'Email',
-    description: 'Connect your email account',
-    logo: '/logos/email.svg',
-    available: false,
-    authType: 'oauth'
   },
   {
     id: 'sms',
     name: 'SMS',
     description: 'Connect SMS via Twilio',
     logo: '/logos/sms.svg',
-    available: false,
+    status: 'coming_soon',
     authType: 'api-key'
   }
 ];
