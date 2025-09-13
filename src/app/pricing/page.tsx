@@ -62,7 +62,7 @@ export default function PricingPage() {
               </div>
 
               <ul className="space-y-4 mb-8">
-                <PricingFeature text="1 AI Chatbot" included />
+                <PricingFeature text="1 AI Agent" included />
                 <PricingFeature text="100 conversations/month" included />
                 <PricingFeature text="Website widget integration" included />
                 <PricingFeature text="Basic analytics" included />
@@ -70,7 +70,7 @@ export default function PricingPage() {
                 <PricingFeature text="Multi-channel integrations" included={false} />
               </ul>
 
-              <a href="/dashboard" className="block w-full">
+              <a href="/signup" className="block w-full">
                 <button className="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200">
                   Get Started Free
                 </button>
@@ -94,7 +94,7 @@ export default function PricingPage() {
               </div>
 
               <ul className="space-y-4 mb-8">
-                <PricingFeature text="5 AI Chatbots" included />
+                <PricingFeature text="5 AI Agents" included />
                 <PricingFeature text="5,000 conversations/month" included />
                 <PricingFeature text="Multi-channel integrations" included />
                 <PricingFeature text="Facebook & Instagram" included />
@@ -103,7 +103,7 @@ export default function PricingPage() {
                 <PricingFeature text="API access" included />
               </ul>
 
-              <a href="/signup" className="block w-full">
+              <a href="/checkout" className="block w-full">
                 <button className="w-full gradient-neural text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:-translate-y-1 shadow-lg hover:shadow-xl animate-glow">
                   Start Free Trial
                 </button>
@@ -190,7 +190,7 @@ export default function PricingPage() {
             Join thousands of companies already automating their customer engagement with AI.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <a href="/signup" className="gradient-neural px-12 py-4 rounded-lg text-white font-bold text-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">
+            <a href="/checkout" className="gradient-neural px-12 py-4 rounded-lg text-white font-bold text-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">
               Start Your Free Trial
             </a>
             <a href="/contact-us" className="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors">

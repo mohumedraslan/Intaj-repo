@@ -142,7 +142,7 @@ export default function ProfilePage() {
 
       // Fetch user statistics with error handling
       const [chatbotsResult, connectionsResult, messagesResult] = await Promise.all([
-        supabase.from('chatbots').select('id').eq('user_id', user.id),
+        supabase.from('agents').select('id').eq('user_id', user.id),
         supabase.from('connections').select('id').eq('user_id', user.id),
         supabase.from('messages').select('id').eq('user_id', user.id)
       ]);

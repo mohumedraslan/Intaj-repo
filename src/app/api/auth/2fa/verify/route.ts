@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import speakeasy from 'speakeasy';
-import { decrypt } from '@/lib/encryption';
+import { decrypt } from '@/lib/security/credentials';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

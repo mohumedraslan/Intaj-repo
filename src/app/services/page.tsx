@@ -108,7 +108,7 @@ export default function ServicesPage() {
                   <h3 className="text-2xl font-bold">AI Agents</h3>
                 </div>
                 <p className="text-gray-300 text-lg mb-6">
-                  Intelligent conversational agents that understand your customers and provides instant, accurate responses 24/7.
+                  Intelligent conversational agents that understand your customers and provide instant, accurate responses 24/7.
                 </p>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center space-x-3">

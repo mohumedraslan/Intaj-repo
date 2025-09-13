@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { OpenAI } from 'openai';
 import { createHash } from 'crypto';
+import { ipRateLimiter } from '@/lib/ipRateLimiter';
+import { getClientIp } from '@/lib/getClientIp';
+import { getRateLimitForTier } from '@/config/rateLimits';
 
 // Initialize Supabase and OpenAI clients
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
@@ -14,26 +17,72 @@ const hashApiKey = (apiKey: string) => {
 
 export async function POST(req: Request) {
   try {
+    // Get client IP address for rate limiting
+    const clientIp = getClientIp(req);
+    
     // 1. Authenticate the request
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    let userId: string | undefined;
+    let userTier: string | undefined;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const apiKey = authHeader.split(' ')[1];
+      const apiKeyHash = hashApiKey(apiKey);
+
+      // Find the user associated with this API key hash
+      const { data: keyData, error: keyError } = await supabase
+        .from('api_keys')
+        .select('user_id')
+        .eq('api_key_hash', apiKeyHash)
+        .single();
+
+      if (!keyError && keyData) {
+        userId = keyData.user_id;
+        
+        // Get user's subscription tier
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('subscription')
+          .eq('id', userId)
+          .single();
+          
+        if (profile) {
+          userTier = profile.subscription;
+        }
+      }
+    }
+    
+    // 2. Apply rate limiting
+    let rateLimit;
+    
+    if (userId && userTier) {
+      // User-based rate limiting for authenticated users
+      const tierLimit = getRateLimitForTier(userTier);
+      rateLimit = await ipRateLimiter.checkUserLimit(userId, 'api_v1_chat', tierLimit);
+    } else {
+      // IP-based rate limiting for unauthenticated requests
+      rateLimit = await ipRateLimiter.checkLimit(clientIp, 'api_v1_chat');
+    }
+    
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': rateLimit.retryAfter.toString(),
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': new Date(rateLimit.reset).toISOString()
+          }
+        }
+      );
+    }
+    
+    // 3. Check if we have a valid user ID (required for this endpoint)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized: Missing or invalid API key' }, { status: 401 });
     }
-    const apiKey = authHeader.split(' ')[1];
-    const apiKeyHash = hashApiKey(apiKey);
-
-    // Find the user associated with this API key hash
-    const { data: keyData, error: keyError } = await supabase
-      .from('api_keys')
-      .select('user_id')
-      .eq('api_key_hash', apiKeyHash)
-      .single();
-
-    if (keyError || !keyData) {
-      return NextResponse.json({ error: 'Unauthorized: Invalid API key' }, { status: 401 });
-    }
-
-    const { userId } = keyData;
 
     // 2. Get the message and agentId from the request body
     const { message, agentId } = await req.json();
@@ -87,6 +136,7 @@ export async function OPTIONS() {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Expose-Headers': 'X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, Retry-After',
     },
   });
 }

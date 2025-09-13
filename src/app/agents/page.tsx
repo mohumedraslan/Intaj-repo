@@ -53,7 +53,7 @@ export default function AgentsPage() {
 
         // Fetch user's chatbots as agents
         const { data: chatbots, error: chatbotsError } = await supabase
-          .from('chatbots')
+          .from('agents')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });

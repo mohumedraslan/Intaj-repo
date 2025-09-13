@@ -28,76 +28,34 @@ interface SidebarItem {
 
 const sidebarItems: SidebarItem[] = [
   {
-    label: 'Overview',
+    label: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
   },
   {
-    label: 'Agents',
+    label: 'Connections',
+    href: '/dashboard/connections',
+    icon: Plug,
+  },
+  {
+    label: 'AI Agents',
     href: '/dashboard/chatbots',
     icon: MessageSquare,
-    children: [
-      { label: 'Active Agents', href: '/dashboard/chatbots/active', icon: MessageSquare },
-      { label: 'Templates', href: '/dashboard/chatbots/templates', icon: FileText },
-      { label: 'Settings', href: '/dashboard/chatbots/settings', icon: Settings },
-    ],
   },
   {
-    label: 'Data Sources',
-    href: '/dashboard/data_sources',
-    icon: Database,
-    children: [
-      { label: 'Documents', href: '/dashboard/data_sources/documents', icon: FileText },
-      { label: 'Databases', href: '/dashboard/data_sources/databases', icon: Database },
-      { label: 'APIs', href: '/dashboard/data_sources/apis', icon: Code },
-    ],
-  },
-  {
-    label: 'Integrations',
-    href: '/dashboard/integrations',
-    icon: Plug,
-    children: [
-      { label: 'WhatsApp', href: '/dashboard/integrations/whatsapp', icon: MessageSquare },
-      { label: 'Facebook', href: '/dashboard/integrations/facebook', icon: MessageSquare },
-      { label: 'Instagram', href: '/dashboard/integrations/instagram', icon: MessageSquare },
-      { label: 'Widget', href: '/dashboard/integrations/widget', icon: Code },
-    ],
+    label: 'Content Studio',
+    href: '/dashboard/content',
+    icon: FileText,
   },
   {
     label: 'Analytics',
     href: '/dashboard/analytics',
     icon: BarChart2,
-    children: [
-      { label: 'Usage', href: '/dashboard/analytics/usage', icon: BarChart2 },
-      { label: 'Performance', href: '/dashboard/analytics/performance', icon: BarChart2 },
-      { label: 'User Activity', href: '/dashboard/analytics/users', icon: Users },
-    ],
-  },
-  {
-    label: 'Billing',
-    href: '/dashboard/billing',
-    icon: CreditCard,
-    children: [
-      { label: 'Subscription', href: '/dashboard/billing/subscription', icon: CreditCard },
-      { label: 'Usage', href: '/dashboard/billing/usage', icon: BarChart2 },
-      { label: 'Invoices', href: '/dashboard/billing/invoices', icon: FileText },
-    ],
-  },
-  {
-    label: 'FAQs',
-    href: '/dashboard/faqs',
-    icon: HelpCircle,
   },
   {
     label: 'Settings',
     href: '/dashboard/settings',
     icon: Settings,
-    children: [
-      { label: 'General', href: '/dashboard/settings/general', icon: Settings },
-      { label: 'Team', href: '/dashboard/settings/team', icon: Users },
-      { label: 'Security', href: '/dashboard/settings/security', icon: AlertCircle },
-      { label: 'API Keys', href: '/dashboard/settings/api-keys', icon: Code },
-    ],
   },
 ];
 

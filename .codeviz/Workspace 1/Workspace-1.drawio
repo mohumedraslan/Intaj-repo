@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <mxfile host="codeviz.app" modified="2025-09-12T06:36:01.381Z" agent="CodeViz Exporter" version="14.6.5" type="device">
+          <diagram id="codeviz-diagram" name="System Diagram">
+            <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+              <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="adf9b17d-ApiRoutes" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                  <mxGeometry x="40" y="1247" width="870" height="334" as="geometry"/>
+                </mxCell>
+                <mxCell id="adf9b17d-ApiRoutes_label" value="**3. API Routes**
+Defined by route.ts (or .js/.tsx)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                  <mxGeometry x="48" y="1255" width="794" height="24" as="geometry"/>
+                </mxCell>
+<mxCell id="adf9b17d-Middleware" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                  <mxGeometry x="482.10416666666674" y="174" width="471" height="649" as="geometry"/>
+                </mxCell>
+                <mxCell id="adf9b17d-Middleware_label" value="**4. Middleware**
+src/middleware.ts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                  <mxGeometry x="490.10416666666674" y="182" width="395" height="24" as="geometry"/>
+                </mxCell>
+<mxCell id="adf9b17d-OverallStrategy" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                  <mxGeometry x="748.6666666666666" y="928" width="346" height="334" as="geometry"/>
+                </mxCell>
+                <mxCell id="adf9b17d-OverallStrategy_label" value="**1. Overall Routing Strategy**
+src/app directory dictates URL paths" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                  <mxGeometry x="756.6666666666666" y="936" width="270" height="24" as="geometry"/>
+                </mxCell>
+<mxCell id="adf9b17d-PageRoutes" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                  <mxGeometry x="870" y="1247" width="1368" height="334" as="geometry"/>
+                </mxCell>
+                <mxCell id="adf9b17d-PageRoutes_label" value="**2. Page Routes**
+Defined by page.tsx (or .js/.ts)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                  <mxGeometry x="878" y="1255" width="1292" height="24" as="geometry"/>
+                </mxCell>
+<mxCell id="adf9b17d-IntajRepoRouting" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="adf9b17d-wrapper">
+                  <mxGeometry x="394" y="20" width="2238" height="1621" as="geometry"/>
+                </mxCell>
+                <mxCell id="adf9b17d-IntajRepoRouting_label" value="**intaj-repo Routing Structure**
+Next.js App Router (File-system based)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="adf9b17d-wrapper">
+                  <mxGeometry x="402" y="28" width="2162" height="24" as="geometry"/>
+                </mxCell>
+<mxCell id="base-diagram-group" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="1">
+                  <mxGeometry x="-30" y="0" width="444" height="298" as="geometry"/>
+                </mxCell>
+                <mxCell id="base-diagram-group_label" value="Base Diagram" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="1">
+                  <mxGeometry x="-22" y="8" width="368" height="24" as="geometry"/>
+                </mxCell>
+<mxCell id="adf9b17d-wrapper" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="1">
+                  <mxGeometry x="374" y="0" width="5184" height="2479" as="geometry"/>
+                </mxCell>
+                <mxCell id="adf9b17d-wrapper_label" value="Project Routing Structure in `intaj-repo`
+the whole project specailly the routing pages 
+
+like for dashbard -&gt; /dashboard
+for x -&gt; /y/x
+
+and like that" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="1">
+                  <mxGeometry x="382" y="8" width="5108" height="24" as="geometry"/>
+                </mxCell>
+                <mxCell id="begin-diagram-generation" value="Generate Base Diagram" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="base-diagram-group">
+                      <mxGeometry x="20" y="60" width="294" height="198" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-report" value="# Project Routing Structure in `intaj-repo`
+
+The `intaj-repo` project leverages the **Next.js App Router** for its routing system, which is primarily file-system based. This means that the directory and file structure within the `src/app` directory directly dictate the application&apos;s URL paths and API endpoints.
+
+## 1. Overall Routing Strategy
+
+The core principle is that each folder within `src/app` represents a segment of a URL path. The presence of specific files within these folders then defines whether it&apos;s a user-facing page or an API endpoint.
+
+## 2. Page Routes (`src/app/**/page.{ts,tsx,js}`)
+
+User-facing pages are defined by `page.tsx` (or `.js`/`.ts`) files. The path to this file, relative to `src/app`, forms the URL.
+
+-   **Root Page:** `src/app/page.tsx` maps to the application&apos;s home page: `/`
+-   **Simple Pages:**
+    -   `src/app/dashboard/page.tsx` maps to `/dashboard`
+    -   `src/app/services/page.tsx` maps to `/services`
+-   **Nested Pages (Example:&amp;#32;`/y/x`&amp;#32;pattern):**
+    -   If there were a file `src/app/settings/profile/page.tsx`, it would map to `/settings/profile`.
+-   **Dynamic Segments:** Square brackets `[]` are used to define dynamic parts of the URL. The value within the brackets becomes a parameter accessible in the page component.
+    -   `src/app/blog/[slug]/page.tsx` maps to `/blog/my-first-post`, `/blog/another-article`, etc. (`slug` is the dynamic parameter).
+    -   `src/app/dashboard/chatbots/[id]/page.tsx` maps to `/dashboard/chatbots/123`, `/dashboard/chatbots/abc`, etc. (`id` is the dynamic parameter).
+
+## 3. API Routes (`src/app/**/route.{ts,tsx,js}`)
+
+API endpoints are defined by `route.ts` (or `.js`/`.tsx`) files. Similar to page routes, their URL path is determined by their location within `src/app`, typically under an `api` subdirectory.
+
+-   **Specific API Endpoints:** These files export HTTP method handlers (e.g., `GET`, `POST`, `PUT`, `DELETE`).
+    -   `src/app/api/widget/chat/route.ts` maps to `/api/widget/chat`. This file would contain `POST` and `OPTIONS` handlers for chat functionality.
+    -   `src/app/api/auth/2fa/verify/route.ts` maps to `/api/auth/2fa/verify`, likely handling `POST` requests for 2FA verification.
+-   **Webhook Endpoints:**
+    -   `src/app/api/webhooks/whatsapp/route.ts` maps to `/api/webhooks/whatsapp`, designed to receive incoming WhatsApp webhook events.
+
+## 4. Middleware (`src/middleware.ts`)
+
+The `src/middleware.ts` file defines a global middleware that runs before requests are completed. It&apos;s crucial for implementing cross-cutting concerns like authentication and redirects.
+
+-   **Authentication Logic:** It uses `@supabase/auth-helpers-nextjs` to manage user sessions.
+    -   It redirects unauthenticated users from protected routes to `/auth`.
+    -   It redirects authenticated users trying to access `/auth` to `/dashboard`.
+-   **Route Matching:** The middleware is configured with a `config.matcher` to apply to almost all routes, explicitly excluding static assets (`_next/static`, `_next/image`), `favicon.ico`, files in the `public` directory, and all API routes (`/api`).
+-   **Public Routes:** Explicitly defined public routes (e.g., `/`, `/auth`, `/signup`, `/about-us`, `/features`, `/pricing`, `/services`, `/contact-us`, `/policy`) are accessible without authentication.
+
+## 5. Nested Routes and Modular Structure
+
+The file-system routing inherently supports nested routes. Any subdirectory within a route folder creates a deeper path segment. For example, `src/app/dashboard/settings/page.tsx` would create the route `/dashboard/settings`.
+
+This structure naturally leads to a modular organization:
+
+-   `src/app/api` acts as a dedicated module for all backend API endpoints.
+-   Directories like `src/app/dashboard`, `src/app/chatbots`, `src/app/auth`, etc., function as distinct modules, encapsulating their specific routes, pages, and components for different parts of the application&apos;s functionality.
+
+In summary, the `intaj-repo` project&apos;s routing is highly organized and intuitive, relying on Next.js&apos;s file-system conventions to map application structure directly to URL paths, supported by a global middleware for security and flow control." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-wrapper">
+                      <mxGeometry x="2456.369936676108" y="345.9256079367502" width="1494" height="1168" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-NXR" value="**Next.js App Router**
+Core Routing Mechanism" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                      <mxGeometry x="797.5625" y="868" width="160" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-U1" value="**User Request**
+[External]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-IntajRepoRouting">
+                      <mxGeometry x="800" y="124" width="95" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-A_AUTH" value="**src/app/api/auth/2fa/verify/route.ts**
+Specific API Endpoint" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-ApiRoutes">
+                      <mxGeometry x="259" y="124" width="239" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-A_WEBHOOK" value="**src/app/api/webhooks/whatsapp/route.ts**
+Webhook Endpoint" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-ApiRoutes">
+                      <mxGeometry x="518" y="124" width="272" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-A_WIDGET" value="**src/app/api/widget/chat/route.ts**
+Specific API Endpoint" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-ApiRoutes">
+                      <mxGeometry x="20" y="124" width="219" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-API_AUTH" value="**/api/auth/2fa/verify**
+Handles POST" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-ApiRoutes">
+                      <mxGeometry x="308.5" y="229" width="140" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-API_WEBHOOK" value="**/api/webhooks/whatsapp**
+Receives events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-ApiRoutes">
+                      <mxGeometry x="567.5" y="229" width="173" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-API_WIDGET" value="**/api/widget/chat**
+Handles POST, OPTIONS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-ApiRoutes">
+                      <mxGeometry x="51.5" y="229" width="156" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-M_AUTH" value="**Authentication Logic**
+@supabase/auth-helpers-nextjs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-Middleware">
+                      <mxGeometry x="158.79166666666666" y="439" width="198" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-M_FILE" value="**src/middleware.ts**
+Global Middleware" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-Middleware">
+                      <mxGeometry x="266.16666666666663" y="124" width="125" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-M_MATCHER" value="**config.matcher**
+Excludes static, /api, public routes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-Middleware">
+                      <mxGeometry x="72.54166666666664" y="229" width="208" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-M_PROTECTED" value="**Protected Routes**
+Requires authentication" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-Middleware">
+                      <mxGeometry x="20" y="334" width="151" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-M_PUBLIC" value="**Public Routes**
+/, /auth, /signup, etc." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-Middleware">
+                      <mxGeometry x="191" y="334" width="134" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-M_REDIRECTS" value="**Redirects**
+Unauth to /auth, Auth to /dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-Middleware">
+                      <mxGeometry x="144.29166666666666" y="544" width="227" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-P_DASH" value="**src/app/dashboard/page.tsx**
+Simple Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="315" y="124" width="189" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-P_DYN_BLOG" value="**src/app/blog/[slug]/page.tsx**
+Dynamic Segment Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="717" y="124" width="193" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-P_DYN_CHAT" value="**src/app/dashboard/chatbots/[id]/page.tsx**
+Dynamic Segment Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="20" y="124" width="275" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-P_NEST" value="**src/app/settings/profile/page.tsx**
+Nested Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="930" y="124" width="219" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-P_ROOT" value="**src/app/page.tsx**
+Root Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="1169" y="124" width="119" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-P_SERV" value="**src/app/services/page.tsx**
+Simple Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="524" y="124" width="173" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-SRCAP" value="**src/app/**
+Root directory for routes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-OverallStrategy">
+                      <mxGeometry x="108.625" y="124" width="157" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-URL_DASH" value="**/dashboard**" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="366.5" y="241.5" width="86" height="40" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-URL_DYN_BLOG" value="**/blog/[slug]**" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="768.5" y="241.5" width="90" height="40" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-URL_DYN_CHAT" value="**/dashboard/chatbots/[id]**" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="71.5" y="241.5" width="172" height="40" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-URL_NEST" value="**/settings/profile**" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="981.5" y="241.5" width="116" height="40" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-URL_ROOT" value="**/**
+Home Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="1187.5" y="229" width="82" height="65" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-URL_SERV" value="**/services**" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-PageRoutes">
+                      <mxGeometry x="575.5" y="241.5" width="70" height="40" as="geometry"/>
+                    </mxCell>
+<mxCell id="adf9b17d-URLPATHS" value="**URL Paths / API Endpoints**
+Application&apos;s accessible routes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="adf9b17d-OverallStrategy">
+                      <mxGeometry x="20" y="229" width="190" height="65" as="geometry"/>
+                    </mxCell>
+                <mxCell id="edge-adf9b17d-L_SRCAP_URLPATHS_0" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-SRCAP" target="adf9b17d-URLPATHS">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_SRCAP_URLPATHS_0_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_SRCAP_URLPATHS_0">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_P_ROOT_URL_ROOT_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-P_ROOT" target="adf9b17d-URL_ROOT">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_P_ROOT_URL_ROOT_1_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_P_ROOT_URL_ROOT_1">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_P_DASH_URL_DASH_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-P_DASH" target="adf9b17d-URL_DASH">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_P_DASH_URL_DASH_2_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_P_DASH_URL_DASH_2">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_P_SERV_URL_SERV_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-P_SERV" target="adf9b17d-URL_SERV">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_P_SERV_URL_SERV_3_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_P_SERV_URL_SERV_3">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_P_NEST_URL_NEST_4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-P_NEST" target="adf9b17d-URL_NEST">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_P_NEST_URL_NEST_4_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_P_NEST_URL_NEST_4">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_P_DYN_BLOG_URL_DYN_BLOG_5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-P_DYN_BLOG" target="adf9b17d-URL_DYN_BLOG">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_P_DYN_BLOG_URL_DYN_BLOG_5_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_P_DYN_BLOG_URL_DYN_BLOG_5">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_P_DYN_CHAT_URL_DYN_CHAT_6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-P_DYN_CHAT" target="adf9b17d-URL_DYN_CHAT">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_P_DYN_CHAT_URL_DYN_CHAT_6_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_P_DYN_CHAT_URL_DYN_CHAT_6">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_A_WIDGET_API_WIDGET_7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-A_WIDGET" target="adf9b17d-API_WIDGET">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_A_WIDGET_API_WIDGET_7_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_A_WIDGET_API_WIDGET_7">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_A_AUTH_API_AUTH_8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-A_AUTH" target="adf9b17d-API_AUTH">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_A_AUTH_API_AUTH_8_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_A_AUTH_API_AUTH_8">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_A_WEBHOOK_API_WEBHOOK_9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-A_WEBHOOK" target="adf9b17d-API_WEBHOOK">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_A_WEBHOOK_API_WEBHOOK_9_label" value="Maps to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_A_WEBHOOK_API_WEBHOOK_9">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_M_FILE_M_AUTH_10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-M_FILE" target="adf9b17d-M_AUTH">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_M_FILE_M_AUTH_10_label" value="Contains" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_M_FILE_M_AUTH_10">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_M_AUTH_M_REDIRECTS_11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-M_AUTH" target="adf9b17d-M_REDIRECTS">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_M_AUTH_M_REDIRECTS_11_label" value="Performs" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_M_AUTH_M_REDIRECTS_11">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_M_FILE_M_MATCHER_12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-M_FILE" target="adf9b17d-M_MATCHER">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_M_FILE_M_MATCHER_12_label" value="Uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_M_FILE_M_MATCHER_12">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_M_MATCHER_M_PROTECTED_13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-M_MATCHER" target="adf9b17d-M_PROTECTED">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_M_MATCHER_M_PROTECTED_13_label" value="Applies to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_M_MATCHER_M_PROTECTED_13">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_M_MATCHER_M_PUBLIC_14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-M_MATCHER" target="adf9b17d-M_PUBLIC">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_M_MATCHER_M_PUBLIC_14_label" value="Excludes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_M_MATCHER_M_PUBLIC_14">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_M_PUBLIC_M_AUTH_15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-M_PUBLIC" target="adf9b17d-M_AUTH">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_M_PUBLIC_M_AUTH_15_label" value="Accessible without" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_M_PUBLIC_M_AUTH_15">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_M_PROTECTED_M_AUTH_16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-M_PROTECTED" target="adf9b17d-M_AUTH">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_M_PROTECTED_M_AUTH_16_label" value="Requires" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_M_PROTECTED_M_AUTH_16">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_U1_NXR_17" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-U1" target="adf9b17d-NXR">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_U1_NXR_17_label" value="Sends request to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_U1_NXR_17">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_NXR_SRCAP_18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-NXR" target="adf9b17d-SRCAP">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_NXR_SRCAP_18_label" value="Determines route from" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_NXR_SRCAP_18">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_SRCAP_PageRoutes_19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-SRCAP" target="adf9b17d-PageRoutes">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_SRCAP_PageRoutes_19_label" value="Defines" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_SRCAP_PageRoutes_19">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_SRCAP_ApiRoutes_20" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-SRCAP" target="adf9b17d-ApiRoutes">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_SRCAP_ApiRoutes_20_label" value="Defines" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_SRCAP_ApiRoutes_20">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_U1_M_FILE_21" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-U1" target="adf9b17d-M_FILE">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_U1_M_FILE_21_label" value="Intercepted by" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_U1_M_FILE_21">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_M_FILE_NXR_22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-M_FILE" target="adf9b17d-NXR">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_M_FILE_NXR_22_label" value="If allowed" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_M_FILE_NXR_22">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_NXR_PageRoutes_23" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-NXR" target="adf9b17d-PageRoutes">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_NXR_PageRoutes_23_label" value="Serves" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_NXR_PageRoutes_23">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+<mxCell id="edge-adf9b17d-L_NXR_ApiRoutes_24" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="adf9b17d-NXR" target="adf9b17d-ApiRoutes">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-adf9b17d-L_NXR_ApiRoutes_24_label" value="Serves" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-adf9b17d-L_NXR_ApiRoutes_24">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+              </root>
+            </mxGraphModel>
+          </diagram>
+        </mxfile>

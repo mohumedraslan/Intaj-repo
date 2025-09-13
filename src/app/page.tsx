@@ -55,7 +55,7 @@ export default function Home() {
               Transform your business with intelligent chatbots, automated workflows, and seamless multi-channel engagement. Built for the future of customer interaction.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <Link href="/signup" className="bg-gradient-to-r from-blue-500 to-purple-500 px-8 py-4 rounded-lg text-white font-semibold text-lg hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">Get Started - Free for Limited Time</Link>
+              <Link href="/auth" className="bg-gradient-to-r from-blue-500 to-purple-500 px-8 py-4 rounded-lg text-white font-semibold text-lg hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">Get Started - Free for Limited Time</Link>
               <a href="#demo" className="flex items-center space-x-2 px-8 py-4 rounded-lg border border-gray-600 text-gray-200 hover:border-blue-500 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
                 <span>Try Demo</span>
@@ -212,7 +212,7 @@ export default function Home() {
             Join thousands of businesses already using AI to scale their operations and delight customers.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/signup" className="bg-gradient-to-r from-blue-500 to-purple-500 px-12 py-4 rounded-lg text-white font-bold text-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">Start Now - Free for Limited Time</Link>
+            <Link href="/auth" className="bg-gradient-to-r from-blue-500 to-purple-500 px-12 py-4 rounded-lg text-white font-bold text-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-2xl animate-glow">Start Now - Free for Limited Time</Link>
             <p className="text-gray-400 text-sm">No Credit Card Required • 5-Minute Setup</p>
           </div>
           <div className="mt-12 text-center text-gray-400">

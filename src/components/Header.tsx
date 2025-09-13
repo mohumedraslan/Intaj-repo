@@ -67,7 +67,7 @@ const publicMenuItems: MenuItem[] = [
 
 const authenticatedMenuItems: MenuItem[] = [
   { title: "Dashboard", href: "/dashboard", requiresAuth: true },
-  { title: "Agents", href: "/agents", requiresAuth: true },
+  { title: "Agent", href: "/agents", requiresAuth: true },
   { title: "Analytics", href: "/analytics", requiresAuth: true },
 ];
 

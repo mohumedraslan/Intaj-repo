@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import speakeasy from 'speakeasy';
-import { encrypt } from '@/lib/encryption';
+import { encrypt } from '@/lib/security/credentials';
 
 export async function POST(request: NextRequest) {
   try {

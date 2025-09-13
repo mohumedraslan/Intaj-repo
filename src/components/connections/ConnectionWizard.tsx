@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import PlatformCard from './PlatformCard';
-import platforms, { Platform } from '@/data/platforms';
+import { Platform, platforms } from '@/data/platforms';
 import { Search, Copy, Check, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useSession } from 'next-auth/react';
@@ -25,6 +25,7 @@ interface Agent {
   id: string;
   name: string;
   avatar_url?: string;
+  description?: string;
 }
 
 interface ApiResponse {
@@ -56,7 +57,7 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const { data, error } = await supabase
-            .from('chatbots')
+            .from('agents')
             .select('id, name, avatar_url')
             .eq('user_id', user.id);
           if (error) {
@@ -80,6 +81,32 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
     setIsLoading(false);
     onClose();
   };
+
+  // Fetch agents when the component mounts or when the dialog opens
+  useEffect(() => {
+    if (isOpen && session?.user) {
+      const fetchAgents = async () => {
+        try {
+          const supabase = createClientComponentClient();
+          const { data, error } = await supabase
+            .from('agents')
+            .select('id, name, description, avatar_url')
+            .eq('user_id', session.user.id);
+            
+          if (error) {
+            console.error('Error fetching agents:', error);
+            return;
+          }
+          
+          setAgents(data || []);
+        } catch (err) {
+          console.error('Failed to fetch agents:', err);
+        }
+      };
+      
+      fetchAgents();
+    }
+  }, [isOpen, session]);
 
   // Function to initiate OAuth flow
   const initiateOAuthFlow = async () => {
@@ -293,7 +320,7 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
     }
   }, [isOpen]);
   
-  // Handle next step navigation
+  // Function to handle next step
   const handleNext = async () => {
     // Clear any previous errors
     setError(null);
@@ -394,24 +421,6 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
             <p className="text-gray-400 mb-6">Choose a platform to connect with your account</p>
             
             {/* Search bar */}
-      case 'select-agent':
-        return (
-          <div className="p-6">
-            <h2 className="text-xl font-semibold text-white mb-4">Select Agent</h2>
-            <p className="text-gray-400 mb-6">Choose which agent to connect to {selectedPlatform?.name}.</p>
-            <div className="space-y-2">
-              {agents.map(agent => (
-                <div
-                  key={agent.id}
-                  className={`p-4 border rounded-lg cursor-pointer ${selectedAgent === agent.id ? 'border-blue-500 bg-blue-500/10' : 'border-gray-700'}`}
-                  onClick={() => setSelectedAgent(agent.id)}
-                >
-                  {agent.name}
-                </div>
-              ))}
-            </div>
-          </div>
-        );
             <div className="relative mb-6">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
@@ -442,6 +451,25 @@ export default function ConnectionWizard({ isOpen, onClose, onComplete }: Connec
                 <p className="text-gray-400">No platforms found matching your search.</p>
               </div>
             )}
+          </div>
+        );
+      
+      case 'select-agent':
+        return (
+          <div className="p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Select Agent</h2>
+            <p className="text-gray-400 mb-6">Choose which agent to connect to {selectedPlatform?.name}</p>
+            <div className="space-y-2">
+              {agents.map(agent => (
+                <div
+                  key={agent.id}
+                  className={`p-4 border rounded-lg cursor-pointer ${selectedAgent === agent.id ? 'border-blue-500 bg-blue-500/10' : 'border-gray-700'}`}
+                  onClick={() => setSelectedAgent(agent.id)}
+                >
+                  {agent.name}
+                </div>
+              ))}
+            </div>
           </div>
         );
       

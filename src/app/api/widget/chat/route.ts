@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { OpenAI } from 'openai';
+import { ipRateLimiter } from '@/lib/ipRateLimiter';
+import { getClientIp } from '@/lib/getClientIp';
 
 // Initialize Supabase and OpenAI clients
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
@@ -14,7 +16,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Message and chatbotId are required' }, { status: 400 });
     }
 
-    // TODO: Implement rate limiting here to prevent abuse
+    // Implement IP-based rate limiting
+    const clientIp = getClientIp(req);
+    const rateLimit = await ipRateLimiter.checkLimit(clientIp, 'api_widget_chat');
+    
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': rateLimit.retryAfter.toString(),
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': new Date(rateLimit.reset).toISOString()
+          }
+        }
+      );
+    }
 
     // 1. Fetch the chatbot's configuration from the database
     const { data: chatbot, error: chatbotError } = await supabase
@@ -64,6 +83,7 @@ export async function OPTIONS() {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Expose-Headers': 'X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, Retry-After',
     },
   });
 }

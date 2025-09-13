@@ -10,13 +10,13 @@ export default function Footer() {
         <span className="text-white/70 ml-2 font-medium">&copy; {new Date().getFullYear()}</span>
       </Link>
       <div className="flex gap-6 text-lg">
-        <Link href="/features" className="hover:underline hover:text-yellow-200">Features</Link>
+        <Link href="/platform/features" className="hover:underline hover:text-yellow-200">Features</Link>
         <Link href="/pricing" className="hover:underline hover:text-yellow-200">Pricing</Link>
-        <Link href="/services" className="hover:underline hover:text-yellow-200">Services</Link>
+        <Link href="/solutions/automation" className="hover:underline hover:text-yellow-200">Services</Link>
       </div>
       <div className="flex flex-col md:flex-row gap-2 md:gap-4 text-sm text-white/90">
         <Link href="/about-us" className="hover:underline hover:text-yellow-200">About Us</Link>
-        <Link href="/faq" className="hover:underline hover:text-yellow-200">FAQ</Link>
+        <Link href="/pricing#faq" className="hover:underline hover:text-yellow-200">FAQ</Link>
         <Link href="/contact-us" className="hover:underline hover:text-yellow-200">Contact</Link>
         <Link href="/policy" className="hover:underline hover:text-yellow-200">Policy</Link>
       </div>

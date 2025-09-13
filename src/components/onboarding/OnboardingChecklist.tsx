@@ -19,7 +19,7 @@ interface OnboardingStep {
 }
 
 interface OnboardingSteps {
-  created_first_chatbot: boolean;
+  created_first_agent: boolean;
   added_data_source: boolean;
   connected_channel: boolean;
   has_dismissed: boolean;
@@ -37,12 +37,12 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
   // Define the steps based on the onboarding progress
   const steps: OnboardingStep[] = [
     {
-      id: 'created_first_chatbot',
+      id: 'created_first_agent',
       title: 'Create your first Agent',
       description: 'Set up an AI agent with your preferred model and personality.',
       action: 'Create Agent',
       link: '/dashboard/chatbots/new',
-      completed: onboardingSteps.created_first_chatbot,
+      completed: onboardingSteps.created_first_agent,
       disabled: false
     },
     {
@@ -52,7 +52,7 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
       action: 'Add Data',
       link: '/dashboard/chatbots', // This will be updated dynamically if they have an agent
       completed: onboardingSteps.added_data_source,
-      disabled: !onboardingSteps.created_first_chatbot
+      disabled: !onboardingSteps.created_first_agent
     },
     {
       id: 'connected_channel',
@@ -61,7 +61,7 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
       action: 'Connect',
       link: '/connections',
       completed: onboardingSteps.connected_channel,
-      disabled: !onboardingSteps.created_first_chatbot
+      disabled: !onboardingSteps.created_first_agent
     }
   ];
 

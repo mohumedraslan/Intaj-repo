@@ -6,15 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Copy, Check } from 'lucide-react';
 
 interface WidgetEmbedCodeProps {
-  chatbotId: string;
+  agentId: string;
 }
 
-export default function WidgetEmbedCode({ chatbotId }: WidgetEmbedCodeProps) {
+export default function WidgetEmbedCode({ agentId }: WidgetEmbedCodeProps) {
   const [copied, setCopied] = useState(false);
 
   const embedCode = `<script
   src="https://intaj.nabih.tech/widget.js"
-  data-chatbot-id="${chatbotId}"
+  data-agent-id="${agentId}"
   defer>
 </script>`;
 
@@ -29,7 +29,7 @@ export default function WidgetEmbedCode({ chatbotId }: WidgetEmbedCodeProps) {
       <CardHeader>
         <CardTitle>Embed on Your Website</CardTitle>
         <CardDescription>
-          Copy and paste this snippet into the `<head>` or `<body>` of your website's HTML.
+          Copy and paste this snippet into the {"<head>"} or {"<body>"} of your website's HTML.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -50,3 +50,4 @@ export default function WidgetEmbedCode({ chatbotId }: WidgetEmbedCodeProps) {
     </Card>
   );
 }
+

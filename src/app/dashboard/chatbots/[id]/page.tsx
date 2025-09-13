@@ -32,7 +32,9 @@ interface Agent {
 export default function EditAgentPage() {
   const router = useRouter();
   const params = useParams();
-  const id = params?.id as string;
+  const rawId = params?.id as string;
+  // Handle URL encoding issues
+  const id = rawId ? decodeURIComponent(rawId) : '';
   const isNew = id === 'new';
   
   const [agent, setAgent] = useState<Agent | null>(null);
@@ -64,8 +66,16 @@ export default function EditAgentPage() {
           return;
         }
         
+        // Validate UUID format before querying
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(id)) {
+          setError('Invalid agent ID format');
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
-          .from('chatbots')
+          .from('agents')
           .select('*')
           .eq('id', id)
           .eq('user_id', user.id)
@@ -120,19 +130,19 @@ export default function EditAgentPage() {
       // Generate a UUID if we don't have one (for new agents)
       const agentId = id !== 'new' ? id : crypto.randomUUID();
       const fileExt = avatarFile.name.split('.').pop();
-      const fileName = `${chatbotId}.${fileExt}`;
+      const fileName = `${agentId}.${fileExt}`;
       const filePath = `${userId}/${fileName}`;
       
       // Check if bucket exists before uploading
       const { data: buckets } = await supabase.storage.listBuckets();
-      const bucketExists = buckets?.some(bucket => bucket.name === 'chatbot-avatars');
+      const bucketExists = buckets?.some(bucket => bucket.name === 'agent-avatars');
       
       if (!bucketExists) {
         throw new Error('Storage bucket not found. Please contact administrator.');
       }
       
       const { error: uploadError } = await supabase.storage
-        .from('chatbot-avatars')
+        .from('agent-avatars')
         .upload(filePath, avatarFile, {
           upsert: true,
           cacheControl: '3600'
@@ -143,7 +153,7 @@ export default function EditAgentPage() {
       }
       
       const { data } = supabase.storage
-        .from('chatbot-avatars')
+        .from('agent-avatars')
         .getPublicUrl(filePath);
         
       return data.publicUrl;
@@ -153,12 +163,12 @@ export default function EditAgentPage() {
     }
   };
   
-  const fetchDataSources = async (chatbotId: string) => {
+  const fetchDataSources = async (agentId: string) => {
     try {
       const { data, error } = await supabase
         .from('data_sources')
         .select('*')
-        .eq('chatbot_id', chatbotId);
+        .eq('chatbot_id', agentId);
         
       if (error) throw error;
       setDataSources(data || []);
@@ -179,18 +189,38 @@ export default function EditAgentPage() {
         return;
       }
       
+      // Debug logging
+      console.log('DEBUG - handleSubmit:', { 
+        id, 
+        isNew, 
+        rawId: params?.id,
+        name: name?.trim(),
+        model,
+        hasDescription: !!description?.trim(),
+        hasBasePrompt: !!basePrompt?.trim()
+      });
+      
       // Generate a UUID for new agents
       const agentId = isNew ? crypto.randomUUID() : id;
       
+      // Validate required fields
+      if (!name?.trim()) {
+        throw new Error('Agent name is required');
+      }
+      if (!model) {
+        throw new Error('AI model selection is required');
+      }
+      
       // Prepare agent data
       const agentData = {
-        name,
-        description, // Allow empty string to be saved as null
+        name: name.trim(),
+        description: description?.trim() || undefined,
         model,
-        base_prompt: basePrompt,
+        base_prompt: basePrompt?.trim() || undefined,
         settings: {
           status: status.toLowerCase()
-        }
+        },
+        avatar_url: undefined as string | undefined
       };
       
       // Upload avatar if there's a new file
@@ -206,21 +236,28 @@ export default function EditAgentPage() {
         setError(`${avatarError instanceof Error ? avatarError.message : 'Error uploading avatar'}`);
       }
       
-      if (isNew) {
+      // Force create path for 'new' agents regardless of isNew flag
+      if (isNew || id === 'new' || !id || id === 'undefined' || id === 'null') {
+        console.log('DEBUG - Taking CREATE path');
+        
         // Create new agent using the createAgent function
-        await createAgent({
+        const result = await createAgent({
           ...agentData,
           id: agentId
         });
+        
+        if (!result) {
+          throw new Error('Failed to create agent - no data returned');
+        }
 
         
         // Check if this is the user's first agent and update onboarding steps
-        const { data: chatbots, error: chatbotsError } = await supabase
-          .from('chatbots')
+        const { data: agents, error: agentsError } = await supabase
+          .from('agents')
           .select('id')
           .eq('user_id', user.id);
           
-        if (!chatbotsError && chatbots && chatbots.length === 1) {
+        if (!agentsError && agents && agents.length === 1) {
           // This is the user's first agent, update onboarding steps
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
@@ -231,19 +268,19 @@ export default function EditAgentPage() {
           if (!profileError && profile) {
             // Get current onboarding steps or use default if not set
             const currentSteps = profile.onboarding_steps || {
-              created_first_chatbot: false,
+              created_first_agent: false,
               added_data_source: false,
               connected_channel: false,
               has_dismissed: false
             };
             
-            // Update the created_first_chatbot flag
+            // Update the created_first_agent flag
             await supabase
               .from('profiles')
               .update({
                 onboarding_steps: {
                   ...currentSteps,
-                  created_first_chatbot: true
+                  created_first_agent: true
                 }
               })
               .eq('id', user.id);
@@ -253,13 +290,28 @@ export default function EditAgentPage() {
         // Redirect to the newly created agent
         router.push('/dashboard/chatbots');
       } else {
+        console.log('DEBUG - Taking UPDATE path');
+        
         // Update existing agent
-        await updateAgent(id, agentData);
+        const result = await updateAgent(id, agentData);
+        
+        if (!result) {
+          throw new Error('Failed to update agent');
+        }
+        
         router.push('/dashboard/chatbots');
       }
     } catch (err) {
-      console.error('Error saving agent:', err);
-      setError((err as Error).message);
+      console.error('Error saving agent:', {
+        error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        isNew,
+        agentId: isNew ? 'new' : id
+      });
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(`Failed to save agent: ${errorMessage}`);
+      setSaving(false);
+    } finally {
       setSaving(false);
     }
   };
@@ -411,8 +463,8 @@ export default function EditAgentPage() {
                     <div className="flex space-x-4">
                       <Button 
                         type="button" 
-                        variant="outline" 
-                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                        variant="default" 
+                        className="border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent"
                         onClick={() => router.push('/dashboard/chatbots')}
                       >
                         Cancel
@@ -430,7 +482,7 @@ export default function EditAgentPage() {
               </TabsContent>
               
               <TabsContent value="personality" className="space-y-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-6">
                   {/* Base Prompt */}
                   <div className="space-y-2">
                     <Label htmlFor="basePrompt" className="text-gray-300">Base Prompt</Label>
@@ -461,33 +513,57 @@ export default function EditAgentPage() {
                   {/* Action Buttons */}
                   <div className="flex justify-end pt-4">
                     <Button 
-                      type="submit" 
+                      type="button"
+                      onClick={handleSubmit}
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                       disabled={saving}
                     >
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving ? 'Saving...' : (isNew ? 'Create Agent' : 'Save Changes')}
                     </Button>
                   </div>
-                </form>
+                </div>
               </TabsContent>
               <TabsContent value="data" className="space-y-6">
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
                     <h3 className="text-lg font-medium">Data Sources</h3>
-                    <AddDataSourceDialog 
-                      chatbotId={id} 
-                      onSuccess={refreshDataSources} 
-                    />
+                    {!isNew && (
+                      <AddDataSourceDialog 
+                        agentId={id}
+                      >
+                        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                          Add Data Source
+                        </Button>
+                      </AddDataSourceDialog>
+                    )}
+                    {isNew && (
+                      <div className="text-sm text-gray-400">
+                        Save agent first to add data sources
+                      </div>
+                    )}
                   </div>
                   
-                  <DataSourceList 
-                    dataSources={dataSources} 
-                    onDelete={refreshDataSources} 
-                  />
+                  {!isNew ? (
+                    <DataSourceList 
+                      agentId={id}
+                      dataSources={dataSources} 
+                      onDelete={refreshDataSources} 
+                    />
+                  ) : (
+                    <div className="text-center py-8 text-gray-400">
+                      <p>Create your agent first, then add data sources to train it.</p>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
               <TabsContent value="widget">
-                <WidgetEmbedCode chatbotId={id} />
+                {!isNew ? (
+                  <WidgetEmbedCode agentId={id} />
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    <p>Save your agent first to get the embed code.</p>
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </CardContent>

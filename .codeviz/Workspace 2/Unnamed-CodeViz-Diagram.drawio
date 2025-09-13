@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <mxfile host="codeviz.app" modified="2025-09-12T13:21:40.839Z" agent="CodeViz Exporter" version="14.6.5" type="device">
+          <diagram id="codeviz-diagram" name="System Diagram">
+            <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+              <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="chatbot_widget_boundary" value="" style="html=1;whiteSpace=wrap;container=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;fillOpacity=20;strokeWidth=2;containerType=none;recursiveResize=0;movable=1;resizable=1;autosize=0;dropTarget=0" vertex="1" parent="temp-wrapper-a57a65a6-8eb1-4e1c-bc43-918617a2b375">
+                  <mxGeometry x="738" y="107.5" width="262" height="269" as="geometry"/>
+                </mxCell>
+                <mxCell id="chatbot_widget_boundary_label" value="Chatbot Widget" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=white;spacing=5" vertex="1" parent="temp-wrapper-a57a65a6-8eb1-4e1c-bc43-918617a2b375">
+                  <mxGeometry x="746" y="115.5" width="186" height="24" as="geometry"/>
+                </mxCell>
+                <mxCell id="temp-wrapper-a57a65a6-8eb1-4e1c-bc43-918617a2b375" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="1">
+                      <mxGeometry x="0" y="0" width="120" height="60" as="geometry"/>
+                    </mxCell>
+<mxCell id="widget_main" value="Main Widget Component" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="chatbot_widget_boundary">
+                      <mxGeometry x="20" y="188" width="162" height="41" as="geometry"/>
+                    </mxCell>
+<mxCell id="widget_script" value="Embeddable Script" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5" vertex="1" parent="chatbot_widget_boundary">
+                      <mxGeometry x="39" y="107" width="124" height="41" as="geometry"/>
+                    </mxCell>
+                <mxCell id="edge-e-widget_script-widget_main" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#808080;strokeWidth=2;jumpStyle=arc;jumpSize=10;spacing=15;labelBackgroundColor=white;labelBorderColor=none" edge="1" parent="1" source="widget_script" target="widget_main">
+                    <mxGeometry relative="1" as="geometry"/>
+                  </mxCell>
+                  <mxCell id="edge-e-widget_script-widget_main_label" value="Initializes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="edge-e-widget_script-widget_main">
+                    <mxGeometry x="-0.2" y="10" relative="1" as="geometry">
+                      <mxPoint as="offset"/>
+                    </mxGeometry>
+                  </mxCell>
+              </root>
+            </mxGraphModel>
+          </diagram>
+        </mxfile>

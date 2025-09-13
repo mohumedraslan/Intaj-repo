@@ -1,41 +1,39 @@
 <<<<<<< Updated upstream
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
+import { createClient } from '@/lib/supabaseClient';
+import { format } from 'date-fns';
 
 interface BlogPost {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
-  date: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  category: string;
-  imageUrl: string;
-  readTime: string;
+  published_at: string;
+  author_id: string;
+  content: string;
+  is_published: boolean;
 }
 
-const blogPosts: BlogPost[] = [
-  {
-    id: '1',
-    title: 'Building Multi-Channel Chatbots with Intaj',
-    excerpt: 'Learn how to create and deploy chatbots across WhatsApp, Facebook, and Instagram using Intaj platform.',
-    date: 'Sept 7, 2025',
-    author: {
-      name: 'Team Intaj',
-      avatar: '/team/avatar1.jpg'
-    },
-    category: 'Tutorials',
-    imageUrl: '/blog/chatbot-tutorial.jpg',
-    readTime: '5 min read'
-  },
-  // Add more blog posts here
-];
+// Default image and author info until we implement proper author management
+const defaultAuthor = {
+  name: 'Team Intaj',
+  avatar: '/team/avatar1.jpg'
+};
 
-export default function BlogPage() {
+const defaultImage = '/blog/chatbot-tutorial.jpg';
+
+export const revalidate = 3600; // Revalidate every hour
+
+export default async function BlogPage() {
+  const supabase = createClient();
+  
+  // Fetch published blog posts from Supabase
+  const { data: blogPosts, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('is_published', true)
+    .order('published_at', { ascending: false });
   return (
     <div className="bg-white">
       {/* Hero Section */}
@@ -563,5 +561,3 @@ export default async function BlogPage() {
     </div>
   );
 }
->>>>>>> Stashed changes
->>>>>>> Stashed changes

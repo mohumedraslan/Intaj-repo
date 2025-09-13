@@ -19,11 +19,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { createDataSource } from '@/app/dashboard/chatbots/data-sources/actions'
 
 interface AddDataSourceDialogProps {
-  chatbotId: string
+  agentId: string
   children: React.ReactNode
 }
 
-export function AddDataSourceDialog({ chatbotId, children }: AddDataSourceDialogProps) {
+export function AddDataSourceDialog({ agentId, children }: AddDataSourceDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -77,7 +77,7 @@ export function AddDataSourceDialog({ chatbotId, children }: AddDataSourceDialog
       }
 
       const result = await createDataSource({
-        chatbotId,
+        agentId,
         type,
         content,
       })
@@ -107,7 +107,7 @@ export function AddDataSourceDialog({ chatbotId, children }: AddDataSourceDialog
         <DialogHeader>
           <DialogTitle>Add Data Source</DialogTitle>
           <DialogDescription>
-            Add knowledge to your chatbot by providing a website URL, uploading a file, or entering text directly.
+            Add knowledge to your agent by providing a website URL, uploading a file, or entering text directly.
           </DialogDescription>
         </DialogHeader>
 

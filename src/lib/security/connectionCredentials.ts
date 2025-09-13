@@ -1,8 +1,8 @@
-import { encrypt, decrypt } from '../encryption';
+import { encrypt, decrypt } from './credentials';
 
 /**
  * Utility functions for handling connection credentials encryption/decryption
- * Uses the existing encryption utilities with a specific AAD tag for connections
+ * Uses the secure credential service with a specific AAD tag for connections
  */
 
 /**
@@ -15,7 +15,7 @@ export function encryptCredentials(credentials: any): string {
     // Convert credentials object to JSON string
     const credentialsString = JSON.stringify(credentials);
     
-    // Encrypt the credentials string
+    // Encrypt the credentials string using the secure credential service
     return encrypt(credentialsString);
   } catch (error) {
     console.error('Failed to encrypt connection credentials:', error);
@@ -34,7 +34,7 @@ export function decryptCredentials(encryptedCredentials: string): any {
       throw new Error('No credentials provided for decryption');
     }
     
-    // Decrypt the credentials string
+    // Decrypt the credentials string using the secure credential service
     const decryptedString = decrypt(encryptedCredentials);
     
     // Parse the JSON string back to an object

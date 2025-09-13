@@ -7,13 +7,13 @@ type DataSourceType = 'website' | 'file' | 'text'
 type DataSourceStatus = 'pending' | 'training' | 'ready' | 'error'
 
 interface CreateDataSourceParams {
-  chatbotId: string
+  agentId: string
   type: DataSourceType
   content: string
 }
 
 export async function createDataSource(params: CreateDataSourceParams) {
-  const { chatbotId, type, content } = params
+  const { agentId, type, content } = params
   const supabase = createClient()
   
   // Get the current user
@@ -28,7 +28,7 @@ export async function createDataSource(params: CreateDataSourceParams) {
   const { data, error } = await supabase
     .from('data_sources')
     .insert({
-      chatbot_id: chatbotId,
+      chatbot_id: agentId,
       user_id: user.id,
       type,
       content,
@@ -58,7 +58,7 @@ export async function createDataSource(params: CreateDataSourceParams) {
     if (!profileError && profile) {
       // Get current onboarding steps or use default if not set
       const currentSteps = profile.onboarding_steps || {
-        created_first_chatbot: false,
+        created_first_agent: false,
         added_data_source: false,
         connected_channel: false,
         has_dismissed: false
@@ -77,13 +77,13 @@ export async function createDataSource(params: CreateDataSourceParams) {
     }
   }
   
-  // Revalidate the chatbot page to show the new data source
-  revalidatePath(`/dashboard/chatbots/${chatbotId}`)
+  // Revalidate the agent page to show the new data source
+  revalidatePath(`/dashboard/chatbots/${agentId}`)
   
   return { success: true, data: data[0] }
 }
 
-export async function getDataSources(chatbotId: string) {
+export async function getDataSources(agentId: string) {
   const supabase = createClient()
   
   // Get the current user
@@ -94,11 +94,11 @@ export async function getDataSources(chatbotId: string) {
     return { success: false, error: 'Authentication error' }
   }
   
-  // Get all data sources for this chatbot
+  // Get all data sources for this agent
   const { data, error } = await supabase
     .from('data_sources')
     .select('*')
-    .eq('chatbot_id', chatbotId)
+    .eq('chatbot_id', agentId)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
   
@@ -110,7 +110,7 @@ export async function getDataSources(chatbotId: string) {
   return { success: true, data }
 }
 
-export async function deleteDataSource(id: string, chatbotId: string) {
+export async function deleteDataSource(id: string, agentId: string) {
   const supabase = createClient()
   
   // Get the current user
@@ -133,8 +133,8 @@ export async function deleteDataSource(id: string, chatbotId: string) {
     return { success: false, error: error.message }
   }
   
-  // Revalidate the chatbot page to update the data sources list
-  revalidatePath(`/dashboard/chatbots/${chatbotId}`)
+  // Revalidate the agent page to update the data sources list
+  revalidatePath(`/dashboard/chatbots/${agentId}`)
   
   return { success: true }
 }

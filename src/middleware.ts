@@ -14,6 +14,12 @@ const PUBLIC_ROUTES = [
   '/policy',
 ];
 
+// Admin routes that require admin role
+const ADMIN_ROUTES = [
+  '/admin',
+  '/admin/dashboard',
+];
+
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
@@ -21,6 +27,9 @@ export async function middleware(req: NextRequest) {
 
   // Check if the route is public
   const isPublicRoute = PUBLIC_ROUTES.some(route => req.nextUrl.pathname === route);
+  
+  // Check if the route is an admin route
+  const isAdminRoute = ADMIN_ROUTES.some(route => req.nextUrl.pathname.startsWith(route));
 
   // If not public and no session, redirect to auth
   if (!isPublicRoute && !session) {
@@ -32,6 +41,22 @@ export async function middleware(req: NextRequest) {
   // If auth page and session exists, redirect to dashboard
   if (req.nextUrl.pathname === '/auth' && session) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+  
+  // Check admin access for admin routes
+  if (isAdminRoute && session) {
+    // Check if user has admin role
+    const { data: userRoles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', session.user.id)
+      .eq('role', 'admin')
+      .single();
+
+    if (!userRoles) {
+      // User doesn't have admin role, redirect to unauthorized page
+      return NextResponse.redirect(new URL('/unauthorized', req.url));
+    }
   }
 
   return res;
@@ -48,5 +73,6 @@ export const config = {
      * - api routes
      */
     '/((?!_next/static|_next/image|favicon.ico|public|api).*)',
+    '/admin/:path*',
   ],
 };

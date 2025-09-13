@@ -11,7 +11,7 @@ type DataSourceStatus = 'pending' | 'training' | 'ready' | 'error'
 
 interface DataSource {
   id: string
-  chatbot_id: string
+  agent_id: string
   user_id: string
   type: DataSourceType
   content: string
@@ -21,18 +21,18 @@ interface DataSource {
 
 interface DataSourceListProps {
   dataSources: DataSource[]
-  chatbotId: string
+  agentId: string
   onDelete: () => void
 }
 
-export function DataSourceList({ dataSources, chatbotId, onDelete }: DataSourceListProps) {
+export function DataSourceList({ dataSources, agentId, onDelete }: DataSourceListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async (id: string) => {
     setIsDeleting(true)
     try {
-      const result = await deleteDataSource(id, chatbotId)
+      const result = await deleteDataSource(id, agentId)
       if (result.success) {
         onDelete()
       }
@@ -151,7 +151,7 @@ export function DataSourceList({ dataSources, chatbotId, onDelete }: DataSourceL
         </div>
         <h3 className="mb-1 text-lg font-semibold">No data sources</h3>
         <p className="mb-4 text-sm text-muted-foreground">
-          Add websites, files, or text to train your chatbot.
+          Add websites, files, or text to train your agent.
         </p>
       </div>
     )
