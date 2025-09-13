@@ -13,10 +13,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/lib/supabaseClient';
 import { updateAgent, deleteAgent, createAgent } from '../actions';
-import { Bot, Trash2, Upload } from 'lucide-react';
+import { Bot, Upload, Save, Trash2, Play, Settings, BarChart3, Zap } from 'lucide-react';
 import { AddDataSourceDialog } from '@/components/add-data-source-dialog';
 import { DataSourceList } from '@/components/data-source-list';
 import WidgetEmbedCode from '@/components/chat/WidgetEmbedCode';
+import WorkflowBuilder from '@/components/agents/WorkflowBuilder';
+import TelegramIntegration from '@/components/integrations/TelegramIntegration';
+import WhatsAppIntegration from '@/components/integrations/WhatsAppIntegration';
 
 interface Agent {
   id: string;
@@ -43,6 +46,7 @@ export default function EditAgentPage() {
   const [model, setModel] = useState('gpt-4o');
   const [basePrompt, setBasePrompt] = useState('');
   const [status, setStatus] = useState('active');
+  const [agentType, setAgentType] = useState('customer_support');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +94,7 @@ export default function EditAgentPage() {
           setModel(data.model || 'gpt-4o');
           setBasePrompt(data.base_prompt || '');
           setStatus(data.settings?.status || 'active');
+          setAgentType(data.settings?.agent_type || 'customer_support');
           setAvatarUrl(data.avatar_url || null);
           
           // Fetch data sources for this agent
@@ -211,14 +216,27 @@ export default function EditAgentPage() {
         throw new Error('AI model selection is required');
       }
       
+      // Set default base prompt based on agent type if none provided
+      let finalBasePrompt = basePrompt?.trim();
+      if (!finalBasePrompt && isNew) {
+        const agentTypePrompts = {
+          customer_support: "You are a friendly and professional customer support assistant. Your main goal is to help customers with their questions, resolve issues, and provide excellent service. Always be polite, empathetic, and solution-focused.",
+          mail_manager: "You are an intelligent email management assistant. You help organize, prioritize, and draft professional emails. You can categorize messages, suggest responses, and help maintain efficient email communication.",
+          sales_agent: "You are a skilled sales assistant focused on helping customers find the right solutions. You understand customer needs, present product benefits clearly, and guide prospects through the sales process with professionalism and expertise.",
+          marketing_agent: "You are a creative marketing assistant specializing in content creation, campaign ideas, and brand messaging. You help develop engaging marketing materials and strategies that resonate with target audiences."
+        };
+        finalBasePrompt = agentTypePrompts[agentType as keyof typeof agentTypePrompts] || agentTypePrompts.customer_support;
+      }
+
       // Prepare agent data
       const agentData = {
         name: name.trim(),
         description: description?.trim() || undefined,
         model,
-        base_prompt: basePrompt?.trim() || undefined,
+        base_prompt: finalBasePrompt || undefined,
         settings: {
-          status: status.toLowerCase()
+          status: status.toLowerCase(),
+          agent_type: agentType
         },
         avatar_url: undefined as string | undefined
       };
@@ -370,9 +388,14 @@ export default function EditAgentPage() {
             )}
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-4 w-full mb-6">
+              <TabsList className="grid grid-cols-6 w-full mb-6">
                 <TabsTrigger value="general">General</TabsTrigger>
                 <TabsTrigger value="personality">Personality & Model</TabsTrigger>
+                <TabsTrigger value="workflows">
+                  <Zap className="h-4 w-4 mr-2" />
+                  Workflows
+                </TabsTrigger>
+                <TabsTrigger value="integrations">Integrations</TabsTrigger>
                 <TabsTrigger value="data">Data Sources</TabsTrigger>
                 <TabsTrigger value="widget">Website Widget</TabsTrigger>
               </TabsList>
@@ -430,6 +453,25 @@ export default function EditAgentPage() {
                       className="bg-gray-800 border-gray-700 text-white" 
                     />
                   </div>
+                  
+                  {/* Agent Type */}
+                  {isNew && (
+                    <div className="space-y-2">
+                      <Label htmlFor="agentType" className="text-gray-300">Agent Type</Label>
+                      <Select value={agentType} onValueChange={setAgentType}>
+                        <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                          <SelectValue placeholder="Select agent type" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                          <SelectItem value="customer_support">Customer Support</SelectItem>
+                          <SelectItem value="sales_agent">Sales Agent</SelectItem>
+                          <SelectItem value="marketing_agent">Marketing Agent</SelectItem>
+                          <SelectItem value="mail_manager">Mail Manager</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-sm text-gray-400">This will set up default prompts and behaviors for your agent.</p>
+                    </div>
+                  )}
                   
                   {/* Status */}
                   <div className="space-y-2">
@@ -555,6 +597,27 @@ export default function EditAgentPage() {
                     </div>
                   )}
                 </div>
+              </TabsContent>
+              <TabsContent value="workflows">
+                {!isNew ? (
+                  <WorkflowBuilder agentId={id} />
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    <p>Save your agent first to create workflows.</p>
+                  </div>
+                )}
+              </TabsContent>
+              <TabsContent value="integrations">
+                {!isNew ? (
+                  <div className="space-y-6">
+                    <TelegramIntegration agentId={id} />
+                    <WhatsAppIntegration agentId={id} />
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    <p>Save your agent first to set up integrations.</p>
+                  </div>
+                )}
               </TabsContent>
               <TabsContent value="widget">
                 {!isNew ? (

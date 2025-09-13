@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,27 @@ interface OnboardingChecklistProps {
 export default function OnboardingChecklist({ userId, onboardingSteps }: OnboardingChecklistProps) {
   const router = useRouter();
   const [dismissing, setDismissing] = useState(false);
+  const [firstAgentId, setFirstAgentId] = useState<string | null>(null);
+
+  // Fetch the user's first agent ID for dynamic linking
+  useEffect(() => {
+    const fetchFirstAgent = async () => {
+      if (onboardingSteps.created_first_agent) {
+        const { data: agents } = await supabase
+          .from('agents')
+          .select('id')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: true })
+          .limit(1);
+        
+        if (agents && agents.length > 0) {
+          setFirstAgentId(agents[0].id);
+        }
+      }
+    };
+
+    fetchFirstAgent();
+  }, [userId, onboardingSteps.created_first_agent]);
 
   // Define the steps based on the onboarding progress
   const steps: OnboardingStep[] = [
@@ -50,7 +71,7 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
       title: 'Train your Agent with data',
       description: 'Add documents, websites, or text to make your agent smarter.',
       action: 'Add Data',
-      link: '/dashboard/chatbots', // This will be updated dynamically if they have an agent
+      link: firstAgentId ? `/dashboard/chatbots/${firstAgentId}?tab=data` : '/dashboard/chatbots',
       completed: onboardingSteps.added_data_source,
       disabled: !onboardingSteps.created_first_agent
     },
@@ -59,7 +80,7 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
       title: 'Connect a communication channel',
       description: 'Deploy your agent to your website, WhatsApp, or other platforms.',
       action: 'Connect',
-      link: '/connections',
+      link: firstAgentId ? `/dashboard/chatbots/${firstAgentId}?tab=integrations` : '/dashboard/chatbots',
       completed: onboardingSteps.connected_channel,
       disabled: !onboardingSteps.created_first_agent
     }

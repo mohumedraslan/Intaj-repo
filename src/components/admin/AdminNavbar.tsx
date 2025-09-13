@@ -4,35 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  Box,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
-import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu, LayoutDashboard, Users, Settings, LogOut, Shield } from 'lucide-react';
 
 export default function AdminNavbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
   const supabase = createClientComponentClient();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -44,77 +23,68 @@ export default function AdminNavbar() {
   };
 
   const navItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
-    { text: 'Users', icon: <PeopleIcon />, path: '/admin/dashboard' }, // Currently points to dashboard as it's the only page
-    { text: 'Settings', icon: <SettingsIcon />, path: '/admin/dashboard' }, // Currently points to dashboard as it's the only page
+    { text: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" />, path: '/admin/dashboard' },
+    { text: 'Users', icon: <Users className="h-4 w-4" />, path: '/admin/dashboard' },
+    { text: 'Settings', icon: <Settings className="h-4 w-4" />, path: '/admin/dashboard' },
   ];
-
-  const drawer = (
-    <Box sx={{ width: 250 }} role="presentation">
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
-        <AdminPanelSettingsIcon sx={{ mr: 1 }} />
-        <Typography variant="h6">Admin Panel</Typography>
-      </Box>
-      <Divider />
-      <List>
-        {navItems.map((item) => (
-          <ListItem 
-            button 
-            key={item.text} 
-            component={Link} 
-            href={item.path}
-            onClick={isMobile ? toggleDrawer : undefined}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        <ListItem button onClick={handleSignOut}>
-          <ListItemIcon><LogoutIcon /></ListItemIcon>
-          <ListItemText primary="Sign Out" />
-        </ListItem>
-      </List>
-    </Box>
-  );
 
   return (
     <>
-      <AppBar position="static" color="primary" elevation={1}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={toggleDrawer}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+      <header className="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center space-x-4">
+            <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+              <SheetTrigger asChild>
+                <Button className="p-2 bg-transparent hover:bg-gray-700 border-none">
+                  <Menu className="h-5 w-5 text-white" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 bg-gray-800 border-gray-700">
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center space-x-2 p-4 border-b border-gray-700">
+                    <Shield className="h-5 w-5 text-blue-500" />
+                    <h2 className="text-lg font-semibold text-white">Admin Panel</h2>
+                  </div>
+                  
+                  <nav className="flex-1 p-4">
+                    <div className="space-y-2">
+                      {navItems.map((item) => (
+                        <Link
+                          key={item.text}
+                          href={item.path}
+                          onClick={() => setDrawerOpen(false)}
+                          className="flex items-center space-x-3 px-3 py-2 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                        >
+                          {item.icon}
+                          <span>{item.text}</span>
+                        </Link>
+                      ))}
+                    </div>
+                    
+                    <div className="border-t border-gray-700 mt-6 pt-6">
+                      <button
+                        onClick={handleSignOut}
+                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-colors w-full"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+            
+            <h1 className="text-xl font-bold text-white">Intaj AI Admin</h1>
+          </div>
           
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Intaj AI Admin
-          </Typography>
-          
-          <Button 
-            color="inherit" 
-            component={Link} 
-            href="/dashboard"
-          >
-            Back to App
-          </Button>
-        </Toolbar>
-      </AppBar>
-      
-      <Drawer
-        anchor="left"
-        open={drawerOpen}
-        onClose={toggleDrawer}
-      >
-        {drawer}
-      </Drawer>
+          <Link href="/dashboard">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              Back to App
+            </Button>
+          </Link>
+        </div>
+      </header>
     </>
   );
 }

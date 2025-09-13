@@ -72,7 +72,7 @@ export default function AgentsPage() {
           .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
         if (messagesError) {
-          console.error('Error fetching messages:', messagesError);
+          console.error('Error fetching messages:', JSON.stringify(messagesError, null, 2));
         }
 
         // Transform chatbots into agents

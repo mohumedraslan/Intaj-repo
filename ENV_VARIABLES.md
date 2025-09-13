@@ -76,6 +76,17 @@ INSTAGRAM_ACCESS_TOKEN=your-instagram-access-token
 # Production: https://intaj.nabih.tech/api/webhooks/instagram
 ```
 
+## 📱 Telegram Bot Integration
+```bash
+# Telegram Bot Configuration
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+TELEGRAM_WEBHOOK_SECRET=your-webhook-secret-token
+
+# Callback URLs
+# Local: http://localhost:3000/api/webhooks/telegram/[agentId]
+# Production: https://intaj.nabih.tech/api/webhooks/telegram/[agentId]
+```
+
 ## 📧 Email Services
 ```bash
 # Email Provider (choose one)

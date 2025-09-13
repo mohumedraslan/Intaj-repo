@@ -2,24 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import {
-  Container,
-  Typography,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
-  Box,
-  Chip,
-  CircularProgress,
-  Alert,
-  Pagination
-} from '@mui/material';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Loader2, Shield, AlertCircle } from 'lucide-react';
 
 type User = {
   id: string;
@@ -86,78 +73,104 @@ export default function AdminDashboard() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box display="flex" alignItems="center" mb={3}>
-        <AdminPanelSettingsIcon fontSize="large" sx={{ mr: 2 }} />
-        <Typography variant="h4" component="h1">
-          Admin Dashboard
-        </Typography>
-      </Box>
+    <div className="w-full min-h-screen bg-[#0a0a0b] text-white p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center space-x-4 mb-6">
+          <Shield className="h-8 w-8 text-blue-500" />
+          <h1 className="text-3xl font-bold">
+            <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+              Admin Dashboard
+            </span>
+          </h1>
+        </div>
 
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h5" component="h2" gutterBottom>
-          User Management
-        </Typography>
+        <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600/50">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">User Management</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-md p-4 mb-6 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-red-500" />
+                <span className="text-red-400">{error}</span>
+              </div>
+            )}
 
-        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
-        {loading ? (
-          <Box display="flex" justifyContent="center" p={4}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Sign-up Date</TableCell>
-                    <TableCell>Last Sign In</TableCell>
-                    <TableCell>Subscription</TableCell>
-                    <TableCell align="right">Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{formatDate(user.created_at)}</TableCell>
-                      <TableCell>{formatDate(user.last_sign_in_at)}</TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={user.subscription_tier || 'Free'} 
-                          color={user.subscription_tier ? 'primary' : 'default'}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <Button 
-                          variant="outlined" 
-                          size="small"
-                          disabled
-                          title="Coming Soon"
-                        >
-                          Impersonate
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            
-            <Box display="flex" justifyContent="center" mt={3}>
-              <Pagination 
-                count={totalPages} 
-                page={page} 
-                onChange={handleChangePage} 
-                color="primary" 
-              />
-            </Box>
-          </>
-        )}
-      </Paper>
-    </Container>
+            {loading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <span className="ml-2 text-gray-400">Loading users...</span>
+              </div>
+            ) : (
+              <>
+                <div className="rounded-md border border-gray-600">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-gray-600">
+                        <TableHead className="text-gray-300">Email</TableHead>
+                        <TableHead className="text-gray-300">Sign-up Date</TableHead>
+                        <TableHead className="text-gray-300">Last Sign In</TableHead>
+                        <TableHead className="text-gray-300">Subscription</TableHead>
+                        <TableHead className="text-gray-300 text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
+                        <TableRow key={user.id} className="border-gray-600">
+                          <TableCell className="text-white">{user.email}</TableCell>
+                          <TableCell className="text-gray-300">{formatDate(user.created_at)}</TableCell>
+                          <TableCell className="text-gray-300">{formatDate(user.last_sign_in_at)}</TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant={user.subscription_tier ? 'default' : 'secondary'}
+                              className={user.subscription_tier ? 'bg-blue-600' : ''}
+                            >
+                              {user.subscription_tier || 'Free'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button 
+                              disabled
+                              className="text-xs px-3 py-1 opacity-50 cursor-not-allowed"
+                              title="Coming Soon"
+                            >
+                              Impersonate
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                {totalPages > 1 && (
+                  <div className="flex justify-center mt-6">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        onClick={() => setPage(Math.max(1, page - 1))}
+                        disabled={page === 1}
+                        className="px-3 py-1 text-sm"
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-gray-400 text-sm">
+                        Page {page} of {totalPages}
+                      </span>
+                      <Button
+                        onClick={() => setPage(Math.min(totalPages, page + 1))}
+                        disabled={page === totalPages}
+                        className="px-3 py-1 text-sm"
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
