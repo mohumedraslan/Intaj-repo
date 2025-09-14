@@ -113,9 +113,16 @@ export async function generateResponse(params: GenerateResponseParams): Promise<
     // Step 4: Construct the final prompt with context
     let contextText = '';
     if (relevantChunks && relevantChunks.length > 0) {
-      contextText = relevantChunks
+      contextText = `Relevant documents:\n${relevantChunks
         .map((chunk: DocumentChunk) => chunk.content)
-        .join('\n\n');
+        .join('\n\n')}`;
+    }
+
+    // Step 4a: Check for agent-specific tools
+    if (agent.settings?.agent_type === 'mail_manager') {
+      const { readEmailsForAgent } = await import('@/lib/agents/tools/emailReader');
+      const emailContext = await readEmailsForAgent({ agentId: agent.id, userId });
+      contextText = `${emailContext}\n\n${contextText}`;
     }
     
     // Step 5: Call the language model with the combined prompt
@@ -124,7 +131,7 @@ export async function generateResponse(params: GenerateResponseParams): Promise<
       messages: [
         {
           role: 'system',
-          content: `${agent.base_prompt}\n\nContext Information:\n${contextText}`
+          content: `${agent.base_prompt}\n\nUse the following context to answer the user's question:\n${contextText}`
         },
         ...conversationHistory
       ],

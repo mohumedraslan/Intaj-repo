@@ -55,6 +55,31 @@ export default function EditAgentPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
   const [dataSources, setDataSources] = useState<any[]>([]);
+  const [googleConnection, setGoogleConnection] = useState<any>(null);
+
+  const handleGoogleConnect = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+
+    if (!clientId || !redirectUri) {
+      setError("Google integration is not configured. Please contact support.");
+      return;
+    }
+
+    const scope = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.email';
+    const state = id; // Use agent ID as state to associate the connection
+
+    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('scope', scope);
+    authUrl.searchParams.set('access_type', 'offline');
+    authUrl.searchParams.set('prompt', 'consent');
+    authUrl.searchParams.set('state', state);
+
+    router.push(authUrl.toString());
+  };
 
   useEffect(() => {
     if (isNew) {
@@ -99,6 +124,8 @@ export default function EditAgentPage() {
           
           // Fetch data sources for this agent
           fetchDataSources(data.id);
+        // Fetch Google connection status
+        fetchGoogleConnection(data.id);
         } else {
           setError('Agent not found');
         }
@@ -610,6 +637,42 @@ export default function EditAgentPage() {
               <TabsContent value="integrations">
                 {!isNew ? (
                   <div className="space-y-6">
+                    {agentType === 'mail_manager' && (
+                      <Card className="bg-[#1f2024] border-gray-700">
+                        <CardHeader>
+                          <CardTitle className="flex items-center">
+                            <Mail className="mr-2 h-5 w-5 text-red-400" />
+                            Gmail Connection
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-gray-400 mb-4">
+                            Connect a Google account to allow this agent to read and manage emails.
+                          </p>
+                          <div id="gmail-connect-button">
+                            {googleConnection && googleConnection.active ? (
+                              <div className="flex items-center space-x-4">
+                                <p className="text-green-400">Connected to Google</p>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => { /* TODO: Implement disconnect logic */ }}
+                                >
+                                  Disconnect
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                onClick={handleGoogleConnect}
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                              >
+                                <Mail className="mr-2 h-4 w-4" />
+                                Connect to Gmail
+                              </Button>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                     <TelegramIntegration agentId={id} />
                     <WhatsAppIntegration agentId={id} />
                   </div>
