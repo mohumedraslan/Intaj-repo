@@ -24,6 +24,14 @@ interface Agent {
 }
 
 /**
+ * Interface for document chunks returned from vector search
+ */
+interface DocumentChunk {
+  content: string;
+  similarity?: number;
+}
+
+/**
  * Parameters for generating a response
  */
 interface GenerateResponseParams {
@@ -43,7 +51,7 @@ export async function generateResponse(params: GenerateResponseParams): Promise<
   try {
     // Fetch the agent details
     const { data: agentData, error: agentError } = await supabase
-      .from('chatbots')
+      .from('agents')
       .select('*')
       .eq('id', agentId)
       .single();
@@ -61,7 +69,6 @@ export async function generateResponse(params: GenerateResponseParams): Promise<
       settings: agentData.settings
     };
 
-  try {
     // Step 1: Generate embedding for the user's message
     const embeddingResponse = await openai.embeddings.create({
       model: 'text-embedding-3-small',
@@ -79,7 +86,7 @@ export async function generateResponse(params: GenerateResponseParams): Promise<
         match_threshold: 0.7, // Adjust threshold as needed
         match_count: 5, // Number of chunks to retrieve
       }
-    );
+    ) as { data: DocumentChunk[] | null; error: any };
     
     if (error) {
       console.error('Vector search error:', error);
@@ -90,7 +97,7 @@ export async function generateResponse(params: GenerateResponseParams): Promise<
     const { data: recentMessages } = await supabase
       .from('messages')
       .select('role, content')
-      .eq('chatbot_id', agent.id)
+      .eq('agent_id', agent.id)
       .order('created_at', { ascending: false })
       .limit(5);
     
@@ -107,7 +114,7 @@ export async function generateResponse(params: GenerateResponseParams): Promise<
     let contextText = '';
     if (relevantChunks && relevantChunks.length > 0) {
       contextText = relevantChunks
-        .map(chunk => chunk.content)
+        .map((chunk: DocumentChunk) => chunk.content)
         .join('\n\n');
     }
     

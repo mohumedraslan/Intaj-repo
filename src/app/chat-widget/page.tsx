@@ -5,7 +5,7 @@ import WidgetTemplates from '@/components/chat/WidgetTemplates';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Settings, Template, Code } from 'lucide-react';
+import { MessageCircle, Settings, Code, FileText } from 'lucide-react';
 
 export default function ChatWidgetPage() {
   const [activeTab, setActiveTab] = useState<'demo' | 'templates' | 'settings'>('demo');
@@ -21,7 +21,7 @@ export default function ChatWidgetPage() {
 
   const tabs = [
     { id: 'demo', label: 'Live Demo', icon: MessageCircle },
-    { id: 'templates', label: 'Templates', icon: Template },
+    { id: 'templates', label: 'Templates', icon: FileText },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
