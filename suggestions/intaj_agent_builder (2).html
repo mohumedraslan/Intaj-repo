@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create AI Agent - Intaj</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'bg-primary': '#0a0a0b',
+                        'bg-secondary': '#141517',
+                        'bg-tertiary': '#1f2024',
+                        'bg-accent': '#2a2d35',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-ai': 'pulse-ai 3s ease-in-out infinite',
+                        'slide-up': 'slide-up 0.8s ease-out forwards',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'neural-pulse': 'neural-pulse 4s ease-in-out infinite',
+                        'typing': 'typing 2s steps(20) infinite',
+                        'fade-in': 'fade-in 0.6s ease-out forwards'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        'pulse-ai': {
+                            '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                            '50%': { opacity: 0.8, transform: 'scale(1.05)' }
+                        },
+                        'slide-up': {
+                            '0%': { opacity: 0, transform: 'translateY(30px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' }
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' },
+                            '100%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.6)' }
+                        },
+                        'neural-pulse': {
+                            '0%, 100%': { opacity: 0.4 },
+                            '50%': { opacity: 0.8 }
+                        },
+                        typing: {
+                            '0%, 50%': { opacity: 1 },
+                            '51%, 100%': { opacity: 0 }
+                        },
+                        'fade-in': {
+                            '0%': { opacity: 0, transform: 'scale(0.9)' },
+                            '100%': { opacity: 1, transform: 'scale(1)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(31, 32, 36, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        .gradient-neural {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        .gradient-automation {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .neural-grid {
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        body {
+            background: #0a0a0b;
+            color: #f8fafc;
+        }
+        .step-active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        .step-completed {
+            background: #10b981;
+        }
+        .step-inactive {
+            background: #374151;
+        }
+        .typing-cursor::after {
+            content: '|';
+            animation: typing 1s infinite;
+        }
+        .integration-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button onclick="goBack()" class="p-2 hover:bg-gray-700 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <div class="w-4 h-4 bg-white rounded-sm opacity-90"></div>
+                        </div>
+                        <span class="text-2xl font-bold text-gradient">Intaj</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="previewBtn" class="flex items-center space-x-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        <span>Preview</span>
+                    </button>
+                    <button id="createAgentBtn" class="gradient-neural px-6 py-2 rounded-lg text-white font-medium hover:opacity-90 transition-opacity">
+                        Create Agent
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="min-h-screen pt-20 neural-grid">
+        <!-- Main Container -->
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <!-- Sidebar - Steps -->
+                <div class="lg:col-span-1">
+                    <div class="glass-card p-6 rounded-2xl sticky top-28">
+                        <h3 class="text-xl font-bold mb-6">Setup Steps</h3>
+                        <div class="space-y-4">
+                            <!-- Step 1 -->
+                            <div id="step1" class="flex items-center space-x-3 p-3 rounded-lg step-active transition-all duration-300">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold">
+                                    <span class="step-number">1</span>
+                                    <svg class="w-5 h-5 hidden step-check" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Agent Type</div>
+                                    <div class="text-sm text-gray-400">Choose your agent type</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 2 -->
+                            <div id="step2" class="flex items-center space-x-3 p-3 rounded-lg step-inactive transition-all duration-300">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold">
+                                    <span class="step-number">2</span>
+                                    <svg class="w-5 h-5 hidden step-check" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Basic Information</div>
+                                    <div class="text-sm text-gray-400">Name and description</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 3 -->
+                            <div id="step3" class="flex items-center space-x-3 p-3 rounded-lg step-inactive transition-all duration-300">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold">
+                                    <span class="step-number">3</span>
+                                    <svg class="w-5 h-5 hidden step-check" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Personality & Behavior</div>
+                                    <div class="text-sm text-gray-400">Agent personality</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 4 -->
+                            <div id="step4" class="flex items-center space-x-3 p-3 rounded-lg step-inactive transition-all duration-300">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold">
+                                    <span class="step-number">4</span>
+                                    <svg class="w-5 h-5 hidden step-check" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Knowledge Base</div>
+                                    <div class="text-sm text-gray-400">Upload data & enable RAG</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 5 -->
+                            <div id="step5" class="flex items-center space-x-3 p-3 rounded-lg step-inactive transition-all duration-300">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold">
+                                    <span class="step-number">5</span>
+                                    <svg class="w-5 h-5 hidden step-check" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Integrations</div>
+                                    <div class="text-sm text-gray-400">Connect platforms</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mt-8">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-400">Progress</span>
+                                <span id="progressText" class="text-sm text-blue-400">20%</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div id="progressBar" class="gradient-neural h-2 rounded-full transition-all duration-500" style="width: 20%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Step 1: Agent Type Selection -->
+                    <div id="stepContent1" class="step-content">
+                        <div class="glass-card p-8 rounded-2xl animate-fade-in">
+                            <div class="text-center mb-8">
+                                <h1 class="text-4xl font-bold mb-4">
+                                    Create Your <span class="text-gradient">AI Agent</span>
+                                </h1>
+                                <p class="text-xl text-gray-300">Choose the type of agent that best fits your business needs</p>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <!-- Customer Support Agent -->
+                                <div class="agent-type-card glass-card p-6 rounded-xl hover:border-blue-500/50 transition-all duration-300 cursor-pointer group" data-type="customer-support">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center group-hover:animate-pulse-ai">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-bold">Customer Support</h3>
+                                            <p class="text-gray-400">Handle inquiries and support tickets</p>
+                                        </div>
+                                    </div>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                                            <span>24/7 customer assistance</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                                            <span>Ticket management</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                                            <span>FAQ automation</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Sales Agent -->
+                                <div class="agent-type-card glass-card p-6 rounded-xl hover:border-green-500/50 transition-all duration-300 cursor-pointer group" data-type="sales-agent">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center group-hover:animate-pulse-ai">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-bold">Sales Agent</h3>
+                                            <p class="text-gray-400">Generate leads and close deals</p>
+                                        </div>
+                                    </div>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                            <span>Lead qualification</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                            <span>Product recommendations</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                            <span>Deal closing assistance</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Marketing Agent -->
+                                <div class="agent-type-card glass-card p-6 rounded-xl hover:border-purple-500/50 transition-all duration-300 cursor-pointer group" data-type="marketing-agent">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center group-hover:animate-pulse-ai">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-bold">Marketing Agent</h3>
+                                            <p class="text-gray-400">Create campaigns and engage customers</p>
+                                        </div>
+                                    </div>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                            <span>Campaign automation</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                            <span>Content personalization</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                            <span>Engagement tracking</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Content Creator Agent -->
+                                <div class="agent-type-card glass-card p-6 rounded-xl hover:border-cyan-500/50 transition-all duration-300 cursor-pointer group" data-type="content-creator">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <div class="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center group-hover:animate-pulse-ai">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-bold">Content Creator</h3>
+                                            <p class="text-gray-400">Generate and manage content</p>
+                                        </div>
+                                    </div>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-cyan-500 rounded-full"></div>
+                                            <span>Blog post generation</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-cyan-500 rounded-full"></div>
+                                            <span>Social media content</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-cyan-500 rounded-full"></div>
+                                            <span>SEO optimization</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Mail Manager Agent -->
+                                <div class="agent-type-card glass-card p-6 rounded-xl hover:border-yellow-500/50 transition-all duration-300 cursor-pointer group" data-type="mail-manager">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <div class="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center group-hover:animate-pulse-ai">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-bold">Mail Manager</h3>
+                                            <p class="text-gray-400">Organize email communications</p>
+                                        </div>
+                                    </div>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+                                            <span>Email automation</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+                                            <span>Smart categorization</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+                                            <span>Response templates</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Task Handler Agent -->
+                                <div class="agent-type-card glass-card p-6 rounded-xl hover:border-orange-500/50 transition-all duration-300 cursor-pointer group" data-type="task-handler">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <div class="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center group-hover:animate-pulse-ai">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-bold">Task Handler</h3>
+                                            <p class="text-gray-400">Automate workflow tasks</p>
+                                        </div>
+                                    </div>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                                            <span>Task automation</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                                            <span>Workflow management</span>
+                                        </li>
+                                        <li class="flex items-center space-x-2">
+                                            <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                                            <span>Schedule optimization</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 text-center">
+                                <button id="nextStep1" class="gradient-neural px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    Continue to Basic Information
+                                    <svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Basic Information -->
+                    <div id="stepContent2" class="step-content hidden">
+                        <div class="glass-card p-8 rounded-2xl animate-fade-in">
+                            <div class="mb-8">
+                                <h2 class="text-3xl font-bold mb-4">
+                                    <span class="text-gradient">Basic Information</span>
+                                </h2>
+                                <p class="text-gray-300">Let's start with the basics. Choose a name and describe your agent.</p>
+                            </div>
+                            
+                            <div class="space-y-8">
+                                <!-- Agent Name -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-3">Agent Name *</label>
+                                    <div class="relative">
+                                        <input type="text" id="agentName" placeholder="e.g., Customer Support Bot" 
+                                               class="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                            <div class="typing-cursor text-blue-400"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Agent Description -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-3">Description</label>
+                                    <textarea id="agentDescription" rows="4" placeholder="Describe what your agent does..."
+                                              class="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300 resize-none"></textarea>
+                                </div>
+                                
+                                <!-- AI Model Selection -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-3">AI Model</label>
+                                    <select id="aiModel" class="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                                        <option value="gpt-4o">GPT-4o (Recommended)</option>
+                                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                        <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+                                        <option value="claude-3-haiku">Claude 3 Haiku</option>
+                                        <option value="gemini-pro">Gemini Pro</option>
+                                        <option value="mixtral-8x7b">Mixtral 8x7B</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Language Selection -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-3">Primary Language</label>
+                                    <select id="primaryLanguage" class="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                                        <option value="en">English</option>
+                                        <option value="es">Spanish</option>
+                                        <option value="fr">French</option>
+                                        <option value="de">German</option>
+                                        <option value="it">Italian</option>
+                                        <option value="pt">Portuguese</option>
+                                        <option value="ar">Arabic</option>
+                                        <option value="zh">Chinese</option>
+                                        <option value="ja">Japanese</option>
+                                        <option value="ko">Korean</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Response Speed -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-3">Response Speed</label>
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="responseSpeed" value="fast" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors speed-option">
+                                                <div class="text-2xl mb-2">⚡</div>
+                                                <div class="font-semibold">Fast</div>
+                                                <div class="text-xs text-gray-400">0.5-1s</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="responseSpeed" value="balanced" class="sr-only" checked>
+                                            <div class="p-4 border border-blue-500 bg-blue-500/10 rounded-lg text-center speed-option">
+                                                <div class="text-2xl mb-2">⚖️</div>
+                                                <div class="font-semibold">Balanced</div>
+                                                <div class="text-xs text-gray-400">1-2s</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="responseSpeed" value="detailed" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors speed-option">
+                                                <div class="text-2xl mb-2">🎯</div>
+                                                <div class="font-semibold">Detailed</div>
+                                                <div class="text-xs text-gray-400">2-3s</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 flex justify-between">
+                                <button id="backStep2" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-colors">
+                                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
+                                    </svg>
+                                    Back
+                                </button>
+                                <button id="nextStep2" class="gradient-neural px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300">
+                                    Continue to Personality
+                                    <svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Personality & Behavior -->
+                    <div id="stepContent3" class="step-content hidden">
+                        <div class="glass-card p-8 rounded-2xl animate-fade-in">
+                            <div class="mb-8">
+                                <h2 class="text-3xl font-bold mb-4">
+                                    <span class="text-gradient">Personality & Behavior</span>
+                                </h2>
+                                <p class="text-gray-300">Define how your agent should communicate and behave with users.</p>
+                            </div>
+                            
+                            <div class="space-y-8">
+                                <!-- Personality Traits -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-4">Personality Traits</label>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <label class="cursor-pointer personality-trait">
+                                            <input type="checkbox" value="professional" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors trait-card">
+                                                <div class="text-2xl mb-2">👔</div>
+                                                <div class="font-semibold">Professional</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer personality-trait">
+                                            <input type="checkbox" value="friendly" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors trait-card">
+                                                <div class="text-2xl mb-2">😊</div>
+                                                <div class="font-semibold">Friendly</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer personality-trait">
+                                            <input type="checkbox" value="empathetic" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors trait-card">
+                                                <div class="text-2xl mb-2">❤️</div>
+                                                <div class="font-semibold">Empathetic</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer personality-trait">
+                                            <input type="checkbox" value="humorous" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors trait-card">
+                                                <div class="text-2xl mb-2">😄</div>
+                                                <div class="font-semibold">Humorous</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer personality-trait">
+                                            <input type="checkbox" value="direct" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors trait-card">
+                                                <div class="text-2xl mb-2">🎯</div>
+                                                <div class="font-semibold">Direct</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer personality-trait">
+                                            <input type="checkbox" value="patient" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors trait-card">
+                                                <div class="text-2xl mb-2">🧘</div>
+                                                <div class="font-semibold">Patient</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer personality-trait">
+                                            <input type="checkbox" value="creative" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors trait-card">
+                                                <div class="text-2xl mb-2">🎨</div>
+                                                <div class="font-semibold">Creative</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer personality-trait">
+                                            <input type="checkbox" value="analytical" class="sr-only">
+                                            <div class="p-4 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors trait-card">
+                                                <div class="text-2xl mb-2">📊</div>
+                                                <div class="font-semibold">Analytical</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Communication Style -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-4">Communication Style</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="communicationStyle" value="casual" class="sr-only">
+                                            <div class="p-6 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors style-card">
+                                                <div class="text-3xl mb-3">💬</div>
+                                                <div class="font-bold mb-2">Casual</div>
+                                                <div class="text-sm text-gray-300">Track revenue and subscription metrics.</div>
+                                        </div>
+
+                                        <!-- Mailchimp -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="mailchimp">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M21.25 7.3v1.5c0 5.25-3 8.25-8.25 8.25s-8.25-3-8.25-8.25v-1.5c0-.75.75-1.5 1.5-1.5h13.5c.75 0 1.5.75 1.5 1.5z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Mailchimp</div>
+                                                        <div class="text-sm text-gray-400">Email marketing</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Manage email campaigns and subscriber lists.</div>
+                                        </div>
+
+                                        <!-- Twilio -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="twilio">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Twilio</div>
+                                                        <div class="text-sm text-gray-400">SMS & Voice</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Send SMS notifications and voice calls.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Business Tools -->
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-4">Business Applications</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <!-- Zapier -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="zapier">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Zapier</div>
+                                                        <div class="text-sm text-gray-400">Workflow automation</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Connect with 5000+ apps through Zapier workflows.</div>
+                                        </div>
+
+                                        <!-- Slack -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="slack">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.521-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.523 2.521h-2.521V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.521A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.523v-2.521h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Slack</div>
+                                                        <div class="text-sm text-gray-400">Team communication</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Send notifications and updates to Slack channels.</div>
+                                        </div>
+
+                                        <!-- HubSpot -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="hubspot">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M18.164 7.931V4.5a4.5 4.5 0 1 0-9 0v3.431a9 9 0 1 0 9 0zM12 3a1.5 1.5 0 0 1 1.5 1.5V7.5h-3V4.5A1.5 1.5 0 0 1 12 3zm0 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">HubSpot</div>
+                                                        <div class="text-sm text-gray-400">CRM integration</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Sync contacts and leads with HubSpot CRM.</div>
+                                        </div>
+
+                                        <!-- Google Analytics -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="google-analytics">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Google Analytics</div>
+                                                        <div class="text-sm text-gray-400">Website analytics</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Track website traffic and user behavior.</div>
+                                        </div>
+
+                                        <!-- Shopify -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="shopify">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-green-700 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M15.337 2.136c-.49-.07-1.33-.09-2.64-.09-3.34 0-4.65.63-5.49 1.47-.84.84-1.47 2.15-1.47 5.49v.09c-1.33 0-2.64.02-2.64.09 0 .07.21.21.21.21l2.43 2.43s.21.21.21.14c0-.07-.14-.21-.14-.21l-.21-.21c0-.07.07-.14.14-.14h.21c.07 0 .14.07.14.14v.21c0 .07-.07.14-.14.14H5.757c-.07 0-.14-.07-.14-.14v-.21c0-.07.07-.14.14-.14h.21c.07 0 .14.07.14.14v.21c0 .07-.07.14-.14.14H5.547c-.07 0-.14-.07-.14-.14v-8.4c0-2.8.56-3.92 1.26-4.62.7-.7 1.82-1.26 4.62-1.26 1.26 0 2.1.02 2.59.07.49.05.98.14 1.47.28.42.14.84.35 1.19.63.35.28.63.63.84 1.05.21.42.35.91.42 1.47.07.56.07 1.19.07 1.89v8.4c0 .07-.07.14-.14.14H16.967c-.07 0-.14-.07-.14-.14v-.21c0-.07.07-.14.14-.14h.21c.07 0 .14.07.14.14v.21c0 .07-.07.14-.14.14h-.21c-.07 0-.14-.07-.14-.14v-.21c0-.07.07-.14.14-.14h.21c.07 0 .14.07.14.14v.21c0 .07-.07.14-.14.14s-.14-.07-.14-.14v-.21c0-.07.07-.14.14-.14.07 0 .14.07.14.14v.21c0 .07-.07.14-.14.14"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Shopify</div>
+                                                        <div class="text-sm text-gray-400">E-commerce platform</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Connect with your Shopify store for order support.</div>
+                                        </div>
+
+                                        <!-- Custom API -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="custom-api">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-gray-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Custom API</div>
+                                                        <div class="text-sm text-gray-400">Your own integrations</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Connect with your custom APIs and services.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Selected Integrations Summary -->
+                                <div id="selectedIntegrations" class="hidden">
+                                    <h3 class="text-xl font-semibold mb-4">Selected Integrations</h3>
+                                    <div class="bg-bg-tertiary rounded-lg p-4">
+                                        <div id="integrationsList" class="flex flex-wrap gap-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 flex justify-between">
+                                <button id="backStep5" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-colors">
+                                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
+                                    </svg>
+                                    Back
+                                </button>
+                                <button id="createAgent" class="gradient-neural px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 animate-glow">
+                                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                    </svg>
+                                    Create Agent
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gradient">Agent Preview</h3>
+                <button id="closePreview" class="p-2 hover:bg-gray-700 rounded-lg transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-6" id="previewContent">
+                <!-- Preview content will be generated here -->
+            </div>
+            
+            <div class="mt-8 flex justify-center">
+                <button class="gradient-neural px-6 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-opacity">
+                    Test Agent
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentStep = 1;
+        let selectedAgentType = '';
+        let selectedPersonalityTraits = [];
+        let selectedIntegrations = [];
+        let uploadedFiles = [];
+
+        // Navigation functions
+        function goBack() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            } else {
+                window.history.back();
+            }
+        }
+
+        function showStep(step) {
+            // Hide all step contents
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`stepContent${i}`).classList.add('hidden');
+                const stepElement = document.getElementById(`step${i}`);
+                stepElement.className = 'flex items-center space-x-3 p-3 rounded-lg step-inactive transition-all duration-300';
+                stepElement.querySelector('.step-number').classList.remove('hidden');
+                stepElement.querySelector('.step-check').classList.add('hidden');
+            }
+
+            // Show current step
+            document.getElementById(`stepContent${step}`).classList.remove('hidden');
+            
+            // Update step indicators
+            for (let i = 1; i <= step; i++) {
+                const stepElement = document.getElementById(`step${i}`);
+                if (i < step) {
+                    stepElement.className = 'flex items-center space-x-3 p-3 rounded-lg step-completed transition-all duration-300';
+                    stepElement.querySelector('.step-number').classList.add('hidden');
+                    stepElement.querySelector('.step-check').classList.remove('hidden');
+                } else if (i === step) {
+                    stepElement.className = 'flex items-center space-x-3 p-3 rounded-lg step-active transition-all duration-300';
+                }
+            }
+
+            // Update progress bar
+            const progress = (step / 5) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+        }
+
+        // Agent type selection
+        document.querySelectorAll('.agent-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove previous selection
+                document.querySelectorAll('.agent-type-card').forEach(c => {
+                    c.classList.remove('border-blue-500', 'bg-blue-500/10');
+                });
+                
+                // Add selection to clicked card
+                this.classList.add('border-blue-500', 'bg-blue-500/10');
+                selectedAgentType = this.dataset.type;
+                
+                // Enable next button
+                document.getElementById('nextStep1').disabled = false;
+                document.getElementById('nextStep1').classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
+            });
+        });
+
+        // Step navigation
+        document.getElementById('nextStep1')?.addEventListener('click', function() {
+            if (selectedAgentType) {
+                currentStep = 2;
+                showStep(currentStep);
+            }
+        });
+
+        document.getElementById('backStep2')?.addEventListener('click', function() {
+            currentStep = 1;
+            showStep(currentStep);
+        });
+
+        document.getElementById('nextStep2')?.addEventListener('click', function() {
+            currentStep = 3;
+            showStep(currentStep);
+        });
+
+        document.getElementById('backStep3')?.addEventListener('click', function() {
+            currentStep = 2;
+            showStep(currentStep);
+        });
+
+        document.getElementById('nextStep3')?.addEventListener('click', function() {
+            currentStep = 4;
+            showStep(currentStep);
+        });
+
+        document.getElementById('backStep4')?.addEventListener('click', function() {
+            currentStep = 3;
+            showStep(currentStep);
+        });
+
+        document.getElementById('nextStep4')?.addEventListener('click', function() {
+            currentStep = 5;
+            showStep(currentStep);
+        });
+
+        document.getElementById('backStep5')?.addEventListener('click', function() {
+            currentStep = 4;
+            showStep(currentStep);
+        });
+
+        // Personality traits selection
+        document.querySelectorAll('.personality-trait').forEach(trait => {
+            trait.addEventListener('click', function() {
+                const value = this.querySelector('input').value;
+                const card = this.querySelector('.trait-card');
+                
+                if (selectedPersonalityTraits.includes(value)) {
+                    // Remove trait
+                    selectedPersonalityTraits = selectedPersonalityTraits.filter(t => t !== value);
+                    card.classList.remove('border-blue-500', 'bg-blue-500/10');
+                } else {
+                    // Add trait
+                    selectedPersonalityTraits.push(value);
+                    card.classList.add('border-blue-500', 'bg-blue-500/10');
+                }
+            });
+        });
+
+        // Communication style selection
+        document.querySelectorAll('input[name="communicationStyle"]').forEach(input => {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('.style-card').forEach(card => {
+                    card.classList.remove('border-blue-500', 'bg-blue-500/10');
+                });
+                this.parentElement.querySelector('.style-card').classList.add('border-blue-500', 'bg-blue-500/10');
+            });
+        });
+
+        // Response speed selection
+        document.querySelectorAll('input[name="responseSpeed"]').forEach(input => {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('.speed-option').forEach(option => {
+                    option.classList.remove('border-blue-500', 'bg-blue-500/10');
+                });
+                this.parentElement.querySelector('.speed-option').classList.add('border-blue-500', 'bg-blue-500/10');
+            });
+        });
+
+        // RAG toggle
+        document.getElementById('enableRAG').addEventListener('change', function() {
+            const toggle = document.querySelector('.toggle-switch');
+            const circle = document.querySelector('.toggle-circle');
+            
+            if (this.checked) {
+                toggle.classList.add('bg-blue-600');
+                toggle.classList.remove('bg-gray-600');
+                circle.classList.add('translate-x-7');
+                circle.classList.remove('translate-x-1');
+            } else {
+                toggle.classList.remove('bg-blue-600');
+                toggle.classList.add('bg-gray-600');
+                circle.classList.remove('translate-x-7');
+                circle.classList.add('translate-x-1');
+            }
+        });
+
+        // File upload handling
+        document.getElementById('uploadArea').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                uploadedFiles.push({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                });
+            });
+            updateFilesList();
+        });
+
+        function updateFilesList() {
+            const container = document.getElementById('uploadedFiles');
+            const list = document.getElementById('filesList');
+            
+            if (uploadedFiles.length > 0) {
+                container.classList.remove('hidden');
+                list.innerHTML = uploadedFiles.map((file, index) => `
+                    <div class="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-medium">${file.name}</div>
+                                <div class="text-sm text-gray-400">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                            </div>
+                        </div>
+                        <button onclick="removeFile(${index})" class="p-2 text-red-400 hover:text-red-300 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            updateFilesList();
+        }
+
+        // FAQ management
+        document.getElementById('addFAQ').addEventListener('click', function() {
+            const container = document.getElementById('faqContainer');
+            const faqItem = document.createElement('div');
+            faqItem.className = 'faq-item';
+            faqItem.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Question..." 
+                           class="px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                    <div class="flex space-x-2">
+                        <input type="text" placeholder="Answer..." 
+                               class="flex-1 px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                        <button class="px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-white transition-colors remove-faq">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(faqItem);
+            
+            // Add remove functionality
+            faqItem.querySelector('.remove-faq').addEventListener('click', function() {
+                faqItem.remove();
+            });
+        });
+
+        // Remove FAQ functionality for existing items
+        document.querySelectorAll('.remove-faq').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.faq-item').remove();
+            });
+        });
+
+        // Integration toggles
+        document.querySelectorAll('.integration-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const integration = this.dataset.integration;
+                const toggle = this.querySelector('.integration-toggle');
+                const toggleSwitch = toggle.querySelector('div');
+                const toggleCircle = toggleSwitch.querySelector('div');
+                
+                if (selectedIntegrations.includes(integration)) {
+                    // Remove integration
+                    selectedIntegrations = selectedIntegrations.filter(i => i !== integration);
+                    toggleSwitch.classList.remove('bg-blue-500');
+                    toggleSwitch.classList.add('bg-gray-600');
+                    toggleCircle.classList.remove('translate-x-4');
+                    this.classList.remove('border-blue-500/50');
+                } else {
+                    // Add integration
+                    selectedIntegrations.push(integration);
+                    toggleSwitch.classList.add('bg-blue-500');
+                    toggleSwitch.classList.remove('bg-gray-600');
+                    toggleCircle.classList.add('translate-x-4');
+                    this.classList.add('border-blue-500/50');
+                }
+                
+                updateSelectedIntegrations();
+            });
+        });
+
+        function updateSelectedIntegrations() {
+            const container = document.getElementById('selectedIntegrations');
+            const list = document.getElementById('integrationsList');
+            
+            if (selectedIntegrations.length > 0) {
+                container.classList.remove('hidden');
+                list.innerHTML = selectedIntegrations.map(integration => {
+                    const integrationName = integration.split('-').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ');
+                    
+                    return `
+                        <span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm border border-blue-500/30">
+                            ${integrationName}
+                        </span>
+                    `;
+                }).join('');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // Preview functionality
+        document.getElementById('previewBtn').addEventListener('click', function() {
+            generatePreview();
+            document.getElementById('previewModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closePreview').addEventListener('click', function() {
+            document.getElementById('previewModal').classList.add('hidden');
+        });
+
+        function generatePreview() {
+            const agentName = document.getElementById('agentName').value || 'Unnamed Agent';
+            const agentDescription = document.getElementById('agentDescription').value || 'No description provided';
+            const aiModel = document.getElementById('aiModel').value;
+            const primaryLanguage = document.getElementById('primaryLanguage').value;
+            const customInstructions = document.getElementById('customInstructions').value;
+            
+            const agentTypeNames = {
+                'customer-support': 'Customer Support Agent',
+                'sales-agent': 'Sales Agent',
+                'marketing-agent': 'Marketing Agent',
+                'content-creator': 'Content Creator Agent',
+                'mail-manager': 'Mail Manager Agent',
+                'task-handler': 'Task Handler Agent'
+            };
+
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2">Agent Overview</h4>
+                        <div class="bg-bg-tertiary p-4 rounded-lg">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-gray-400">Name:</span>
+                                    <div class="font-medium">${agentName}</div>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">Type:</span>
+                                    <div class="font-medium">${agentTypeNames[selectedAgentType] || 'Not selected'}</div>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">AI Model:</span>
+                                    <div class="font-medium">${aiModel}</div>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">Language:</span>
+                                    <div class="font-medium">${primaryLanguage}</div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-gray-400">Description:</span>
+                                <div class="font-medium">${agentDescription}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2">Personality</h4>
+                        <div class="bg-bg-tertiary p-4 rounded-lg">
+                            <div class="mb-2">
+                                <span class="text-gray-400">Traits:</span>
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    ${selectedPersonalityTraits.length > 0 ? 
+                                        selectedPersonalityTraits.map(trait => 
+                                            `<span class="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-sm">${trait}</span>`
+                                        ).join('') : 
+                                        '<span class="text-gray-500">No traits selected</span>'
+                                    }
+                                </div>
+                            </div>
+                            ${customInstructions ? `
+                                <div>
+                                    <span class="text-gray-400">Custom Instructions:</span>
+                                    <div class="font-medium mt-1">${customInstructions}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2">Knowledge Base</h4>
+                        <div class="bg-bg-tertiary p-4 rounded-lg">
+                            <div class="mb-2">
+                                <span class="text-gray-400">RAG Enabled:</span>
+                                <span class="ml-2 ${document.getElementById('enableRAG').checked ? 'text-green-400' : 'text-red-400'}">
+                                    ${document.getElementById('enableRAG').checked ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Uploaded Files:</span>
+                                <span class="ml-2">${uploadedFiles.length} files</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2">Integrations</h4>
+                        <div class="bg-bg-tertiary p-4 rounded-lg">
+                            <div class="flex flex-wrap gap-2">
+                                ${selectedIntegrations.length > 0 ? 
+                                    selectedIntegrations.map(integration => {
+                                        const name = integration.split('-').map(word => 
+                                            word.charAt(0).toUpperCase() + word.slice(1)
+                                        ).join(' ');
+                                        return `<span class="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm">${name}</span>`;
+                                    }).join('') : 
+                                    '<span class="text-gray-500">No integrations selected</span>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create agent functionality
+        document.getElementById('createAgent').addEventListener('click', function() {
+            // Collect all form data
+            const agentData = {
+                type: selectedAgentType,
+                name: document.getElementById('agentName').value,
+                description: document.getElementById('agentDescription').value,
+                aiModel: document.getElementById('aiModel').value,
+                primaryLanguage: document.getElementById('primaryLanguage').value,
+                responseSpeed: document.querySelector('input[name="responseSpeed"]:checked')?.value,
+                personalityTraits: selectedPersonalityTraits,
+                communicationStyle: document.querySelector('input[name="communicationStyle"]:checked')?.value,
+                customInstructions: document.getElementById('customInstructions').value,
+                responseLength: document.getElementById('responseLength').value,
+                ragEnabled: document.getElementById('enableRAG').checked,
+                uploadedFiles: uploadedFiles,
+                integrations: selectedIntegrations
+            };
+
+            // Show loading state
+            const button = this;
+            const originalText = button.innerHTML;
+            button.innerHTML = `
+                <svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Creating Agent...
+            `;
+            button.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                alert('Agent created successfully!');
+                button.innerHTML = originalText;
+                button.disabled = false;
+                // Redirect to dashboard or agent management page
+                // window.location.href = '/dashboard';
+            }, 2000);
+        });
+
+        // Initialize drag and drop for file upload
+        const uploadArea = document.getElementById('uploadArea');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.add('border-blue-500', 'bg-blue-500/5');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.remove('border-blue-500', 'bg-blue-500/5');
+            });
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            const files = Array.from(e.dataTransfer.files);
+            files.forEach(file => {
+                if (file.size <= 10 * 1024 * 1024) { // 10MB limit
+                    uploadedFiles.push({
+                        name: file.name,
+                        size: file.size,
+                        type: file.type
+                    });
+                }
+            });
+            updateFilesList();
+        });
+
+        // Initialize with first step
+        showStep(1);
+
+        // Add smooth animations to cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = Math.random() * 0.5 + 's';
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.glass-card, .integration-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add typing animation to input focus
+        document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.querySelector('.typing-cursor')?.classList.add('opacity-100');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.querySelector('.typing-cursor')?.classList.remove('opacity-100');
+            });
+        });
+
+        // Add particle effects
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'fixed w-1 h-1 bg-blue-500/20 rounded-full pointer-events-none animate-neural-pulse';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.top = '100vh';
+            particle.style.animationDuration = Math.random() * 3 + 2 + 's';
+            
+            document.body.appendChild(particle);
+            
+            const animation = particle.animate([
+                { transform: 'translateY(0px)', opacity: 0 },
+                { transform: 'translateY(-100vh)', opacity: 1 },
+                { transform: 'translateY(-200vh)', opacity: 0 }
+            ], {
+                duration: Math.random() * 5000 + 3000,
+                easing: 'linear'
+            });
+            
+            animation.onfinish = () => particle.remove();
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 3000);
+
+        // Add click ripple effect to buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (this.disabled) return;
+                
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.className = 'absolute bg-white/20 rounded-full pointer-events-none animate-ping';
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Auto-save functionality (optional)
+        function autoSave() {
+            const formData = {
+                currentStep,
+                selectedAgentType,
+                selectedPersonalityTraits,
+                selectedIntegrations,
+                formInputs: {}
+            };
+            
+            // Collect form inputs
+            document.querySelectorAll('input, textarea, select').forEach(input => {
+                if (input.id) {
+                    formData.formInputs[input.id] = input.value;
+                }
+            });
+            
+            localStorage.setItem('intaj_agent_builder', JSON.stringify(formData));
+        }
+
+        // Load saved data
+        function loadSaved() {
+            const saved = localStorage.getItem('intaj_agent_builder');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    // Restore form state
+                    Object.entries(data.formInputs).forEach(([id, value]) => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.value = value;
+                        }
+                    });
+                    
+                    selectedAgentType = data.selectedAgentType || '';
+                    selectedPersonalityTraits = data.selectedPersonalityTraits || [];
+                    selectedIntegrations = data.selectedIntegrations || [];
+                } catch (e) {
+                    console.warn('Failed to load saved data:', e);
+                }
+            }
+        }
+
+        // Auto-save every 10 seconds
+        setInterval(autoSave, 10000);
+
+        // Load saved data on page load
+        // loadSaved();
+    </script>
+</body>
+</html>-400">Relaxed and informal tone</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="communicationStyle" value="professional" class="sr-only" checked>
+                                            <div class="p-6 border border-blue-500 bg-blue-500/10 rounded-lg text-center style-card">
+                                                <div class="text-3xl mb-3">🏢</div>
+                                                <div class="font-bold mb-2">Professional</div>
+                                                <div class="text-sm text-gray-400">Formal business tone</div>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="communicationStyle" value="technical" class="sr-only">
+                                            <div class="p-6 border border-gray-600 rounded-lg text-center hover:border-blue-500 transition-colors style-card">
+                                                <div class="text-3xl mb-3">⚙️</div>
+                                                <div class="font-bold mb-2">Technical</div>
+                                                <div class="text-sm text-gray-400">Detailed and precise</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Custom Instructions -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-3">Custom Instructions</label>
+                                    <textarea id="customInstructions" rows="4" placeholder="Add any specific instructions for your agent's behavior..."
+                                              class="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300 resize-none"></textarea>
+                                    <div class="text-xs text-gray-400 mt-2">Example: "Always ask for the customer's name before helping them" or "End conversations with a satisfaction survey"</div>
+                                </div>
+                                
+                                <!-- Response Length -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-3">Response Length</label>
+                                    <div class="relative">
+                                        <input type="range" id="responseLength" min="1" max="3" value="2" 
+                                               class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider">
+                                        <div class="flex justify-between text-xs text-gray-400 mt-2">
+                                            <span>Concise</span>
+                                            <span>Balanced</span>
+                                            <span>Detailed</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 flex justify-between">
+                                <button id="backStep3" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-colors">
+                                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
+                                    </svg>
+                                    Back
+                                </button>
+                                <button id="nextStep3" class="gradient-neural px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300">
+                                    Continue to Knowledge Base
+                                    <svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Knowledge Base -->
+                    <div id="stepContent4" class="step-content hidden">
+                        <div class="glass-card p-8 rounded-2xl animate-fade-in">
+                            <div class="mb-8">
+                                <h2 class="text-3xl font-bold mb-4">
+                                    <span class="text-gradient">Knowledge Base</span>
+                                </h2>
+                                <p class="text-gray-300">Upload your data and configure how your agent accesses information.</p>
+                            </div>
+                            
+                            <div class="space-y-8">
+                                <!-- RAG Toggle -->
+                                <div class="flex items-center justify-between p-6 bg-bg-tertiary rounded-lg">
+                                    <div>
+                                        <div class="font-semibold text-lg mb-2">Enable RAG (Retrieval-Augmented Generation)</div>
+                                        <div class="text-gray-400">Allow your agent to search and retrieve information from your uploaded documents</div>
+                                    </div>
+                                    <div class="relative">
+                                        <input type="checkbox" id="enableRAG" class="sr-only" checked>
+                                        <label for="enableRAG" class="cursor-pointer">
+                                            <div class="w-14 h-8 bg-blue-600 rounded-full flex items-center toggle-switch">
+                                                <div class="w-6 h-6 bg-white rounded-full shadow-md transform translate-x-7 transition-transform duration-200 toggle-circle"></div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- File Upload Area -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-4">Upload Documents</label>
+                                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer" id="uploadArea">
+                                        <div class="mb-4">
+                                            <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="text-lg font-semibold mb-2">Drop files here or click to upload</div>
+                                        <div class="text-gray-400 mb-4">Supports PDF, DOCX, TXT, CSV files up to 10MB each</div>
+                                        <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,.csv" class="hidden">
+                                        <button class="gradient-neural px-6 py-2 rounded-lg text-white font-medium hover:opacity-90 transition-opacity">
+                                            Choose Files
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Uploaded Files List -->
+                                <div id="uploadedFiles" class="hidden">
+                                    <label class="block text-sm font-semibold mb-4">Uploaded Files</label>
+                                    <div id="filesList" class="space-y-3"></div>
+                                </div>
+                                
+                                <!-- FAQ Section -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-4">Frequently Asked Questions</label>
+                                    <div class="space-y-4" id="faqContainer">
+                                        <div class="faq-item">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <input type="text" placeholder="Question..." 
+                                                       class="px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                                                <div class="flex space-x-2">
+                                                    <input type="text" placeholder="Answer..." 
+                                                           class="flex-1 px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                                                    <button class="px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-white transition-colors remove-faq">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button id="addFAQ" class="mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-medium transition-colors">
+                                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        Add FAQ
+                                    </button>
+                                </div>
+                                
+                                <!-- Knowledge Base Settings -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-3">Search Accuracy</label>
+                                        <select class="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                                            <option value="high">High (More accurate, slower)</option>
+                                            <option value="medium" selected>Medium (Balanced)</option>
+                                            <option value="fast">Fast (Quick, less precise)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-3">Max Results</label>
+                                        <select class="w-full px-4 py-3 bg-bg-tertiary border border-gray-600 rounded-lg text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300">
+                                            <option value="3">3 Results</option>
+                                            <option value="5" selected>5 Results</option>
+                                            <option value="10">10 Results</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 flex justify-between">
+                                <button id="backStep4" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-colors">
+                                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
+                                    </svg>
+                                    Back
+                                </button>
+                                <button id="nextStep4" class="gradient-neural px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300">
+                                    Continue to Integrations
+                                    <svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Integrations -->
+                    <div id="stepContent5" class="step-content hidden">
+                        <div class="glass-card p-8 rounded-2xl animate-fade-in">
+                            <div class="mb-8">
+                                <h2 class="text-3xl font-bold mb-4">
+                                    <span class="text-gradient">Platform Integrations</span>
+                                </h2>
+                                <p class="text-gray-300">Connect your agent to messaging platforms, analytics tools, and business applications.</p>
+                            </div>
+                            
+                            <div class="space-y-8">
+                                <!-- Messaging Platforms -->
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-4">Messaging Platforms</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <!-- WhatsApp -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="whatsapp">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">WhatsApp</div>
+                                                        <div class="text-sm text-gray-400">Business messaging</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Connect your WhatsApp Business account for direct customer messaging.</div>
+                                        </div>
+
+                                        <!-- Telegram -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="telegram">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="m20.665 3.717-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.787l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Telegram</div>
+                                                        <div class="text-sm text-gray-400">Bot messaging</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Deploy your agent as a Telegram bot for seamless communication.</div>
+                                        </div>
+
+                                        <!-- Facebook Messenger -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="facebook">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Facebook</div>
+                                                        <div class="text-sm text-gray-400">Messenger integration</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Integrate with Facebook Messenger for social customer service.</div>
+                                        </div>
+
+                                        <!-- Instagram -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="instagram">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Instagram</div>
+                                                        <div class="text-sm text-gray-400">DM automation</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Handle Instagram DMs and comments automatically.</div>
+                                        </div>
+
+                                        <!-- Discord -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="discord">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.0002 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9554 2.4189-2.1568 2.4189Z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Discord</div>
+                                                        <div class="text-sm text-gray-400">Community bot</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Deploy as a Discord bot for community management.</div>
+                                        </div>
+
+                                        <!-- Website Widget -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="website">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Website Widget</div>
+                                                        <div class="text-sm text-gray-400">Embed chat widget</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle active">
+                                                    <div class="w-10 h-6 bg-blue-500 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transform translate-x-4 transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Add a chat widget to your website for direct customer interaction.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Analytics & Marketing Tools -->
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-4">Analytics & Marketing Tools</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <!-- Google Ads -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="google-ads">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Google Ads</div>
+                                                        <div class="text-sm text-gray-400">Campaign tracking</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Track ad performance and conversion data.</div>
+                                        </div>
+
+                                        <!-- Meta Ads -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="meta-ads">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Meta Ads</div>
+                                                        <div class="text-sm text-gray-400">Facebook & Instagram ads</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Monitor Facebook and Instagram ad campaigns.</div>
+                                        </div>
+
+                                        <!-- Mixpanel -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="mixpanel">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2 2z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Mixpanel</div>
+                                                        <div class="text-sm text-gray-400">User analytics</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-300">Track user behavior and engagement metrics.</div>
+                                        </div>
+
+                                        <!-- Stripe -->
+                                        <div class="integration-card glass-card p-6 rounded-lg cursor-pointer transition-all duration-300" data-integration="stripe">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.274 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-semibold">Stripe</div>
+                                                        <div class="text-sm text-gray-400">Payment processing</div>
+                                                    </div>
+                                                </div>
+                                                <div class="integration-toggle">
+                                                    <div class="w-10 h-6 bg-gray-600 rounded-full flex items-center p-1 transition-colors duration-200">
+                                                        <div class="w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-200"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray

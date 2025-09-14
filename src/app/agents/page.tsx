@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import '@/styles/agents.css';
 
@@ -29,6 +31,7 @@ interface Agent {
 }
 
 export default function AgentsPage() {
+  const router = useRouter();
   const [selectedType, setSelectedType] = useState<AgentType>('all');
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,15 +54,15 @@ export default function AgentsPage() {
           return;
         }
 
-        // Fetch user's chatbots as agents
-        const { data: chatbots, error: chatbotsError } = await supabase
+        // Fetch user's agents
+        const { data: agents, error: agentsError } = await supabase
           .from('agents')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
-        if (chatbotsError) {
-          setError(chatbotsError.message);
+        if (agentsError) {
+          setError(agentsError.message);
           setLoading(false);
           return;
         }
@@ -68,32 +71,32 @@ export default function AgentsPage() {
         const { data: messages, error: messagesError } = await supabase
           .from('messages')
           .select('*')
-          .in('chatbot_id', chatbots?.map(bot => bot.id) || [])
+          .in('agent_id', agents?.map(agent => agent.id) || [])
           .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
         if (messagesError) {
           console.error('Error fetching messages:', JSON.stringify(messagesError, null, 2));
         }
 
-        // Transform chatbots into agents
-        const transformedAgents: Agent[] = chatbots?.map((chatbot, index) => {
-          const botMessages = messages?.filter(msg => msg.chatbot_id === chatbot.id) || [];
-          const todayMessages = botMessages.length;
+        // Transform agents data
+        const transformedAgents: Agent[] = agents?.map((agent, index) => {
+          const agentMessages = messages?.filter(msg => msg.agent_id === agent.id) || [];
+          const todayMessages = agentMessages.length;
           const avgResponseTime = '1.2s'; // Placeholder - would need more complex calculation
           
           const agentType: Exclude<AgentType, 'all'> = 
-            chatbot.name.toLowerCase().includes('sales') ? 'sales' :
-            chatbot.name.toLowerCase().includes('marketing') ? 'marketing' : 'chatbot';
+            agent.name.toLowerCase().includes('sales') ? 'sales' :
+            agent.name.toLowerCase().includes('marketing') ? 'marketing' : 'chatbot';
 
           return {
-            id: chatbot.id,
-            name: chatbot.name,
+            id: agent.id,
+            name: agent.name,
             type: agentType,
-            role: chatbot.description || `${agentType === 'chatbot' ? 'Customer Support' : agentType === 'sales' ? 'Sales' : 'Marketing'} Agent`,
-            status: (chatbot.status === 'active' ? 'online' : 'offline') as AgentStatus,
+            role: agent.description || `${agentType === 'chatbot' ? 'Customer Support' : agentType === 'sales' ? 'Sales' : 'Marketing'} Agent`,
+            status: (agent.status === 'active' ? 'online' : 'offline') as AgentStatus,
             avatar: getAgentAvatar(agentType),
-            message: chatbot.settings?.welcome_message || "How can I help you today?",
-            activity: chatbot.status === 'active' ? 
+            message: agent.settings?.welcome_message || "How can I help you today?",
+            activity: agent.status === 'active' ? 
               (agentType === 'sales' ? 'Qualifying leads...' : 
                agentType === 'marketing' ? 'Creating content...' : 
                'Helping customers...') : 'Offline',
@@ -259,6 +262,18 @@ export default function AgentsPage() {
 
   return (
     <div className="min-h-screen neural-grid pt-24 pb-12">
+      {/* Logo Navigation */}
+      <div className="fixed top-6 left-6 z-50">
+        <Link href="/dashboard" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-5 h-5 bg-white rounded-sm opacity-90"></div>
+          </div>
+          <div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">Intaj</span>
+          </div>
+        </Link>
+      </div>
+
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl animate-float"></div>
@@ -276,12 +291,12 @@ export default function AgentsPage() {
               </h1>
               <p className="text-xl text-gray-300">Manage your intelligent workforce of AI agents</p>
             </div>
-            <button className="gradient-neural px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-lg">
+            <Link href="/dashboard/agents/new" className="gradient-neural px-8 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1 shadow-lg">
               <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
               Create New Agent
-            </button>
+            </Link>
           </div>
 
           {/* Stats Overview */}
@@ -290,12 +305,12 @@ export default function AgentsPage() {
               <div key={index} className="glass-card p-6 rounded-xl text-center">
                 <div className="text-3xl font-bold text-gradient mb-2">{stat.value}</div>
                 <div className="text-gray-300 text-sm">{stat.label}</div>
-                {'status' in stat ? (
+                {'status' in stat && stat.status ? (
                   <div className="flex items-center justify-center mt-2">
                     <div className={`w-2 h-2 agent-status-${stat.status.type} rounded-full animate-pulse mr-2`}></div>
                     <span className="text-xs text-green-400">{stat.status.text}</span>
                   </div>
-                ) : 'trend' in stat ? (
+                ) : 'trend' in stat && stat.trend ? (
                   <div className={`text-xs ${stat.trend.color} mt-2`}>
                     {stat.trend.value} {stat.trend.text}
                   </div>
@@ -382,17 +397,21 @@ export default function AgentsPage() {
               </div>
 
               <div className="flex space-x-2">
-                <button className={`flex-1 ${agent.gradientClass} px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity`}>
+                <button 
+                  onClick={() => router.push(`/agents/${agent.id}/configure`)}
+                  className={`flex-1 ${agent.gradientClass} px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity`}
+                >
                   Configure
                 </button>
-                <button className={`px-4 py-2 bg-bg-tertiary border border-gray-600 text-gray-300 rounded-lg text-sm hover:border-${
-                  agent.type === 'sales' ? 'orange' :
-                  agent.type === 'marketing' ? 'green' :
-                  'blue'
-                }-500 transition-colors`}>
-                  {agent.type === 'sales' ? 'Pipeline' :
-                   agent.type === 'marketing' ? 'Campaigns' :
-                   'Analytics'}
+                <button 
+                  onClick={() => router.push(`/dashboard/analytics?agent=${agent.id}`)}
+                  className={`px-4 py-2 bg-bg-tertiary border border-gray-600 text-gray-300 rounded-lg text-sm hover:border-${
+                    agent.type === 'sales' ? 'orange' :
+                    agent.type === 'marketing' ? 'green' :
+                    'blue'
+                  }-500 transition-colors`}
+                >
+                  Analytics
                 </button>
               </div>
             </div>

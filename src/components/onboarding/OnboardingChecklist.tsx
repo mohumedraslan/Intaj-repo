@@ -62,7 +62,7 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
       title: 'Create your first Agent',
       description: 'Set up an AI agent with your preferred model and personality.',
       action: 'Create Agent',
-      link: '/dashboard/chatbots/new',
+      link: '/dashboard/agents/new',
       completed: onboardingSteps.created_first_agent,
       disabled: false
     },
@@ -71,7 +71,7 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
       title: 'Train your Agent with data',
       description: 'Add documents, websites, or text to make your agent smarter.',
       action: 'Add Data',
-      link: firstAgentId ? `/dashboard/chatbots/${firstAgentId}?tab=data` : '/dashboard/chatbots',
+      link: firstAgentId ? `/dashboard/agents/${firstAgentId}?tab=data` : '/dashboard/agents',
       completed: onboardingSteps.added_data_source,
       disabled: !onboardingSteps.created_first_agent
     },
@@ -80,7 +80,7 @@ export default function OnboardingChecklist({ userId, onboardingSteps }: Onboard
       title: 'Connect a communication channel',
       description: 'Deploy your agent to your website, WhatsApp, or other platforms.',
       action: 'Connect',
-      link: firstAgentId ? `/dashboard/chatbots/${firstAgentId}?tab=integrations` : '/dashboard/chatbots',
+      link: firstAgentId ? `/dashboard/agents/${firstAgentId}?tab=integrations` : '/dashboard/agents',
       completed: onboardingSteps.connected_channel,
       disabled: !onboardingSteps.created_first_agent
     }
