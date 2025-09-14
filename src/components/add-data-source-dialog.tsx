@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { FileUpload } from '@/components/ui/file-upload'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { createDataSource } from '@/app/dashboard/chatbots/data-sources/actions'
+import { createDataSource } from '@/app/dashboard/agents/data-sources/actions'
 
 interface AddDataSourceDialogProps {
   agentId: string

@@ -84,7 +84,7 @@ const integrations = [
 export default function AgentConfigurePage() {
   const router = useRouter();
   const params = useParams();
-  const agentId = params.id as string;
+  const agentId = params?.id as string;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

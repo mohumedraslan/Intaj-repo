@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { deleteDataSource } from '@/app/dashboard/chatbots/data-sources/actions'
+import { deleteDataSource } from '@/app/dashboard/agents/data-sources/actions'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
 type DataSourceType = 'website' | 'file' | 'text'
