@@ -9,7 +9,7 @@ import PlatformCard from './PlatformCard';
 import { Platform, platforms } from '@/data/platforms';
 import { Search, Copy, Check, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { useSession } from 'next-auth/react';
+// Removed next-auth dependency for now
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
