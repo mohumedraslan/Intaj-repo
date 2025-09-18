@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -72,6 +73,7 @@ interface Connection {
 }
 
 export default function AgentsPage() {
+  const router = useRouter();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -224,8 +226,15 @@ export default function AgentsPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#0a0a0b] text-white p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0b] via-[#141517] to-[#1f2024] p-6 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl animate-pulse delay-2000"></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -237,7 +246,7 @@ export default function AgentsPage() {
               </h1>
               <p className="text-gray-300">Manage and deploy your AI-powered agents across multiple channels</p>
             </div>
-            <Link href="/dashboard/chatbots/new">
+            <Link href="/dashboard/agents/new">
               <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:-translate-y-0.5">
                 <Plus className="w-5 h-5 mr-2" />
                 Create New Agent
@@ -254,106 +263,133 @@ export default function AgentsPage() {
           </Card>
         )}
 
-        {/* Agents Table */}
+        {/* Agents Grid */}
         {agents.length === 0 ? (
-          <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600 rounded-2xl">
-            <CardContent className="p-12 text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Bot className="w-12 h-12 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold mb-4">No agents yet</h3>
-              <p className="text-gray-400 mb-8 max-w-md mx-auto">
-                Get started by creating your first AI agent. It only takes a few minutes to set up and deploy.
-              </p>
-              <Link href="/dashboard/chatbots/new">
-                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:-translate-y-0.5">
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create Your First Agent
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <div className="glass-card p-12 text-center rounded-2xl">
+            <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-pulse">
+              <Bot className="w-12 h-12 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold mb-4 text-white">No agents yet</h3>
+            <p className="text-gray-400 mb-8 max-w-md mx-auto">
+              Get started by creating your first AI agent. It only takes a few minutes to set up and deploy.
+            </p>
+            <Link href="/dashboard/agents/new">
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg">
+                <Plus className="w-5 h-5 mr-2" />
+                Create Your First Agent
+              </Button>
+            </Link>
+          </div>
         ) : (
-          <Card className="bg-[rgba(31,32,36,0.8)] backdrop-blur-lg border border-gray-600/50 rounded-xl overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-gray-700/50 hover:bg-gray-800/50">
-                  <TableHead className="text-gray-300">Agent Name</TableHead>
-                  <TableHead className="text-gray-300">Status</TableHead>
-                  <TableHead className="text-gray-300">Connected Channels</TableHead>
-                  <TableHead className="text-gray-300">Last Updated</TableHead>
-                  <TableHead className="text-gray-300 text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {agents.map((agent) => (
-                  <TableRow key={agent.id} className="border-gray-700/50 hover:bg-gray-800/50">
-                    <TableCell className="font-medium">
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-10 w-10 rounded-md bg-gradient-to-r from-blue-500 to-purple-600">
-                          {agent.avatar_url ? (
-                            <AvatarImage src={agent.avatar_url} alt={agent.name} />
-                          ) : (
-                            <AvatarFallback className="rounded-md bg-gradient-to-r from-blue-500 to-purple-600">
-                              <MessageSquare className="h-5 w-5 text-white" />
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <div>
-                          <div className="font-medium text-white">{agent.name}</div>
-                          <div className="text-xs text-gray-400">{agent.model}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {getAgentStatus(agent)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
-                        {getConnectionIcons(agent.id)}
-                        {getConnectionIcons(agent.id).length === 0 && (
-                          <span className="text-xs text-gray-500">None configured</span>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {agents.map((agent) => (
+              <div
+                key={agent.id}
+                className="glass-card p-6 rounded-2xl transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl cursor-pointer group"
+                onClick={() => router.push(`/agents/${agent.id}/configure`)}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12 rounded-xl">
+                        {agent.avatar_url ? (
+                          <AvatarImage src={agent.avatar_url} alt={agent.name} className="rounded-xl" />
+                        ) : (
+                          <AvatarFallback className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600">
+                            <MessageSquare className="h-6 w-6 text-white" />
+                          </AvatarFallback>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-gray-400">
-                      {formatDate(agent.created_at)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700">
-                          <Link href={`/dashboard/chatbots/${agent.id}`}>
-                            <DropdownMenuItem className="text-gray-200 hover:text-white cursor-pointer">
-                              <Edit3 className="mr-2 h-4 w-4" />
-                              <span>Edit</span>
-                            </DropdownMenuItem>
-                          </Link>
-                          <Link href={`/dashboard/analytics?agent=${agent.id}`}>
-                            <DropdownMenuItem className="text-gray-200 hover:text-white cursor-pointer">
-                              <BarChart className="mr-2 h-4 w-4" />
-                              <span>View Analytics</span>
-                            </DropdownMenuItem>
-                          </Link>
-                          <DropdownMenuItem 
-                            className="text-red-400 hover:text-red-300 cursor-pointer"
-                            onClick={() => handleDeleteClick(agent.id)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            <span>Delete</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
+                      </Avatar>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></div>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white group-hover:text-blue-300 transition-colors">{agent.name}</h3>
+                      <p className="text-xs text-gray-400">{agent.model}</p>
+                    </div>
+                  </div>
+                  {getAgentStatus(agent)}
+                </div>
+
+                <div className="bg-gray-800/50 rounded-lg p-3 mb-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-gray-300">Active</span>
+                  </div>
+                  <p className="text-sm text-gray-300 line-clamp-2">
+                    {agent.description || "AI-powered agent ready to assist your customers"}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-blue-400">24</div>
+                    <div className="text-xs text-gray-400">Chats Today</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-green-400">96%</div>
+                    <div className="text-xs text-gray-400">Satisfaction</div>
+                  </div>
+                </div>
+
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/agents/${agent.id}/configure`);
+                    }}
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm font-medium transition-all duration-300"
+                  >
+                    Configure
+                  </Button>
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/dashboard/analytics?agent=${agent.id}`);
+                    }}
+                    variant="outline"
+                    className="px-4 bg-gray-800/50 border-gray-600 text-gray-300 hover:border-blue-500 hover:text-blue-300 transition-all duration-300"
+                  >
+                    <BarChart className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700">
+                      <Link href={`/agents/${agent.id}/configure`}>
+                        <DropdownMenuItem className="text-gray-200 hover:text-white cursor-pointer">
+                          <Edit3 className="mr-2 h-4 w-4" />
+                          <span>Edit</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href={`/dashboard/analytics?agent=${agent.id}`}>
+                        <DropdownMenuItem className="text-gray-200 hover:text-white cursor-pointer">
+                          <BarChart className="mr-2 h-4 w-4" />
+                          <span>View Analytics</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <DropdownMenuItem 
+                        className="text-red-400 hover:text-red-300 cursor-pointer"
+                        onClick={() => handleDeleteClick(agent.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
         
         {/* Delete Confirmation Dialog */}

@@ -145,6 +145,7 @@ export default function NewAgentPage() {
     avatar_url: '',
     enableRAG: false,
     selectedIntegrations: [] as string[],
+    integrationCredentials: {} as Record<string, {source: string, token: string, username?: string}>,
     knowledgeFiles: [] as Array<{name: string, size: number, type: string}>,
     websiteSources: [] as string[]
   });
@@ -193,7 +194,7 @@ export default function NewAgentPage() {
 
       if (error) throw error;
 
-      router.push(`/dashboard/agents/${data.id}`);
+      router.push(`/agents/${data.id}/dashboard`);
     } catch (error) {
       console.error('Error creating agent:', JSON.stringify(error, null, 2));
       alert('Failed to create agent. Please try again.');
@@ -770,8 +771,249 @@ export default function NewAgentPage() {
                       );
                     })}
                   </div>
+                  <div className="mt-4 space-y-3">
+                    {formData.selectedIntegrations.map((integrationKey) => {
+                      const integration = integrationOptions[integrationKey as keyof typeof integrationOptions];
+                      if (!integration) return null;
+                      
+                      return (
+                        <div key={integrationKey} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="font-medium text-white flex items-center">
+                              <integration.icon className="h-4 w-4 mr-2" />
+                              {integration.name} Configuration
+                            </h4>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div>
+                              <Label className="text-sm text-gray-300 mb-2 block">Credential Source</Label>
+                              <Select 
+                                defaultValue="new"
+                                onValueChange={(value) => {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integrationCredentials: {
+                                      ...prev.integrationCredentials,
+                                      [integrationKey]: {
+                                        ...prev.integrationCredentials[integrationKey],
+                                        source: value
+                                      }
+                                    }
+                                  }));
+                                }}
+                              >
+                                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                                  <SelectValue placeholder="Choose credential source" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-gray-800 border-gray-700">
+                                  <SelectItem value="existing" className="text-gray-200">Use Existing Credentials</SelectItem>
+                                  <SelectItem value="new" className="text-gray-200">Add New Credentials</SelectItem>
+                                  <SelectItem value="platform" className="text-gray-200">Use Platform Token (if available)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            {integrationKey === 'telegram' && (
+                              <div className="space-y-2">
+                                <Label className="text-sm text-gray-300">Bot Token</Label>
+                                <Input 
+                                  type="password"
+                                  placeholder="Enter your Telegram bot token"
+                                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                                  value={formData.integrationCredentials[integrationKey]?.token || ''}
+                                  onChange={(e) => {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      integrationCredentials: {
+                                        ...prev.integrationCredentials,
+                                        [integrationKey]: {
+                                          ...prev.integrationCredentials[integrationKey],
+                                          token: e.target.value,
+                                          source: prev.integrationCredentials[integrationKey]?.source || 'new'
+                                        }
+                                      }
+                                    }));
+                                  }}
+                                />
+                                <p className="text-xs text-gray-400">
+                                  Get your bot token from @BotFather on Telegram
+                                </p>
+                              </div>
+                            )}
+                            
+                            {integrationKey === 'whatsapp' && (
+                              <div className="space-y-2">
+                                <Label className="text-sm text-gray-300">WhatsApp Business API</Label>
+                                <Input 
+                                  type="password"
+                                  placeholder="Enter your WhatsApp Business API token"
+                                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                                  value={formData.integrationCredentials[integrationKey]?.token || ''}
+                                  onChange={(e) => {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      integrationCredentials: {
+                                        ...prev.integrationCredentials,
+                                        [integrationKey]: {
+                                          ...prev.integrationCredentials[integrationKey],
+                                          token: e.target.value,
+                                          source: prev.integrationCredentials[integrationKey]?.source || 'new'
+                                        }
+                                      }
+                                    }));
+                                  }}
+                                />
+                                <p className="text-xs text-gray-400">
+                                  Requires WhatsApp Business API access
+                                </p>
+                              </div>
+                            )}
+                            
+                            {integrationKey === 'stripe' && (
+                              <div className="space-y-2">
+                                <Label className="text-sm text-gray-300">Stripe Secret Key</Label>
+                                <Input 
+                                  type="password"
+                                  placeholder="sk_live_... or sk_test_..."
+                                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                                  value={formData.integrationCredentials[integrationKey]?.token || ''}
+                                  onChange={(e) => {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      integrationCredentials: {
+                                        ...prev.integrationCredentials,
+                                        [integrationKey]: {
+                                          ...prev.integrationCredentials[integrationKey],
+                                          token: e.target.value,
+                                          source: prev.integrationCredentials[integrationKey]?.source || 'new'
+                                        }
+                                      }
+                                    }));
+                                  }}
+                                />
+                                <p className="text-xs text-gray-400">
+                                  Found in your Stripe Dashboard under API Keys
+                                </p>
+                              </div>
+                            )}
+                            
+                            {!['telegram', 'whatsapp', 'stripe'].includes(integrationKey) && (
+                              <div className="space-y-2">
+                                <Label className="text-sm text-gray-300">API Key / Access Token</Label>
+                                <Input 
+                                  type="password"
+                                  placeholder={`Enter your ${integration.name} credentials`}
+                                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                                  value={formData.integrationCredentials[integrationKey]?.token || ''}
+                                  onChange={(e) => {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      integrationCredentials: {
+                                        ...prev.integrationCredentials,
+                                        [integrationKey]: {
+                                          ...prev.integrationCredentials[integrationKey],
+                                          token: e.target.value,
+                                          source: prev.integrationCredentials[integrationKey]?.source || 'new'
+                                        }
+                                      }
+                                    }));
+                                  }}
+                                />
+                                <p className="text-xs text-gray-400">
+                                  Check {integration.name} documentation for API credentials
+                                </p>
+                              </div>
+                            )}
+                            
+                            <div className="flex space-x-2">
+                              <Button 
+                                onClick={async () => {
+                                  try {
+                                    setLoading(true);
+                                    const supabase = createClient();
+                                    const { data: { user } } = await supabase.auth.getUser();
+                                    
+                                    if (user && formData.integrationCredentials[integrationKey]?.token) {
+                                      const { error } = await supabase
+                                        .from('connections')
+                                        .upsert({
+                                          user_id: user.id,
+                                          platform: integrationKey,
+                                          credentials: {
+                                            token: formData.integrationCredentials[integrationKey].token,
+                                            source: formData.integrationCredentials[integrationKey].source
+                                          },
+                                          created_at: new Date().toISOString()
+                                        });
+                                      
+                                      if (!error) {
+                                        alert('Credentials saved successfully!');
+                                      } else {
+                                        alert('Error saving credentials: ' + error.message);
+                                      }
+                                    }
+                                  } catch (error) {
+                                    alert('Error: ' + (error as Error).message);
+                                  } finally {
+                                    setLoading(false);
+                                  }
+                                }}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                                disabled={!formData.integrationCredentials[integrationKey]?.token || loading}
+                              >
+                                {loading ? 'Saving...' : 'Save'}
+                              </Button>
+                              
+                              {integrationKey === 'telegram' && (
+                                <Button 
+                                  onClick={async () => {
+                                    try {
+                                      setLoading(true);
+                                      const token = formData.integrationCredentials[integrationKey]?.token;
+                                      
+                                      if (!token) {
+                                        alert('Please enter a bot token first');
+                                        return;
+                                      }
+                                      
+                                      // Test Telegram bot by sending a test message
+                                      const response = await fetch('/api/integrations/telegram/test', {
+                                        method: 'POST',
+                                        headers: {
+                                          'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ token })
+                                      });
+                                      
+                                      const result = await response.json();
+                                      
+                                      if (result.success) {
+                                        alert(`✅ Bot test successful!\nBot Name: ${result.botInfo.first_name}\nUsername: @${result.botInfo.username}`);
+                                      } else {
+                                        alert(`❌ Bot test failed: ${result.error}`);
+                                      }
+                                    } catch (error) {
+                                      alert('Error testing bot: ' + (error as Error).message);
+                                    } finally {
+                                      setLoading(false);
+                                    }
+                                  }}
+                                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                  disabled={!formData.integrationCredentials[integrationKey]?.token || loading}
+                                >
+                                  {loading ? 'Testing...' : 'Test Bot'}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
                   <p className="text-sm text-gray-400 mt-3">
-                    These integrations will be available for configuration after creating your agent.
+                    Configure your integration credentials now or set them up later in the agent settings.
                   </p>
                 </CardContent>
               </Card>

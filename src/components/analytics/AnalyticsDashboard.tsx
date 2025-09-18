@@ -1,6 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
+interface AnalyticsDashboardProps {
+  agentId?: string | null;
+}
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -65,7 +69,7 @@ interface AnalyticsData {
   };
 }
 
-export default function AnalyticsDashboard() {
+export default function AnalyticsDashboard({ agentId }: AnalyticsDashboardProps) {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7d');
@@ -75,7 +79,12 @@ export default function AnalyticsDashboard() {
   useEffect(() => {
     fetchAnalyticsData();
     fetchAgents();
-  }, [timeRange, selectedAgent]);
+    
+    // Set selected agent if agentId is provided
+    if (agentId && agentId !== selectedAgent) {
+      setSelectedAgent(agentId);
+    }
+  }, [timeRange, selectedAgent, agentId]);
 
   const fetchAgents = async () => {
     try {

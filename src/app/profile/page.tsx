@@ -190,7 +190,7 @@ export default function ProfilePage() {
       setTimeout(() => setSaveMessage(''), 3000);
     } catch (error) {
       console.error('Error updating profile:', error);
-      setSaveMessage('Error updating profile');
+      setSaveMessage(`Error updating profile: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setTimeout(() => setSaveMessage(''), 3000);
     }
   };

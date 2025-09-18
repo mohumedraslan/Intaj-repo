@@ -15,9 +15,9 @@ export default function DashboardPage() {
   const [onboardingSteps, setOnboardingSteps] = useState<{
     created_first_agent: boolean;
     added_data_source: boolean;
-    created_first_connection: boolean;
+    connected_channel: boolean;
     has_dismissed: boolean;
-  }>({ created_first_agent: false, added_data_source: false, created_first_connection: false, has_dismissed: false });
+  }>({ created_first_agent: false, added_data_source: false, connected_channel: false, has_dismissed: false });
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -45,7 +45,7 @@ export default function DashboardPage() {
       {/* Sidebar */}
       <aside className="w-80 bg-[#141517] border-r border-gray-700/50 flex flex-col">
         <div className="p-6 border-b border-gray-700/50">
-          <Link href="http://localhost:3001/pricing" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <div className="w-5 h-5 bg-white rounded-sm opacity-90"></div>
             </div>

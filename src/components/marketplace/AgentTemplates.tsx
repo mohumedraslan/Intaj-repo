@@ -60,18 +60,19 @@ const templateCategories = [
 const predefinedTemplates: AgentTemplate[] = [
   {
     id: 'customer-support-pro',
-    name: 'Customer Support Pro',
-    description: 'Advanced customer support agent with escalation workflows, ticket creation, and satisfaction tracking.',
+    name: 'Adam - Customer Support Specialist',
+    description: 'Meet Adam, your dedicated customer support specialist. Expert in handling inquiries, resolving issues, and ensuring customer satisfaction.',
     category: 'customer_support',
     use_case: 'Handle customer inquiries, create support tickets, and escalate complex issues to human agents.',
-    base_prompt: `You are a professional customer support agent. Your role is to:
+    avatar_url: '/agents photos/ADAM-customerSupport.png',
+    base_prompt: `Hi! I'm Adam, your customer support specialist. I'm here to help you with any questions or concerns. My role is to:
 1. Provide helpful and accurate information about products/services
 2. Resolve customer issues efficiently and empathetically
 3. Escalate complex problems to human agents when needed
 4. Collect customer feedback and satisfaction ratings
 5. Create support tickets for tracking purposes
 
-Always maintain a friendly, professional tone and prioritize customer satisfaction.`,
+I always maintain a friendly, professional tone and prioritize your satisfaction. How can I assist you today?`,
     model: 'gpt-4o',
     settings: {
       status: 'active',
@@ -94,16 +95,17 @@ Always maintain a friendly, professional tone and prioritize customer satisfacti
     rating: 4.8,
     downloads: 1250,
     tags: ['support', 'escalation', 'tickets', 'satisfaction'],
-    created_by: 'Intaj Team',
+    created_by: 'Adam Thompson - Support Specialist',
     is_premium: false
   },
   {
     id: 'ecommerce-sales-assistant',
-    name: 'E-commerce Sales Assistant',
-    description: 'Boost your online sales with product recommendations, cart recovery, and order assistance.',
-    category: 'ecommerce',
+    name: 'Ahmed - Sales Representative',
+    description: 'Meet Ahmed, your dedicated sales representative. Expert in boosting sales with product recommendations, cart recovery, and customer conversion.',
+    category: 'sales',
     use_case: 'Product recommendations, cart abandonment recovery, order tracking, and sales conversion.',
-    base_prompt: `You are an e-commerce sales assistant. Your goals are to:
+    avatar_url: '/agents photos/AHMED-sales.png',
+    base_prompt: `Hello! I'm Ahmed, your sales representative. I'm passionate about helping you find exactly what you need. My expertise includes:
 1. Help customers find the perfect products
 2. Provide detailed product information and comparisons
 3. Assist with order tracking and shipping information
@@ -111,7 +113,7 @@ Always maintain a friendly, professional tone and prioritize customer satisfacti
 5. Upsell and cross-sell relevant products
 6. Handle return and refund inquiries
 
-Be enthusiastic about products while being helpful and honest.`,
+I'm enthusiastic about our products while being helpful and honest. Let me help you find what you're looking for!`,
     model: 'gpt-4o',
     settings: {
       status: 'active',
@@ -133,18 +135,19 @@ Be enthusiastic about products while being helpful and honest.`,
     ],
     rating: 4.9,
     downloads: 890,
-    tags: ['ecommerce', 'sales', 'recommendations', 'cart-recovery'],
-    created_by: 'Intaj Team',
+    tags: ['sales', 'recommendations', 'cart-recovery', 'conversion'],
+    created_by: 'Ahmed Hassan - Sales Representative',
     is_premium: true,
     price: 29
   },
   {
-    id: 'lead-qualification-bot',
-    name: 'Lead Qualification Bot',
-    description: 'Qualify leads, schedule meetings, and nurture prospects with intelligent conversation flows.',
+    id: 'marketing-specialist',
+    name: 'Sara - Marketing Specialist',
+    description: 'Meet Sara, your marketing specialist. Expert in lead qualification, campaign management, and customer engagement strategies.',
     category: 'sales',
-    use_case: 'Lead qualification, meeting scheduling, prospect nurturing, and CRM integration.',
-    base_prompt: `You are a lead qualification specialist. Your mission is to:
+    use_case: 'Lead qualification, meeting scheduling, prospect nurturing, and marketing campaign management.',
+    avatar_url: '/agents photos/SARA-marketing.png',
+    base_prompt: `Hi there! I'm Sara, your marketing specialist. I'm here to help grow your business through strategic marketing. My expertise includes:
 1. Engage website visitors and qualify their interest level
 2. Ask qualifying questions to understand their needs and budget
 3. Schedule meetings with sales representatives for qualified leads
@@ -152,7 +155,7 @@ Be enthusiastic about products while being helpful and honest.`,
 5. Nurture leads with relevant content and follow-ups
 6. Integrate with CRM systems for lead tracking
 
-Be conversational and consultative, not pushy.`,
+I'm conversational and consultative, never pushy. Let's discuss how I can help your business grow!`,
     model: 'gpt-4o',
     settings: {
       status: 'active',
@@ -177,18 +180,19 @@ Be conversational and consultative, not pushy.`,
     ],
     rating: 4.7,
     downloads: 650,
-    tags: ['sales', 'leads', 'qualification', 'crm', 'meetings'],
-    created_by: 'Intaj Team',
+    tags: ['marketing', 'leads', 'qualification', 'crm', 'campaigns'],
+    created_by: 'Sara Johnson - Marketing Specialist',
     is_premium: true,
     price: 49
   },
   {
     id: 'hr-onboarding-assistant',
-    name: 'HR Onboarding Assistant',
-    description: 'Streamline employee onboarding with document collection, policy explanations, and FAQ responses.',
+    name: 'Jane - HR Specialist',
+    description: 'Meet Jane, your HR specialist. Expert in employee onboarding, policy guidance, and creating a welcoming workplace experience.',
     category: 'hr',
     use_case: 'New employee onboarding, document collection, policy Q&A, and first-day assistance.',
-    base_prompt: `You are an HR onboarding assistant. Your responsibilities include:
+    avatar_url: '/agents photos/jone-HR.png',
+    base_prompt: `Hello! I'm Jane, your HR specialist. I'm here to make your onboarding experience smooth and welcoming. My responsibilities include:
 1. Welcome new employees and guide them through onboarding
 2. Explain company policies, benefits, and procedures
 3. Collect required documents and information
@@ -196,7 +200,7 @@ Be conversational and consultative, not pushy.`,
 5. Schedule meetings with HR representatives and managers
 6. Provide resources for training and development
 
-Be welcoming, informative, and supportive throughout the process.`,
+I'm here to be welcoming, informative, and supportive throughout your journey with us. Welcome to the team!`,
     model: 'gpt-4o',
     settings: {
       status: 'active',
@@ -219,50 +223,51 @@ Be welcoming, informative, and supportive throughout the process.`,
     rating: 4.6,
     downloads: 420,
     tags: ['hr', 'onboarding', 'documents', 'policies'],
-    created_by: 'Intaj Team',
+    created_by: 'Jane Smith - HR Specialist',
     is_premium: false
   },
   {
-    id: 'appointment-scheduler',
-    name: 'Smart Appointment Scheduler',
-    description: 'Automate appointment booking with calendar integration, reminders, and rescheduling capabilities.',
+    id: 'mail-manager',
+    name: 'Noah - Email Manager',
+    description: 'Meet Noah, your email management specialist. Expert in organizing emails, managing communications, and streamlining your inbox.',
     category: 'business',
-    use_case: 'Appointment scheduling, calendar management, automated reminders, and booking confirmations.',
-    base_prompt: `You are a smart appointment scheduling assistant. Your functions include:
-1. Check availability and book appointments
-2. Send confirmation and reminder messages
-3. Handle rescheduling and cancellation requests
-4. Collect necessary information before appointments
-5. Integrate with calendar systems and booking platforms
-6. Provide location and preparation instructions
+    use_case: 'Email management, inbox organization, automated responses, and communication workflow optimization.',
+    avatar_url: '/agents photos/NOAH-mailManager.png',
+    base_prompt: `Hello! I'm Noah, your email management specialist. I'm here to help you stay organized and efficient with your communications. My capabilities include:
+1. Organize and categorize your emails automatically
+2. Manage your inbox with smart filtering and sorting
+3. Handle routine email responses and acknowledgments
+4. Schedule and send follow-up emails
+5. Integrate with your calendar for meeting coordination
+6. Provide email analytics and productivity insights
 
-Be efficient and clear about scheduling details.`,
+I'm efficient and detail-oriented, ensuring nothing important gets missed. Let me help you master your inbox!`,
     model: 'gpt-4o',
     settings: {
       status: 'active',
-      calendar_integration: true,
-      reminder_system: true,
-      timezone_handling: true
+      email_integration: true,
+      auto_categorization: true,
+      response_templates: true
     },
     workflows: [
       {
-        name: 'Book Appointment',
-        triggers: [{ type: 'keyword_detected', value: 'book,schedule,appointment,meeting' }],
+        name: 'Auto-Categorize Emails',
+        triggers: [{ type: 'email_received' }],
         actions: [
-          { type: 'api_call', config: { url: '/api/calendar/availability', method: 'GET' } },
-          { type: 'collect_info', config: { fields: 'preferred_date,preferred_time,contact_info' } }
+          { type: 'api_call', config: { url: '/api/email/categorize', method: 'POST' } },
+          { type: 'apply_label', config: { label: 'auto_sorted' } }
         ]
       },
       {
-        name: 'Send Reminders',
-        triggers: [{ type: 'time_based', value: '24 hours before appointment' }],
-        actions: [{ type: 'send_message', config: { message: 'Reminder: You have an appointment tomorrow at {time}. Please confirm or reschedule if needed.' } }]
+        name: 'Send Follow-ups',
+        triggers: [{ type: 'time_based', value: '3 days after important email' }],
+        actions: [{ type: 'send_message', config: { message: 'Following up on our previous conversation. Please let me know if you need any additional information.' } }]
       }
     ],
     rating: 4.5,
     downloads: 780,
-    tags: ['scheduling', 'appointments', 'calendar', 'reminders'],
-    created_by: 'Intaj Team',
+    tags: ['email', 'organization', 'productivity', 'automation'],
+    created_by: 'Noah Williams - Email Specialist',
     is_premium: false
   }
 ];
@@ -364,6 +369,7 @@ export default function AgentTemplates() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
+              type="text"
               placeholder="Search templates..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

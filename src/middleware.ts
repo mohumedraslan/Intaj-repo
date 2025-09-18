@@ -45,15 +45,14 @@ export async function middleware(req: NextRequest) {
   
   // Check admin access for admin routes
   if (isAdminRoute && session) {
-    // Check if user has admin role
-    const { data: userRoles } = await supabase
-      .from('user_roles')
+    // Check if user has admin role in profiles table
+    const { data: profile } = await supabase
+      .from('profiles')
       .select('role')
-      .eq('user_id', session.user.id)
-      .eq('role', 'admin')
+      .eq('id', session.user.id)
       .single();
 
-    if (!userRoles) {
+    if (!profile || profile.role !== 'admin') {
       // User doesn't have admin role, redirect to unauthorized page
       return NextResponse.redirect(new URL('/unauthorized', req.url));
     }

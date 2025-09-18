@@ -170,19 +170,34 @@ try {
 - **Business KPIs** - Revenue, conversion, engagement metrics
 - **Export Functionality** - CSV/PDF report generation
 
-### 11. Troubleshooting Common Issues
+### 11. Error Handling Protocol
 
-#### TypeScript Errors
+#### When User Provides errors.md File:
+1. **Analyze the error** - Read error message, stack trace, and code frame carefully
+2. **Identify root cause** - Determine if it's hydration mismatch, type error, missing component, etc.
+3. **Fix the issue** - Apply appropriate solution based on error type
+4. **Clear errors.md** - Remove solved errors from the file after fixing
+5. **Update EDITED.md** - Document all changes made during error resolution
+
+#### Common Error Types & Solutions:
+- **Hydration Mismatches**: Server/client differences, dynamic IDs, browser extensions
+- **Type Errors**: Missing props, incorrect types, undefined values
+- **Component Errors**: Missing imports, incorrect usage, prop issues
+- **Build Errors**: Missing dependencies, configuration issues, syntax errors
+
+#### Troubleshooting Common Issues
+
+##### TypeScript Errors
 - Missing type definitions - Install @types packages
 - Import errors - Check file paths and exports
 - Interface mismatches - Update interfaces to match data structure
 
-#### Supabase Issues
+##### Supabase Issues
 - RLS policy errors - Check user permissions
 - Connection timeouts - Implement retry logic
 - Real-time subscription issues - Verify channel setup
 
-#### UI/UX Issues
+##### UI/UX Issues
 - Layout shifts - Use proper loading skeletons
 - Mobile responsiveness - Test on different screen sizes
 - Accessibility - Ensure keyboard navigation and screen reader support

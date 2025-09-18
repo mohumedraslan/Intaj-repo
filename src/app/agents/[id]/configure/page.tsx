@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bot, Settings, Brain, Database, Zap, Upload, Globe, Trash2, Plus, Save } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 // Simple Switch component
 const Switch = ({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (checked: boolean) => void }) => (
@@ -80,6 +81,167 @@ const integrations = [
   { id: 'stripe', name: 'Stripe', icon: '💳', category: 'Payment' },
   { id: 'zapier', name: 'Zapier', icon: '⚡', category: 'Automation' }
 ];
+
+// Integration Credential Form Component
+const IntegrationCredentialForm = ({ integration, agentId }: { integration: any, agentId: string }) => {
+  const [credentials, setCredentials] = useState({ token: '', source: 'new' });
+  const [loading, setLoading] = useState(false);
+
+  const saveCredentials = async () => {
+    try {
+      setLoading(true);
+      const supabaseClient = createClient();
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      
+      if (user && credentials.token) {
+        const { error } = await supabaseClient
+          .from('connections')
+          .upsert({
+            user_id: user.id,
+            platform: integration.id,
+            agent_id: agentId,
+            credentials: {
+              token: credentials.token,
+              source: credentials.source
+            },
+            created_at: new Date().toISOString()
+          });
+        
+        if (!error) {
+          alert('Credentials saved successfully!');
+        } else {
+          alert('Error saving credentials: ' + error.message);
+        }
+      }
+    } catch (error) {
+      alert('Error: ' + (error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const testCredentials = async () => {
+    if (integration.id === 'telegram') {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/integrations/telegram/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: credentials.token })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          alert(`✅ Bot test successful!\nBot Name: ${result.botInfo.first_name}\nUsername: @${result.botInfo.username}`);
+        } else {
+          alert(`❌ Bot test failed: ${result.error}`);
+        }
+      } catch (error) {
+        alert('Error testing bot: ' + (error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  return (
+    <Card className="bg-[#0a0a0b] border-gray-700">
+      <CardHeader>
+        <CardTitle className="flex items-center text-white">
+          <span className="mr-2">{integration.icon}</span>
+          {integration.name} Configuration
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <Label className="text-sm text-gray-300 mb-2 block">Credential Source</Label>
+          <Select 
+            value={credentials.source}
+            onValueChange={(value) => setCredentials(prev => ({ ...prev, source: value }))}
+          >
+            <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 border-gray-700">
+              <SelectItem value="existing" className="text-gray-200">Use Existing Credentials</SelectItem>
+              <SelectItem value="new" className="text-gray-200">Add New Credentials</SelectItem>
+              <SelectItem value="platform" className="text-gray-200">Use Platform Token</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {integration.id === 'telegram' && (
+          <div>
+            <Label className="text-sm text-gray-300">Bot Token</Label>
+            <Input 
+              type="password"
+              placeholder="Enter your Telegram bot token"
+              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              value={credentials.token}
+              onChange={(e) => setCredentials(prev => ({ ...prev, token: e.target.value }))}
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Get your bot token from @BotFather on Telegram
+            </p>
+          </div>
+        )}
+
+        {integration.id === 'whatsapp' && (
+          <div>
+            <Label className="text-sm text-gray-300">WhatsApp Business API</Label>
+            <Input 
+              type="password"
+              placeholder="Enter your WhatsApp Business API token"
+              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              value={credentials.token}
+              onChange={(e) => setCredentials(prev => ({ ...prev, token: e.target.value }))}
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Requires WhatsApp Business API access
+            </p>
+          </div>
+        )}
+
+        {!['telegram', 'whatsapp'].includes(integration.id) && (
+          <div>
+            <Label className="text-sm text-gray-300">API Key / Access Token</Label>
+            <Input 
+              type="password"
+              placeholder={`Enter your ${integration.name} credentials`}
+              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              value={credentials.token}
+              onChange={(e) => setCredentials(prev => ({ ...prev, token: e.target.value }))}
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Check {integration.name} documentation for API credentials
+            </p>
+          </div>
+        )}
+
+        <div className="flex space-x-2">
+          <Button 
+            onClick={saveCredentials}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={!credentials.token || loading}
+          >
+            {loading ? 'Saving...' : 'Save'}
+          </Button>
+          
+          {integration.id === 'telegram' && (
+            <Button 
+              onClick={testCredentials}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              disabled={!credentials.token || loading}
+            >
+              {loading ? 'Testing...' : 'Test Bot'}
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function AgentConfigurePage() {
   const router = useRouter();
@@ -445,10 +607,30 @@ export default function AgentConfigurePage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium">Knowledge Files</h3>
-                    <Button variant="outline" size="sm" className="border-gray-600">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Files
-                    </Button>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        multiple
+                        accept=".pdf,.doc,.docx,.txt,.md"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          const newFiles = files.map(file => ({
+                            name: file.name,
+                            size: file.size,
+                            type: file.type
+                          }));
+                          setFormData(prev => ({
+                            ...prev,
+                            knowledgeFiles: [...prev.knowledgeFiles, ...newFiles]
+                          }));
+                        }}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <Button variant="outline" size="sm" className="border-gray-600">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Files
+                      </Button>
+                    </div>
                   </div>
                   {formData.knowledgeFiles.length > 0 ? (
                     <div className="space-y-2">
@@ -522,27 +704,55 @@ export default function AgentConfigurePage() {
                 <CardTitle>Integrations</CardTitle>
                 <CardDescription>Connect your agent to various platforms and services</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {integrations.map((integration) => (
-                    <div
-                      key={integration.id}
-                      onClick={() => toggleIntegration(integration.id)}
-                      className={`p-4 rounded-lg border cursor-pointer transition-all ${
-                        formData.selectedIntegrations.includes(integration.id)
-                          ? 'border-blue-500 bg-blue-500/10'
-                          : 'border-gray-700 bg-[#0a0a0b] hover:border-gray-600'
-                      }`}
-                    >
-                      <div className="flex flex-col items-center space-y-2">
-                        <div className="text-2xl">{integration.icon}</div>
-                        <div className="font-medium text-center">{integration.name}</div>
-                        <Badge variant="secondary" className="text-xs">
-                          {integration.category}
-                        </Badge>
+              <CardContent className="space-y-6">
+                {/* Selected Integrations with Credential Management */}
+                {formData.selectedIntegrations.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-white">Configure Selected Integrations</h3>
+                    {formData.selectedIntegrations.map((integrationId) => {
+                      const integration = integrations.find(i => i.id === integrationId);
+                      if (!integration) return null;
+                      
+                      return (
+                        <IntegrationCredentialForm 
+                          key={integrationId}
+                          integration={integration}
+                          agentId={agentId}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Integration Selection Grid */}
+                <div>
+                  <h3 className="font-medium text-white mb-4">Available Integrations</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {integrations.map((integration) => (
+                      <div
+                        key={integration.id}
+                        onClick={() => toggleIntegration(integration.id)}
+                        className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                          formData.selectedIntegrations.includes(integration.id)
+                            ? 'border-blue-500 bg-blue-500/10'
+                            : 'border-gray-700 bg-[#0a0a0b] hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex flex-col items-center space-y-2">
+                          <div className="text-2xl">{integration.icon}</div>
+                          <div className="font-medium text-center">{integration.name}</div>
+                          <Badge variant="secondary" className="text-xs">
+                            {integration.category}
+                          </Badge>
+                          {formData.selectedIntegrations.includes(integration.id) && (
+                            <Badge className="bg-green-500/20 text-green-400 text-xs">
+                              Selected
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>

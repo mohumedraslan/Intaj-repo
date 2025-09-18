@@ -41,64 +41,62 @@ export default function ConnectionsPage() {
 
       setUser(user);
 
-      // Fetch real connections data
+      // Fetch real connections data with credentials
       const { data: connectionsData, error: connectionsError } = await supabase
         .from('connections')
-        .select('*')
+        .select('id, platform, status, credentials, created_at, updated_at')
         .eq('user_id', user.id);
 
       if (connectionsError) {
         console.error('Error fetching connections:', connectionsError);
+        setLoading(false);
+        return;
       }
 
-      // Fetch messages count for each connection
+      console.log('Fetched connections data:', connectionsData);
+
+      // Process connections data
       const connectionsWithCounts: Connection[] = [];
       
       if (connectionsData && connectionsData.length > 0) {
+        console.log('Processing connections:', connectionsData);
         for (const conn of connectionsData) {
+          // Try to get message count from multiple possible tables
+          let messageCount = 0;
+          
+          // Check messages table
           const { data: messages } = await supabase
             .from('messages')
             .select('id')
             .eq('user_id', user.id)
             .eq('channel', conn.platform.toLowerCase());
+          
+          messageCount += messages?.length || 0;
 
-          const messageCount = messages?.length || 0;
+          // Check platform-specific tables if they exist
+          if (conn.platform.toLowerCase() === 'telegram') {
+            try {
+              const { data: telegramMessages } = await supabase
+                .from('telegram_messages')
+                .select('id')
+                .eq('user_id', user.id);
+              messageCount += telegramMessages?.length || 0;
+            } catch (error) {
+              // Table might not exist yet
+            }
+          }
           
           connectionsWithCounts.push({
             id: conn.id,
-            platform: conn.platform || conn.type || 'Unknown Platform',
-            status: conn.status || 'disconnected',
+            platform: getPlatformDisplayName(conn.platform),
+            status: conn.status || 'connected',
             lastSync: getRelativeTime(conn.updated_at || conn.created_at),
             messagesCount: messageCount,
             created_at: conn.created_at,
             updated_at: conn.updated_at
           });
         }
-      } else {
-        // Show sample data when no connections exist
-        connectionsWithCounts.push(
-          {
-            id: 'sample-1',
-            platform: 'Website Chat',
-            status: 'disconnected',
-            lastSync: 'Never',
-            messagesCount: 0
-          },
-          {
-            id: 'sample-2',
-            platform: 'WhatsApp Business',
-            status: 'disconnected',
-            lastSync: 'Never',
-            messagesCount: 0
-          },
-          {
-            id: 'sample-3',
-            platform: 'Facebook Messenger',
-            status: 'disconnected',
-            lastSync: 'Never',
-            messagesCount: 0
-          }
-        );
+        console.log('Processed connections with counts:', connectionsWithCounts);
       }
 
       setConnections(connectionsWithCounts);
@@ -108,6 +106,19 @@ export default function ConnectionsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getPlatformDisplayName = (platform: string) => {
+    const platformMap: { [key: string]: string } = {
+      'telegram': 'Telegram',
+      'whatsapp': 'WhatsApp Business',
+      'facebook': 'Facebook Messenger',
+      'instagram': 'Instagram Direct',
+      'discord': 'Discord',
+      'slack': 'Slack',
+      'website': 'Website Chat'
+    };
+    return platformMap[platform.toLowerCase()] || platform;
   };
 
   const getRelativeTime = (timestamp: string) => {
