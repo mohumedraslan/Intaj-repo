@@ -168,36 +168,68 @@ export default function NewAgentPage() {
 
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('agents')
-        .insert({
-          user_id: user.id,
-          name: formData.name,
-          description: formData.description,
-          model: formData.model,
-          base_prompt: formData.base_prompt || getDefaultPrompt(formData.agent_type),
-          avatar_url: formData.avatar_url,
-          settings: {
-            agent_type: formData.agent_type,
-            status: 'active',
-            enableRAG: formData.enableRAG,
-            integrations: formData.selectedIntegrations,
-            knowledge_files: formData.knowledgeFiles,
-            website_sources: formData.websiteSources
-          }
-        })
-        .select()
-        .single();
+      // Prepare integrations payload
+      const integrations: any = {};
+      
+      // Check if Telegram is selected and has credentials
+      if (formData.selectedIntegrations.includes('telegram')) {
+        const telegramCreds = formData.integrationCredentials.telegram;
+        if (telegramCreds?.token) {
+          integrations.telegramToken = telegramCreds.token;
+          integrations.autoSetupWebhook = true;
+          integrations.baseUrl = window.location.origin;
+        }
+      }
 
-      if (error) throw error;
+      // Prepare the payload for the new /api/agents endpoint
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        base_prompt: formData.base_prompt || getDefaultPrompt(formData.agent_type),
+        model: formData.model,
+        agent_type: formData.agent_type,
+        avatar_url: formData.avatar_url,
+        settings: {
+          enableRAG: formData.enableRAG,
+          integrations: formData.selectedIntegrations,
+          knowledge_files: formData.knowledgeFiles,
+          website_sources: formData.websiteSources
+        },
+        integrations
+      };
 
-      router.push(`/agents/${data.id}/dashboard`);
+      // Call the new unified API endpoint
+      const response = await fetch('/api/agents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create agent');
+      }
+
+      const result = await response.json();
+      
+      if (result.webhook?.success) {
+        alert('Agent created successfully! Telegram webhook has been configured automatically.');
+      } else if (integrations.telegramToken) {
+        alert('Agent created successfully! Note: Telegram webhook setup failed - you may need to configure it manually.');
+      } else {
+        alert('Agent created successfully!');
+      }
+
+      router.push(`/agents/${result.agentId}/dashboard`);
     } catch (error) {
-      console.error('Error creating agent:', JSON.stringify(error, null, 2));
-      alert('Failed to create agent. Please try again.');
+      console.error('Error creating agent:', error);
+      alert(`Failed to create agent: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -977,19 +1009,37 @@ export default function NewAgentPage() {
                                         return;
                                       }
                                       
-                                      // Test Telegram bot by sending a test message
+                                      // Test Telegram bot by sending a test message to our platform bot
                                       const response = await fetch('/api/integrations/telegram/test', {
                                         method: 'POST',
                                         headers: {
                                           'Content-Type': 'application/json',
                                         },
-                                        body: JSON.stringify({ token })
+                                        body: JSON.stringify({ 
+                                          token,
+                                          agentId: null, // Will be set after agent creation
+                                          agentType: formData.agent_type || 'customer_support'
+                                        })
                                       });
                                       
                                       const result = await response.json();
                                       
                                       if (result.success) {
-                                        alert(`✅ Bot test successful!\nBot Name: ${result.botInfo.first_name}\nUsername: @${result.botInfo.username}`);
+                                        const message = `🎉 Integration Test Successful!
+
+✅ Bot Details:
+   • Name: ${result.botInfo.first_name}
+   • Username: @${result.botInfo.username || 'N/A'}
+   • Bot ID: ${result.botInfo.id}
+
+🔗 Webhook: ${result.webhook.success ? '✅ Configured' : '⏳ Will be set up after agent creation'}
+   • URL: ${result.webhook.url}
+
+📤 Test Notification: ${result.testMessage}
+
+Your Telegram bot is ready to receive and respond to messages!`;
+                                        
+                                        alert(message);
                                       } else {
                                         alert(`❌ Bot test failed: ${result.error}`);
                                       }

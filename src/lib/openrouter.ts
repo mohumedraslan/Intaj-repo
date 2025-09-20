@@ -2,34 +2,36 @@
 const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
 
 interface Message {
-  role: string;
+  role: 'system' | 'user' | 'assistant';
   content: string;
 }
 
 export async function getResponse(messages: Message[]): Promise<string> {
   try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://intaj.ai', 
-        'X-Title': 'Intaj AI Demo',
         'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://intaj.ai', // Required by OpenRouter
+        'X-Title': 'Intaj AI Platform' // Required by OpenRouter
       },
       body: JSON.stringify({
-        model: 'mistralai/mistral-7b-instruct',
+        model: 'openai/gpt-3.5-turbo', // Default model
         messages,
-      }),
+        temperature: 0.7,
+        max_tokens: 1000
+      })
     });
 
-    if (!res.ok) {
-      throw new Error(`API error: ${res.status}`);
+    if (!response.ok) {
+      throw new Error(`OpenRouter API error: ${response.status}`);
     }
 
-    const data = await res.json();
-    return data.choices[0].message.content;
+    const data = await response.json();
+    return data.choices[0]?.message?.content || "I couldn't generate a response. Please try again.";
   } catch (error) {
-    console.error('Error calling OpenRouter:', error);
+    console.error('OpenRouter API call failed:', error);
     throw error;
   }
 }
@@ -49,8 +51,10 @@ export async function streamResponse(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistralai/mistral-7b-instruct',
+        model: 'openai/gpt-4o',
         messages,
+        temperature: 0.7,
+        max_tokens: 1000,
         stream: true,
       }),
     });

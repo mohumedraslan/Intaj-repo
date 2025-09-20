@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import { useState, useRef, useId } from "react";
 import Image from "next/image";
 import { getResponse } from "../lib/openrouter";
@@ -27,9 +28,16 @@ export default function DemoChatbot() {
     setLoading(true);
 
     try {
+      if (!process.env.NEXT_PUBLIC_OPENROUTER_API_KEY) {
+        throw new Error('OpenRouter API key is missing');
+      }
+      
       // Call OpenRouter API
       const response = await getResponse([
-        { role: "system", content: "You are Intaj AI, a helpful assistant focused on explaining Intaj's AI automation platform features, integrations, and capabilities. Be concise, friendly, and enthusiastic about helping businesses automate their processes." },
+        { 
+          role: "system", 
+          content: "You are Intaj AI, a helpful assistant focused on explaining Intaj's AI automation platform features, integrations, and capabilities. Be concise, friendly, and enthusiastic about helping businesses automate their processes." 
+        },
         ...messages,
         userMsg
       ]);
@@ -39,7 +47,10 @@ export default function DemoChatbot() {
       }
     } catch (error) {
       console.error('Error getting response:', error);
-      setMessages((msgs) => [...msgs, { role: "assistant", content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment." }]);
+      setMessages((msgs) => [...msgs, { 
+        role: "assistant", 
+        content: "I'm having trouble connecting right now. Please try again later or check your OpenRouter API key in the settings."
+      }]);
     }
 
     setLoading(false);

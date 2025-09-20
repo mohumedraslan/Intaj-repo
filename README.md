@@ -45,6 +45,72 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Contributing
 See `db/DB_DESCRIPTION.md` for schema and table docs. PRs welcome!
 
+## LLM Loop
+
+The platform implements an automated message processing loop:
+
+### Flow
+1. **Inbound**: Webhook receives message → stores in `messages` table (`direction='inbound'`, `status='received'`)
+2. **Processing**: Edge Function `process-inbound` → calls LLM API → queues reply (`direction='outbound'`, `status='queued'`)
+3. **Outbound**: Edge Function `dispatch-outbound` → sends via platform APIs → updates status to `sent`
+
+### Environment Variables
+```bash
+# Required for LLM processing
+OPENROUTER_API_KEY=your_openrouter_key
+INTERNAL_ADMIN_KEY=your_secret_key
+
+# Required for Edge Function to call Next.js LLM route
+LLM_GENERATE_URL=https://yourapp.com/api/internal/llm-generate
+```
+
+### Manual Testing
+```bash
+# Test LLM generation
+curl -X POST https://yourapp.com/api/internal/llm-generate \
+  -H "Content-Type: application/json" \
+  -H "X-ADMIN-KEY: your_secret_key" \
+  -d '{"agentId": "agent_id", "messages": [{"role": "user", "content": "Hello"}]}'
+
+# Trigger inbound processing
+supabase functions invoke process-inbound
+
+# Trigger outbound dispatch
+curl -X POST https://yourapp.com/api/internal/dispatch \
+  -H "X-ADMIN-KEY: your_secret_key"
+
+# Setup Telegram webhook
+curl -X POST https://yourapp.com/api/integrations/telegram/setupWebhook \
+  -H "Content-Type: application/json" \
+  -d '{"botToken": "your_bot_token", "baseUrl": "https://yourapp.com"}'
+
+# Create agent with Telegram integration
+curl -X POST https://yourapp.com/api/agents \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_jwt" \
+  -d '{
+    "name": "Support Bot",
+    "base_prompt": "You are a helpful support assistant.",
+    "model": "gpt-4o",
+    "integrations": {
+      "telegramToken": "your_bot_token",
+      "autoSetupWebhook": true,
+      "baseUrl": "https://yourapp.com"
+    }
+  }'
+```
+
+### Deployment
+```bash
+# Deploy Edge Functions
+supabase functions deploy process-inbound --no-verify-jwt
+supabase functions deploy dispatch-outbound --no-verify-jwt
+
+# Schedule dispatcher (every 10 seconds)
+# Configure via Supabase Dashboard → Edge Functions → Cron Jobs
+# Function: dispatch-outbound, Schedule: */10 * * * * *
+```
+
 ## Links
 - [DB Schema](db/DB_DESCRIPTION.md)
 

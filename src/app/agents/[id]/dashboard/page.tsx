@@ -31,6 +31,13 @@ interface Agent {
 
 interface Message {
   id: string;
+  // Unified preferred
+  channel?: string | null;
+  direction?: 'inbound' | 'outbound' | null;
+  role?: 'user' | 'agent' | 'system' | null;
+  content_text?: string | null;
+  attachments?: any[] | null;
+  // Legacy fallback
   content: string;
   sender_type: 'user' | 'agent';
   sender_name: string;
@@ -124,74 +131,31 @@ export default function AgentDashboard() {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      // Only fetch from tables that exist - telegram_messages and whatsapp_messages might not exist yet
-      let telegramMessages = [];
-      let whatsappMessages = [];
-      let telegramError = null;
-      let whatsappError = null;
-
-      // Try to fetch Telegram messages if table exists
-      try {
-        const telegramResult = await supabase
-          .from('telegram_messages')
-          .select('*')
-          .eq('agent_id', agentId)
-          .order('created_at', { ascending: false })
-          .limit(50);
-        telegramMessages = telegramResult.data || [];
-        telegramError = telegramResult.error;
-      } catch (error) {
-        console.log('Telegram messages table not available yet');
-      }
-
-      // Try to fetch WhatsApp messages if table exists
-      try {
-        const whatsappResult = await supabase
-          .from('whatsapp_messages')
-          .select('*')
-          .eq('agent_id', agentId)
-          .order('created_at', { ascending: false })
-          .limit(50);
-        whatsappMessages = whatsappResult.data || [];
-        whatsappError = whatsappResult.error;
-      } catch (error) {
-        console.log('WhatsApp messages table not available yet');
-      }
-
+      // All messages are now in the unified messages table, no need for separate platform tables
       if (messagesError) console.error('Messages error:', messagesError.message || messagesError);
-      if (telegramError) console.error('Telegram error:', telegramError.message || telegramError);
-      if (whatsappError) console.error('WhatsApp error:', whatsappError.message || whatsappError);
 
       // Combine all messages
       const allMessages = [
-        ...(messagesData || []).map(msg => ({
-          ...msg,
-          platform: msg.channel || 'website',
-          sentiment: analyzeSentiment(msg.content),
-          resolved: msg.status === 'resolved'
-        })),
-        ...(telegramMessages || []).map(msg => ({
-          id: `telegram_${msg.id}`,
-          content: msg.message_text || msg.content,
-          sender_type: msg.from_bot ? 'agent' : 'user',
-          sender_name: msg.from_bot ? agent?.name || 'Agent' : (msg.from_first_name || 'User'),
-          created_at: msg.created_at,
-          platform: 'telegram',
-          sentiment: analyzeSentiment(msg.message_text || msg.content),
-          resolved: Math.random() > 0.4,
-          agent_id: agentId
-        })),
-        ...(whatsappMessages || []).map(msg => ({
-          id: `whatsapp_${msg.id}`,
-          content: msg.message_text || msg.content,
-          sender_type: msg.from_bot ? 'agent' : 'user', 
-          sender_name: msg.from_bot ? agent?.name || 'Agent' : (msg.from_name || 'User'),
-          created_at: msg.created_at,
-          platform: 'whatsapp',
-          sentiment: analyzeSentiment(msg.message_text || msg.content),
-          resolved: Math.random() > 0.4,
-          agent_id: agentId
-        }))
+        ...(messagesData || []).map((msg: any) => {
+          const text = msg.content_text || msg.content || '';
+          const platform = msg.channel || msg.platform || 'website';
+          const sender_type = (msg.role === 'agent' ? 'agent' : 'user') as 'agent' | 'user';
+          return {
+            id: msg.id,
+            channel: msg.channel,
+            direction: msg.direction,
+            role: msg.role,
+            content_text: msg.content_text,
+            attachments: msg.attachments,
+            content: text,
+            sender_type,
+            sender_name: msg.sender_name || (sender_type === 'agent' ? (agent?.name || 'Agent') : 'User'),
+            created_at: msg.created_at,
+            platform,
+            sentiment: analyzeSentiment(text),
+            resolved: msg.status === 'resolved'
+          } as Message;
+        })
       ];
 
       // Sort by created_at descending
@@ -581,6 +545,9 @@ export default function AgentDashboard() {
                               </span>
                             </div>
                             <p className="text-sm text-gray-300 line-clamp-2">{message.content}</p>
+                            {Array.isArray(message.attachments) && message.attachments.length > 0 && (
+                              <div className="mt-1 text-xs text-gray-400">{message.attachments.length} attachment(s)</div>
+                            )}
                             <div className="flex items-center space-x-2 mt-2">
                               <Badge className={`text-xs ${getSentimentColor(message.sentiment || 'neutral')}`}>
                                 {message.sentiment || 'neutral'}
@@ -682,6 +649,9 @@ export default function AgentDashboard() {
                             </span>
                           </div>
                           <p className="text-sm text-gray-300 mb-2">{message.content}</p>
+                          {Array.isArray(message.attachments) && message.attachments.length > 0 && (
+                            <div className="text-xs text-gray-400 mb-1">{message.attachments.length} attachment(s)</div>
+                          )}
                           <div className="flex items-center space-x-2">
                             <Badge className={`text-xs ${getSentimentColor(message.sentiment || 'neutral')}`}>
                               {message.sentiment === 'positive' && <ThumbsUp className="w-3 h-3 mr-1" />}

@@ -47,25 +47,40 @@ ON agents
 FOR DELETE
 USING (auth.uid() = user_id);
 
--- Update onboarding steps in profiles
-UPDATE profiles
-SET onboarding_steps = jsonb_set(
-  onboarding_steps,
-  '{created_first_agent}',
-  onboarding_steps->'created_first_chatbot'
-)
-WHERE onboarding_steps ? 'created_first_chatbot';
+-- Update onboarding steps in profiles (only if profiles table exists)
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.tables 
+        WHERE table_name = 'profiles' 
+        AND table_schema = 'public'
+    ) THEN
+        -- Update onboarding steps to use agent terminology
+        UPDATE profiles
+        SET onboarding_steps = jsonb_set(
+          COALESCE(onboarding_steps, '{}'::jsonb),
+          '{created_first_agent}',
+          COALESCE(onboarding_steps->'created_first_chatbot', 'true'::jsonb)
+        )
+        WHERE onboarding_steps ? 'created_first_chatbot';
 
-UPDATE profiles
-SET onboarding_steps = onboarding_steps - 'created_first_chatbot'
-WHERE onboarding_steps ? 'created_first_chatbot';
+        UPDATE profiles
+        SET onboarding_steps = onboarding_steps - 'created_first_chatbot'
+        WHERE onboarding_steps ? 'created_first_chatbot';
+        
+        RAISE NOTICE 'Updated onboarding steps in profiles table';
+    ELSE
+        RAISE NOTICE 'Profiles table does not exist, skipping onboarding steps update';
+    END IF;
+END $$;
 
--- Rename function
+-- Rename function - fix return type to match actual agents table structure
 CREATE OR REPLACE FUNCTION public.get_top_agents()
- RETURNS TABLE(id uuid, name text, description text, avatar_url text, user_id uuid, created_at timestamp with time zone, updated_at timestamp with time zone, settings jsonb, base_prompt text, model text)
+ RETURNS TABLE(id uuid, user_id uuid, name text, description text, settings jsonb, created_at timestamp with time zone, updated_at timestamp with time zone)
  LANGUAGE sql
 AS $function$
-  SELECT * FROM agents
+  SELECT id, user_id, name, description, settings, created_at, updated_at 
+  FROM agents
   ORDER BY created_at DESC
   LIMIT 10;
 $function$;

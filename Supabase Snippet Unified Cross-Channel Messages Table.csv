@@ -1,0 +1,66 @@
+table_name,column_name,data_type,is_nullable,column_default
+agents,id,uuid,NO,gen_random_uuid()
+agents,user_id,uuid,YES,null
+agents,name,text,NO,null
+agents,model,text,NO,null
+agents,settings,jsonb,YES,null
+agents,created_at,timestamp with time zone,NO,now()
+agents,description,text,YES,null
+agents,avatar_url,text,YES,null
+agents,base_prompt,text,YES,null
+agents,status,text,YES,'active'::text
+agents,updated_at,timestamp with time zone,YES,now()
+agents,agent_type,text,YES,null
+connections,id,uuid,NO,gen_random_uuid()
+connections,user_id,uuid,YES,null
+connections,agent_id,uuid,YES,null
+connections,platform,text,NO,null
+connections,active,boolean,NO,true
+connections,created_at,timestamp with time zone,NO,now()
+connections,status,text,YES,'pending'::text
+connections,config,jsonb,YES,'{}'::jsonb
+connections,name,text,YES,null
+connections,updated_at,timestamp with time zone,YES,now()
+conversations,id,uuid,NO,gen_random_uuid()
+conversations,user_id,uuid,YES,null
+conversations,agent_id,uuid,YES,null
+conversations,connection_id,uuid,YES,null
+conversations,channel,text,NO,null
+conversations,status,text,NO,'open'::text
+conversations,chat_id,text,YES,null
+conversations,first_message_at,timestamp with time zone,YES,now()
+conversations,last_message_at,timestamp with time zone,YES,null
+conversations,metadata,jsonb,NO,'{}'::jsonb
+conversations,created_at,timestamp with time zone,NO,now()
+conversations,updated_at,timestamp with time zone,NO,now()
+messages,id,uuid,NO,gen_random_uuid()
+messages,agent_id,uuid,YES,null
+messages,role,text,NO,null
+messages,content,text,NO,null
+messages,created_at,timestamp with time zone,NO,now()
+messages,user_id,uuid,YES,null
+messages,connection_id,uuid,YES,null
+messages,conversation_id,uuid,YES,null
+messages,channel,text,YES,null
+messages,platform,text,YES,null
+messages,chat_id,text,YES,null
+messages,thread_id,text,YES,null
+messages,direction,text,YES,'inbound'::text
+messages,sender_type,text,YES,null
+messages,sender_name,text,YES,null
+messages,message_type,text,YES,'text'::text
+messages,content_text,text,YES,null
+messages,content_json,jsonb,YES,null
+messages,attachments,jsonb,YES,null
+messages,external_id,text,YES,null
+messages,external_message_id,text,YES,null
+messages,external_conversation_id,text,YES,null
+messages,sender_external_id,text,YES,null
+messages,status,text,YES,'received'::text
+messages,sent_at,timestamp with time zone,YES,null
+messages,delivered_at,timestamp with time zone,YES,null
+messages,read_at,timestamp with time zone,YES,null
+messages,sentiment,text,YES,null
+messages,tags,ARRAY,YES,null
+messages,metadata,jsonb,NO,'{}'::jsonb
+messages,updated_at,timestamp with time zone,NO,now()

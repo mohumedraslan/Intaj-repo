@@ -1,0 +1,45 @@
+{
+  "Environment": "local",
+  "EndTime": "2025-09-19T21:48:52.7031238+03:00",
+  "EdgeFunctionTests": {
+    "Status": "Passed",
+    "Details": null
+  },
+  "OverallStatus": "Failed",
+  "APITests": {
+    "Status": "Partial",
+    "Details": null
+  },
+  "BaseUrl": "http://localhost:3000",
+  "DatabaseTests": {
+    "Status": "Passed",
+    "Details": [
+      "Database connectivity: OK"
+    ]
+  },
+  "Warnings": [
+    "Missing environment variables: SUPABASE_PROJECT_REF, SUPABASE_ANON_KEY, INTERNAL_ADMIN_KEY",
+    "Some API tests failed"
+  ],
+  "Duration": {
+    "Ticks": 14781271367,
+    "Days": 0,
+    "Hours": 0,
+    "Milliseconds": 127,
+    "Microseconds": 136,
+    "Nanoseconds": 700,
+    "Minutes": 24,
+    "Seconds": 38,
+    "TotalDays": 0.017107952971064815,
+    "TotalHours": 0.41059087130555555,
+    "TotalMilliseconds": 1478127.1367,
+    "TotalMicroseconds": 1478127136.7,
+    "TotalNanoseconds": 1478127136700.0,
+    "TotalMinutes": 24.635452278333332,
+    "TotalSeconds": 1478.1271367
+  },
+  "Errors": [
+    "Server connectivity failed"
+  ],
+  "StartTime": "2025-09-19T21:24:14.5759871+03:00"
+}

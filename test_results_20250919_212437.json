@@ -1,0 +1,12 @@
+{
+  "testAgentId": null,
+  "testConnectionId": null,
+  "timestamp": "2025-09-19T21:24:37Z",
+  "results": {
+    "Passed": 2,
+    "Total": 12,
+    "Skipped": 5,
+    "Failed": 5
+  },
+  "baseUrl": "-BaseUrl"
+}
