@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createApiClient } from '@/lib/supabase/server';
+import { getAgentService, getIntegrationService } from '@/services/ServiceFactory';
+import { generateCorrelationId } from '@/lib/logging/Logger';
 
 // Types for better type safety
 interface CreateAgentRequest {
@@ -40,12 +42,14 @@ interface AgentCreationResponse {
 
 export async function POST(req: NextRequest): Promise<NextResponse<AgentCreationResponse | { error: string; details?: string; debug?: any }>> {
   const startTime = Date.now();
+  const correlationId = generateCorrelationId();
   
   try {
-    const requestBody: CreateAgentRequest = await req.json();
+    const requestBody = await req.json() as CreateAgentRequest;
     const { name, base_prompt, model, agent_type, description, integrations } = requestBody;
     
     console.log('🚀 Agent Creation Request:', {
+      correlationId,
       name,
       agent_type: agent_type || 'customer_support',
       hasIntegrations: !!integrations,
@@ -57,28 +61,12 @@ export async function POST(req: NextRequest): Promise<NextResponse<AgentCreation
       return NextResponse.json({ error: 'name and base_prompt are required' }, { status: 400 });
     }
 
-    // Check if we have a Bearer token
+    // Get user authentication
     const authHeader = req.headers.get('Authorization');
     const hasBearerToken = authHeader?.startsWith('Bearer ');
-    
-    console.log('POST /api/agents - Auth Debug:', {
-      hasAuthHeader: !!authHeader,
-      hasBearerToken,
-      authHeaderLength: authHeader?.length
-    });
-    
-    // Use appropriate client based on authentication method
     const supabase = hasBearerToken ? createApiClient(req) : createClient();
     
-    // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    console.log('POST /api/agents - User Auth Result:', {
-      hasUser: !!user,
-      userId: user?.id,
-      userEmail: user?.email,
-      authError: authError?.message
-    });
     
     if (authError || !user) {
       return NextResponse.json({ 
@@ -87,159 +75,126 @@ export async function POST(req: NextRequest): Promise<NextResponse<AgentCreation
         debug: {
           hasAuthHeader: !!authHeader,
           hasBearerToken,
-          authHeaderPreview: authHeader?.substring(0, 20) + '...'
+          correlationId
         }
       }, { status: 401 });
     }
 
-    // Start transaction by creating agent first
-    const { data: agent, error: agentError } = await supabase
-      .from('agents')
-      .insert({
-        user_id: user.id,
-        name,
-        base_prompt,
-        model: model || 'gpt-4o',
-        status: 'active',
-        agent_type: agent_type || 'customer_support',
-        description: description || `AI agent: ${name}`
-      })
-      .select()
-      .single();
+    // Use service layer to create agent
+    const agentService = getAgentService();
+    const agent = await agentService.createAgent(user.id, {
+      name,
+      description: description || `AI agent: ${name}`,
+      model: model || 'gpt-4o',
+      base_prompt,
+      settings: {
+        temperature: 0.7,
+        max_tokens: 1000,
+        timeout_ms: 10000,
+        enable_rag: false
+      }
+    }, correlationId);
 
-    if (agentError) {
-      console.error('❌ Agent creation failed:', {
-        error: agentError.message,
-        code: agentError.code,
-        details: JSON.stringify(agentError, null, 2),
-        requestData: { name, base_prompt, model, agent_type }
-      });
-      return NextResponse.json({ 
-        error: 'Failed to create agent', 
-        details: agentError.message,
-        debug: { code: agentError.code, hint: agentError.hint }
-      }, { status: 500 });
-    }
-    
     console.log('✅ Agent created successfully:', {
+      correlationId,
       agentId: agent.id,
-      name: agent.name,
-      agent_type: agent.agent_type
+      name: agent.name
     });
 
-    let connectionId = null;
-    let webhookResult = null;
+    let connectionId: string | null = null;
+    let webhookResult: WebhookSetupResult | null = null;
 
     // Handle Telegram integration if provided
     if (integrations?.telegramToken) {
-      const { data: connection, error: connectionError } = await supabase
-        .from('connections')
-        .insert({
-          user_id: user.id,
+      try {
+        const integrationService = getIntegrationService();
+        const connection = await integrationService.createConnection(user.id, {
           agent_id: agent.id,
           platform: 'telegram',
-          name: `${name} - Telegram`,
           config: {
             bot_token: integrations.telegramToken
-          },
-          status: 'pending'
-        })
-        .select()
-        .single();
+          }
+        }, correlationId);
 
-      if (connectionError) {
-        // Rollback agent creation if connection fails
-        await supabase.from('agents').delete().eq('id', agent.id);
-        return NextResponse.json({ 
-          error: 'Failed to create Telegram connection', 
-          details: connectionError.message 
-        }, { status: 500 });
-      }
+        connectionId = connection.id;
 
-      connectionId = connection.id;
-
-      // Set up webhook automatically with enhanced error handling
-      if (integrations.autoSetupWebhook && integrations.baseUrl) {
-        console.log('🔗 Setting up Telegram webhook...', {
-          agentId: agent.id,
-          connectionId: connection.id,
-          baseUrl: integrations.baseUrl
-        });
-        
-        try {
-          // Add a small delay to ensure connection is fully committed
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
-          const webhookResponse = await fetch(`${req.url.split('/api/')[0]}/api/integrations/telegram/setupWebhook`, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': req.headers.get('Authorization') || ''
-            },
-            body: JSON.stringify({
-              botToken: integrations.telegramToken,
-              baseUrl: integrations.baseUrl,
-              agentId: agent.id // Pass the actual agent ID
-            })
+        // Set up webhook automatically
+        if (integrations.autoSetupWebhook && integrations.baseUrl) {
+          console.log('🔗 Setting up Telegram webhook...', {
+            correlationId,
+            agentId: agent.id,
+            connectionId: connection.id,
+            baseUrl: integrations.baseUrl
           });
-
-          if (webhookResponse.ok) {
-            webhookResult = await webhookResponse.json();
-            console.log('✅ Webhook setup successful:', {
-              agentId: agent.id,
-              webhookUrl: webhookResult.webhookUrl,
-              connectionId: webhookResult.connectionId
+          
+          try {
+            const webhookResponse = await fetch(`${req.url.split('/api/')[0]}/api/integrations/telegram/setupWebhook`, {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': req.headers.get('Authorization') || ''
+              },
+              body: JSON.stringify({
+                botToken: integrations.telegramToken,
+                baseUrl: integrations.baseUrl,
+                agentId: agent.id
+              })
             });
-            
-            // Update connection status to active
-            await supabase
-              .from('connections')
-              .update({ status: 'active' })
-              .eq('id', connection.id);
+
+            if (webhookResponse.ok) {
+              const webhookData = await webhookResponse.json() as WebhookSetupResult;
+              webhookResult = webhookData;
               
-          } else {
-            const webhookError = await webhookResponse.json();
-            console.error('❌ Webhook setup failed:', {
-              status: webhookResponse.status,
-              error: webhookError,
+              // Update connection status to active
+              await integrationService.updateConnectionStatus(
+                connection.id,
+                user.id,
+                'active',
+                undefined,
+                correlationId
+              );
+              
+            } else {
+              const webhookError = await webhookResponse.json() as { error: string };
+              webhookResult = {
+                success: false,
+                error: webhookError.error || 'Webhook setup failed',
+                agentId: agent.id,
+                connectionId: connection.id
+              };
+            }
+          } catch (webhookError) {
+            console.error('❌ Webhook setup exception:', {
+              correlationId,
+              error: webhookError instanceof Error ? webhookError.message : String(webhookError),
               agentId: agent.id,
               connectionId: connection.id
             });
             
             webhookResult = {
               success: false,
-              error: webhookError.error || 'Webhook setup failed',
+              error: 'Webhook setup failed due to network or server error',
               agentId: agent.id,
               connectionId: connection.id
             };
           }
-        } catch (webhookError) {
-          console.error('❌ Webhook setup exception:', {
-            error: webhookError instanceof Error ? webhookError.message : String(webhookError),
-            stack: webhookError instanceof Error ? webhookError.stack : undefined,
-            agentId: agent.id,
-            connectionId: connection.id
-          });
-          
-          webhookResult = {
-            success: false,
-            error: 'Webhook setup failed due to network or server error',
-            agentId: agent.id,
-            connectionId: connection.id
-          };
         }
-      } else {
-        console.log('⏭️ Skipping webhook setup:', {
-          autoSetupWebhook: integrations.autoSetupWebhook,
-          hasBaseUrl: !!integrations.baseUrl,
+      } catch (connectionError) {
+        console.error('❌ Connection creation failed:', {
+          correlationId,
+          error: connectionError instanceof Error ? connectionError.message : String(connectionError),
           agentId: agent.id
         });
+        
+        // Note: We don't rollback agent creation here as the agent is still valid
+        // The user can set up integrations later
       }
     }
 
     const executionTime = Date.now() - startTime;
     
     console.log('🎉 Agent creation completed:', {
+      correlationId,
       agentId: agent.id,
       connectionId,
       webhookSuccess: webhookResult?.success || false,
@@ -254,10 +209,10 @@ export async function POST(req: NextRequest): Promise<NextResponse<AgentCreation
       agent: {
         id: agent.id,
         name: agent.name,
-        base_prompt: agent.base_prompt,
+        base_prompt: agent.base_prompt || '',
         model: agent.model,
         status: agent.status,
-        agent_type: agent.agent_type
+        agent_type: agent_type || 'customer_support'
       },
       webhook: webhookResult
     });
@@ -266,6 +221,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<AgentCreation
     const executionTime = Date.now() - startTime;
     
     console.error('💥 Agent creation failed:', {
+      correlationId,
       error: error.message,
       stack: error.stack,
       executionTimeMs: executionTime,
@@ -275,48 +231,95 @@ export async function POST(req: NextRequest): Promise<NextResponse<AgentCreation
     return NextResponse.json({ 
       error: 'Internal server error during agent creation',
       details: error.message,
-      debug: { executionTimeMs: executionTime }
+      debug: { executionTimeMs: executionTime, correlationId }
     }, { status: 500 });
   }
 }
 
 export async function GET(req: NextRequest) {
+  const correlationId = generateCorrelationId();
+  
   try {
-    // Check if we have a Bearer token
+    // Get user authentication
     const authHeader = req.headers.get('Authorization');
     const hasBearerToken = authHeader?.startsWith('Bearer ');
-    
-    // Use appropriate client based on authentication method
     const supabase = hasBearerToken ? createApiClient(req) : createClient();
     
-    // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized', details: authError?.message }, { status: 401 });
+      return NextResponse.json({ 
+        error: 'Unauthorized', 
+        details: authError?.message,
+        debug: { correlationId }
+      }, { status: 401 });
     }
 
-    const { data: agents, error } = await supabase
-      .from('agents')
-      .select(`
-        *,
-        connections (
-          id,
-          platform,
-          name,
-          status,
-          config
-        )
-      `)
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
+    // Use service layer to get agents
+    const agentService = getAgentService();
+    const integrationService = getIntegrationService();
+    
+    const agents = await agentService.getUserAgents(user.id, correlationId);
+    
+    // Get connections for each agent
+    const agentsWithConnections = await Promise.all(
+      agents.map(async (agent) => {
+        try {
+          const connections = await integrationService.getAgentConnections(
+            agent.id,
+            user.id,
+            correlationId
+          );
+          return {
+            ...agent,
+            connections: connections.map(conn => ({
+              id: conn.id,
+              platform: conn.platform,
+              status: conn.status,
+              config: conn.config
+            }))
+          };
+        } catch (error) {
+          console.error('Failed to get connections for agent:', {
+            correlationId,
+            agentId: agent.id,
+            error: error instanceof Error ? error.message : String(error)
+          });
+          return {
+            ...agent,
+            connections: []
+          };
+        }
+      })
+    );
 
-    if (error) {
-      return NextResponse.json({ error: 'Failed to fetch agents' }, { status: 500 });
-    }
+    console.log('✅ Agents fetched successfully:', {
+      correlationId,
+      userId: user.id,
+      agentCount: agents.length,
+      timestamp: new Date().toISOString()
+    });
 
-    return NextResponse.json({ agents });
+    return NextResponse.json({ 
+      agents: agentsWithConnections,
+      metadata: {
+        correlationId,
+        count: agents.length,
+        timestamp: new Date().toISOString()
+      }
+    });
 
   } catch (error: any) {
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    console.error('💥 Failed to fetch agents:', {
+      correlationId,
+      error: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString()
+    });
+    
+    return NextResponse.json({ 
+      error: 'Internal server error while fetching agents',
+      details: error.message,
+      debug: { correlationId }
+    }, { status: 500 });
   }
 }

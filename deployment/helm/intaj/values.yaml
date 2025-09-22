@@ -1,0 +1,226 @@
+# Default values for Intaj AI Platform
+# This is a YAML-formatted file.
+
+replicaCount: 3
+
+image:
+  repository: ghcr.io/intaj/intaj
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3000"
+  prometheus.io/path: "/api/v1/metrics"
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+  hosts:
+    - host: intaj.ai
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: intaj-tls
+      hosts:
+        - intaj.ai
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - intaj
+        topologyKey: kubernetes.io/hostname
+
+# Environment configuration
+environment: production
+
+# Application configuration
+app:
+  name: intaj
+  domain: intaj.ai
+  port: 3000
+
+# Database configuration
+database:
+  host: ""
+  port: 5432
+  name: intaj_production
+  ssl: true
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: ""
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# PostgreSQL configuration (if using internal)
+postgresql:
+  enabled: false
+  auth:
+    postgresPassword: ""
+    database: intaj_production
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+
+# Monitoring
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    path: /api/v1/metrics
+
+# Health checks
+healthCheck:
+  enabled: true
+  path: /api/v1/health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Secrets
+secrets:
+  # Supabase
+  supabaseUrl: ""
+  supabaseAnonKey: ""
+  supabaseServiceRoleKey: ""
+  
+  # NextAuth
+  nextAuthSecret: ""
+  nextAuthUrl: ""
+  
+  # OpenRouter
+  openRouterApiKey: ""
+  
+  # Stripe
+  stripePublishableKey: ""
+  stripeSecretKey: ""
+  stripeWebhookSecret: ""
+  
+  # Telegram
+  telegramBotToken: ""
+  
+  # WhatsApp
+  whatsappAccessToken: ""
+  whatsappVerifyToken: ""
+  
+  # Email
+  smtpHost: ""
+  smtpPort: 587
+  smtpUser: ""
+  smtpPassword: ""
+  
+  # Monitoring
+  grafanaPassword: ""
+  prometheusPassword: ""
+
+# ConfigMap data
+config:
+  logLevel: "info"
+  nodeEnv: "production"
+  enableMetrics: "true"
+  enableTracing: "true"
+  rateLimitEnabled: "true"
+  corsOrigins: "https://intaj.ai"
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+# Network policies
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+  egress:
+    enabled: true
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Jobs for database migrations
+jobs:
+  dbMigrate:
+    enabled: true
+    image:
+      repository: ghcr.io/intaj/intaj
+      tag: "latest"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi

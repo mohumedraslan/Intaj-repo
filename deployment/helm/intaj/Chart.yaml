@@ -1,0 +1,31 @@
+apiVersion: v2
+name: intaj
+description: A Helm chart for Intaj AI Automation Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - ai
+  - automation
+  - chatbot
+  - nextjs
+  - supabase
+
+home: https://intaj.ai
+sources:
+  - https://github.com/intaj/intaj-platform
+
+maintainers:
+  - name: Intaj Team
+    email: engineering@intaj.ai
+
+dependencies:
+  - name: postgresql
+    version: 12.1.9
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: 17.3.7
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
