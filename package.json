@@ -20,7 +20,18 @@
     "test:all": "npm run test && npm run test:integration && npm run test:e2e",
     "type-check": "tsc --noEmit",
     "format:check": "prettier --check .",
-    "format:write": "prettier --write ."
+    "format:write": "prettier --write .",
+    "mvp:dev": "docker-compose -f docker-compose.mvp.yml up",
+    "mvp:build": "npm run build",
+    "mvp:deploy": "vercel --prod",
+    "mvp:functions": "supabase functions deploy process-inbound && supabase functions deploy dispatch-outbound",
+    "mvp:db:push": "supabase db push",
+    "mvp:db:reset": "supabase db reset",
+    "mvp:setup": "npm run mvp:db:push && npm run mvp:functions",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset"
   },
   "dependencies": {
     "@azure/openai": "^2.0.0",

@@ -1,0 +1,79 @@
+# MVP Docker Compose for Local Development
+# Simplified setup with Supabase local and Redis for development
+
+version: '3.8'
+
+services:
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - REDIS_URL=redis://redis:6379
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - redis
+    networks:
+      - intaj-mvp
+
+  # Redis for caching and queues
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - intaj-mvp
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Supabase Local (Optional - for complete local development)
+  supabase:
+    image: supabase/supabase:latest
+    ports:
+      - "54321:8000"  # API Gateway
+      - "54322:5432"  # PostgreSQL
+      - "54323:3000"  # Dashboard
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - JWT_SECRET=your-jwt-secret
+      - ANON_KEY=your-anon-key
+      - SERVICE_ROLE_KEY=your-service-role-key
+    volumes:
+      - supabase_data:/var/lib/postgresql/data
+      - ./supabase:/docker-entrypoint-initdb.d
+    networks:
+      - intaj-mvp
+    profiles:
+      - local-supabase
+
+volumes:
+  redis_data:
+  supabase_data:
+
+networks:
+  intaj-mvp:
+    driver: bridge
+
+# Usage:
+# Development with external Supabase: docker-compose -f docker-compose.mvp.yml up app redis
+# Full local development: docker-compose -f docker-compose.mvp.yml --profile local-supabase up
