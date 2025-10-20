@@ -262,6 +262,13 @@ export default function Header() {
                         >
                           Connections
                         </Link>
+                        <Link
+                          href="/dashboard/security"
+                          className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          Security
+                        </Link>
                         <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
                         <button
                           onClick={handleSignOut}

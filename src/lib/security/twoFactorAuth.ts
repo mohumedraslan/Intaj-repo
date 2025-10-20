@@ -1,6 +1,7 @@
 import { createHmac, randomBytes } from 'crypto';
 import QRCode from 'qrcode';
 import { base32Encode, base32Decode } from './base32';
+import { createClient } from '../supabaseClient';
 
 export interface TOTPConfig {
   secret: string;
@@ -69,17 +70,36 @@ export class TwoFactorAuth {
 // Export singleton instance
 export const twoFactorAuth = new TwoFactorAuth();
 
-// Enable 2FA for a user (stub, should update DB in real use)
+// Enable 2FA for a user
 export async function enable2FA(userId: string, token: string): Promise<boolean> {
-  // In a real implementation, fetch the secret from DB for userId
-  // For now, just verify the token against a test secret
-  // TODO: Replace with actual DB logic
-  const secret = 'JBSWY3DPEHPK3PXP'; // Replace with actual secret lookup
+  const supabase = createClient();
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('two_factor_secret')
+    .eq('id', userId)
+    .single();
+
+  if (error || !profile || !profile.two_factor_secret) {
+    console.error('Error fetching user profile or secret:', error);
+    return false;
+  }
+
   const twoFactor = new TwoFactorAuth();
-  const valid = twoFactor.verifyToken(token, secret);
-  if (!valid) return false;
-  // TODO: Update user profile in DB to set two_factor_enabled = true
-  return true;
+  const valid = twoFactor.verifyToken(token, profile.two_factor_secret);
+
+  if (valid) {
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ two_factor_enabled: true })
+      .eq('id', userId);
+    if (updateError) {
+      console.error('Error enabling 2FA:', updateError);
+      return false;
+    }
+    return true;
+  }
+
+  return false;
 }
 
 // Add setup generation method
@@ -97,5 +117,57 @@ export async function generateSetup(userId: string, issuer = 'Intaj'): Promise<T
   const backupCodes = Array.from({ length: 8 }, () =>
     Math.random().toString(36).slice(-8).toUpperCase()
   );
+
+  // Store the secret and backup codes in the user's profile
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      two_factor_secret: secret,
+      two_factor_backup_codes: backupCodes,
+    })
+    .eq('id', userId);
+
+  if (error) {
+    console.error('Error storing 2FA setup:', error);
+    throw new Error('Could not save 2FA setup.');
+  }
+
   return { secret, qrCode, backupCodes };
+}
+
+// Disable 2FA for a user
+export async function disable2FA(userId: string, token: string): Promise<boolean> {
+  const supabase = createClient();
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('two_factor_secret')
+    .eq('id', userId)
+    .single();
+
+  if (error || !profile || !profile.two_factor_secret) {
+    console.error('Error fetching user profile or secret:', error);
+    return false;
+  }
+
+  const twoFactor = new TwoFactorAuth();
+  const valid = twoFactor.verifyToken(token, profile.two_factor_secret);
+
+  if (valid) {
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        two_factor_enabled: false,
+        two_factor_secret: null,
+        two_factor_backup_codes: null,
+      })
+      .eq('id', userId);
+    if (updateError) {
+      console.error('Error disabling 2FA:', updateError);
+      return false;
+    }
+    return true;
+  }
+
+  return false;
 }
