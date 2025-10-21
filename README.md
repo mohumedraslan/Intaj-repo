@@ -1,4 +1,4 @@
-# Intaj — Automation Platform MVP (Version 1)
+# Intaj — Automation Platform MVP v0.1.3
 
 Intaj is a modern automation platform for business, sales, marketing, and content creation. It enables you to build, deploy, and manage:
 
