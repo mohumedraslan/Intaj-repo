@@ -412,6 +412,107 @@ export class WhatsAppIntegration {
       };
     }
   }
+
+  /**
+   * Initiate WhatsApp OAuth flow
+   */
+  static signInWithWhatsApp(appId: string, redirectUri: string, state: string) {
+    const scope = 'whatsapp_business_messaging,whatsapp_business_management';
+    const url = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+    window.location.href = url;
+  }
+
+  /**
+   * Exchange authorization code for access token
+   */
+  static async exchangeCodeForAccessToken(
+    code: string,
+    redirectUri: string
+  ): Promise<{ success: boolean; accessToken?: string; error?: string }> {
+    try {
+      const response = await fetch(
+        `https://graph.facebook.com/v18.0/oauth/access_token?client_id=${process.env.WHATSAPP_APP_ID}&redirect_uri=${redirectUri}&client_secret=${process.env.WHATSAPP_APP_SECRET}&code=${code}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        return {
+          success: true,
+          accessToken: data.access_token,
+        };
+      } else {
+        return {
+          success: false,
+          error: data.error?.message || 'Failed to exchange code for access token',
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Get WhatsApp business accounts
+   */
+  static async getBusinessAccounts(
+    accessToken: string
+  ): Promise<{ success: boolean; accounts?: any[]; error?: string }> {
+    try {
+      const response = await fetch(
+        `https://graph.facebook.com/v18.0/me/accounts?access_token=${accessToken}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        return {
+          success: true,
+          accounts: data.data,
+        };
+      } else {
+        return {
+          success: false,
+          error: data.error?.message || 'Failed to get business accounts',
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Get phone numbers for a WhatsApp business account
+   */
+  static async getPhoneNumbers(
+    accountId: string,
+    accessToken: string
+  ): Promise<{ success: boolean; phoneNumbers?: any[]; error?: string }> {
+    try {
+      const response = await fetch(
+        `https://graph.facebook.com/v18.0/${accountId}/phone_numbers?access_token=${accessToken}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        return {
+          success: true,
+          phoneNumbers: data.data,
+        };
+      } else {
+        return {
+          success: false,
+          error: data.error?.message || 'Failed to get phone numbers',
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
 }
 
 /**
